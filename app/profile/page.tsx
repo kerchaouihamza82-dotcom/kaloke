@@ -9,11 +9,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
-import { Camera, Mail, User, Lock, Bell, CreditCard, Award, ArrowLeft } from "lucide-react"
+import { Camera, Mail, User, Lock, Bell, CreditCard, Award, ArrowLeft, Sun, Moon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useTheme } from "@/hooks/use-theme"
 
 export default function ProfilePage() {
   const router = useRouter()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <div className="space-y-8 p-8">
@@ -90,6 +92,35 @@ export default function ProfilePage() {
 
         {/* General Tab */}
         <TabsContent value="general" className="space-y-6">
+          {/* Theme Toggle */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                Apariencia
+              </CardTitle>
+              <CardDescription>
+                Cambia entre modo oscuro y modo claro
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Modo Oscuro</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {theme === "dark"
+                      ? "Interfaz oscura activa. Cambia a modo claro."
+                      : "Interfaz clara activa. Cambia a modo oscuro."}
+                  </p>
+                </div>
+                <Switch
+                  checked={theme === "dark"}
+                  onCheckedChange={toggleTheme}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
