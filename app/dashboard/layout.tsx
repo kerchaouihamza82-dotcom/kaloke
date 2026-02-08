@@ -1,12 +1,11 @@
 'use client'
 
 import React from "react"
-
 import { AppSidebar } from '@/components/app-sidebar'
 import { AppHeader } from '@/components/app-header'
 import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 export default function DashboardLayout({
   children,
@@ -15,24 +14,14 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [tempSession, setTempSession] = useState<string | null>(null)
-  const [mounted, setMounted] = useState(false)
-
-  // Evitar hydration mismatch: solo acceder a localStorage después del mount
-  useEffect(() => {
-    setMounted(true)
-    const session = localStorage.getItem('temp_admin_session')
-    setTempSession(session)
-  }, [])
 
   useEffect(() => {
-    if (mounted && !loading && !user && !tempSession) {
+    if (!loading && !user) {
       router.push('/login')
     }
-  }, [user, loading, tempSession, router, mounted])
+  }, [user, loading, router])
 
-  // Mostrar loading mientras se monta el componente
-  if (!mounted || (loading && !tempSession)) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
@@ -43,7 +32,7 @@ export default function DashboardLayout({
     )
   }
 
-  if (!user && !tempSession) {
+  if (!user) {
     return null
   }
 

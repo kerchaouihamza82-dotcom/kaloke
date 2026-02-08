@@ -24,31 +24,27 @@ export default function CoursesPage() {
         .select('*')
         .order('created_at', { ascending: false })
       
-      if (error) {
-        console.error('[v0] Error loading courses:', error)
-        return
-      }
-      
+      if (error) return
       setCourses(data || [])
-    } catch (error) {
-      console.error('[v0] Error:', error)
+    } catch {
+      // ignore
     } finally {
       setLoading(false)
     }
   }
 
   const getLevelBadge = (level: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       beginner: 'bg-green-500/10 text-green-600 dark:text-green-400',
       intermediate: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
       advanced: 'bg-red-500/10 text-red-600 dark:text-red-400'
     }
-    const labels = {
+    const labels: Record<string, string> = {
       beginner: 'Principiante',
       intermediate: 'Intermedio',
       advanced: 'Avanzado'
     }
-    return { color: colors[level as keyof typeof colors], label: labels[level as keyof typeof labels] }
+    return { color: colors[level] || '', label: labels[level] || level }
   }
 
   if (loading) {
@@ -64,18 +60,15 @@ export default function CoursesPage() {
 
   return (
     <div className="space-y-8 p-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground">
-            Cursos Disponibles
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Marca personal, mentalidad de éxito y sublimación profesional
-          </p>
-        </div>
+      <div>
+        <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground">
+          Cursos Disponibles
+        </h1>
+        <p className="mt-2 text-muted-foreground">
+          Marca personal, mentalidad de exito y sublimacion profesional
+        </p>
       </div>
 
-      {/* Grid de Cursos */}
       {courses.length === 0 ? (
         <div className="flex min-h-[300px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
           <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -83,7 +76,7 @@ export default function CoursesPage() {
             No hay cursos disponibles
           </p>
           <p className="text-sm text-muted-foreground">
-            Los cursos aparecerán aquí cuando estén disponibles
+            Los cursos apareceran aqui cuando esten disponibles
           </p>
         </div>
       ) : (
@@ -93,11 +86,7 @@ export default function CoursesPage() {
             return (
               <Card key={course.id} className="group cursor-pointer transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <Badge className={levelBadge.color}>
-                      {levelBadge.label}
-                    </Badge>
-                  </div>
+                  <Badge className={levelBadge.color}>{levelBadge.label}</Badge>
                   <CardTitle className="mt-2">{course.title}</CardTitle>
                   <CardDescription>{course.description}</CardDescription>
                 </CardHeader>
@@ -114,7 +103,9 @@ export default function CoursesPage() {
                       <span>{levelBadge.label}</span>
                     </div>
                   </div>
-                  <Button className="mt-4 w-full">Ver Curso</Button>
+                  <Link href={`/dashboard/courses/${course.id}`}>
+                    <Button className="mt-4 w-full">Ver Curso</Button>
+                  </Link>
                 </CardContent>
               </Card>
             )

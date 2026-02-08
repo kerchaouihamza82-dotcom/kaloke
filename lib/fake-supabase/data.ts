@@ -98,6 +98,34 @@ export interface Topic {
   order_index: number
 }
 
+export interface Call {
+  id: string
+  title: string
+  description: string
+  date: string
+  time: string
+  duration_minutes: number
+  meeting_url: string
+  type: 'mentoring' | 'webinar' | 'workshop'
+  created_by: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Post {
+  id: string
+  user_id: string
+  user_name: string
+  user_avatar: string | null
+  title: string
+  content: string
+  tag: string
+  likes: number
+  replies: number
+  created_at: string
+  updated_at: string
+}
+
 // ---- Seed IDs ----
 const ADMIN_ID = '00000000-0000-0000-0000-000000000001'
 const STUDENT_ID = '00000000-0000-0000-0000-000000000002'
@@ -345,6 +373,90 @@ function createSeedData() {
     },
   ]
 
+  const calls: Call[] = [
+    {
+      id: generateId(),
+      title: 'Sesion de Mentoria Personal',
+      description: 'Reunion individual para resolver dudas y revisar tu estrategia de marca personal y contenido viral.',
+      date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+      time: '15:00',
+      duration_minutes: 60,
+      meeting_url: 'https://meet.google.com/abc-defg-hij',
+      type: 'mentoring',
+      created_by: ADMIN_ID,
+      created_at: now,
+      updated_at: now,
+    },
+    {
+      id: generateId(),
+      title: 'Estrategias de Contenido Viral 2025',
+      description: 'Webinar grupal sobre las mejores estrategias y tendencias de contenido para este ano.',
+      date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+      time: '18:00',
+      duration_minutes: 120,
+      meeting_url: 'https://meet.google.com/xyz-uvwx-rst',
+      type: 'webinar',
+      created_by: ADMIN_ID,
+      created_at: now,
+      updated_at: now,
+    },
+    {
+      id: generateId(),
+      title: 'Workshop: Crea tu Plan de Marca Personal',
+      description: 'Taller practico donde aprenderemos a crear un plan de marca personal paso a paso.',
+      date: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+      time: '16:00',
+      duration_minutes: 120,
+      meeting_url: 'https://meet.google.com/klm-nopq-stu',
+      type: 'workshop',
+      created_by: ADMIN_ID,
+      created_at: now,
+      updated_at: now,
+    },
+  ]
+
+  const posts: Post[] = [
+    {
+      id: generateId(),
+      user_id: STUDENT_ID,
+      user_name: 'Estudiante Demo',
+      user_avatar: null,
+      title: 'Cual es la mejor estrategia para viralizar contenido?',
+      content: 'Estoy comenzando a crear contenido y me gustaria saber que estrategias recomiendan para alguien que esta empezando. Tengo dudas sobre si usar reels, carruseles o hilos.',
+      tag: 'Marca Personal',
+      likes: 24,
+      replies: 12,
+      created_at: new Date(Date.now() - 7200000).toISOString(),
+      updated_at: new Date(Date.now() - 7200000).toISOString(),
+    },
+    {
+      id: generateId(),
+      user_id: ADMIN_ID,
+      user_name: 'Administrador DigiCash',
+      user_avatar: null,
+      title: 'Guia completa sobre storytelling para redes',
+      content: 'He preparado una guia detallada sobre como usar storytelling en tus publicaciones. Incluye ejemplos practicos, plantillas y consejos para conectar con tu audiencia.',
+      tag: 'Contenido',
+      likes: 45,
+      replies: 28,
+      created_at: new Date(Date.now() - 18000000).toISOString(),
+      updated_at: new Date(Date.now() - 18000000).toISOString(),
+    },
+    {
+      id: generateId(),
+      user_id: STUDENT_ID,
+      user_name: 'Estudiante Demo',
+      user_avatar: null,
+      title: 'Mi experiencia con el curso de Mentalidad de Exito',
+      content: 'Comparto mi experiencia tras completar el primer modulo. Los conceptos de reprogramacion mental son muy potentes y ya estoy viendo cambios en mi forma de pensar.',
+      tag: 'Mentalidad',
+      likes: 67,
+      replies: 34,
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      updated_at: new Date(Date.now() - 86400000).toISOString(),
+    },
+  ]
+
   return {
     users,
     passwords,
@@ -356,6 +468,8 @@ function createSeedData() {
     lesson_progress,
     community_messages,
     topics,
+    calls,
+    posts,
   }
 }
 

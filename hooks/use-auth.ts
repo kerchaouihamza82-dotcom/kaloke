@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
 
 interface Profile {
   id: string
@@ -13,24 +12,22 @@ interface Profile {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
 
-    // Get initial user
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: any) => {
       setUser(user)
       if (user) {
-        // Get user profile
         supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single()
-          .then(({ data }) => {
+          .then(({ data }: any) => {
             setProfile(data)
             setLoading(false)
           })
@@ -39,10 +36,9 @@ export function useAuth() {
       }
     })
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
       setUser(session?.user ?? null)
       if (session?.user) {
         supabase
@@ -50,7 +46,7 @@ export function useAuth() {
           .select('*')
           .eq('id', session.user.id)
           .single()
-          .then(({ data }) => {
+          .then(({ data }: any) => {
             setProfile(data)
           })
       } else {

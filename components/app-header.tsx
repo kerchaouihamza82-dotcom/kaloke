@@ -16,34 +16,17 @@ import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { EditModeToggle } from "@/components/edit-mode-toggle"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 
 export function AppHeader() {
   const { user, profile, isAdmin } = useAuth()
   const router = useRouter()
-  const [tempSession, setTempSession] = useState<string | null>(null)
 
-  // Evitar hydration mismatch
-  useEffect(() => {
-    setTempSession(localStorage.getItem('temp_admin_session'))
-  }, [])
-
-  const displayEmail = user?.email || (tempSession ? 'admin@digicash.academy' : '')
-  const displayName = profile?.full_name || (tempSession ? 'Administrador' : 'Usuario')
-  const displayInitial = displayName?.[0]?.toUpperCase() || 'A'
-  const showAdminBadge = isAdmin || tempSession
+  const displayEmail = user?.email || ''
+  const displayName = profile?.full_name || 'Usuario'
+  const displayInitial = displayName?.[0]?.toUpperCase() || 'U'
 
   async function handleSignOut() {
-    // BYPASS TEMPORAL: Limpiar sesión temporal
-    if (tempSession) {
-      localStorage.removeItem('temp_admin_session')
-      router.push('/login')
-      router.refresh()
-      return
-    }
-
     const supabase = createClient()
     await supabase.auth.signOut()
     router.push('/login')
@@ -53,12 +36,10 @@ export function AppHeader() {
   return (
     <header className="fixed left-64 right-0 top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-6">
-        {/* Mobile menu button */}
         <Button variant="ghost" size="icon" className="lg:hidden">
           <Menu className="h-5 w-5" />
         </Button>
 
-        {/* Search */}
         <div className="flex flex-1 items-center gap-4">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -70,20 +51,14 @@ export function AppHeader() {
           </div>
         </div>
 
-        {/* Right side */}
         <div className="flex items-center gap-2">
-          {/* Edit Mode Toggle */}
-          <EditModeToggle />
-          
-          {/* Admin Badge */}
-          {showAdminBadge && (
+          {isAdmin && (
             <Badge variant="secondary" className="gap-1">
               <Shield className="h-3 w-3" />
               Admin
             </Badge>
           )}
 
-          {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -98,7 +73,7 @@ export function AppHeader() {
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">Nuevo curso disponible</p>
                   <p className="text-xs text-muted-foreground">
-                    Se ha publicado un nuevo módulo en Cripto Avanzado
+                    Se ha publicado un nuevo modulo en Marca Personal
                   </p>
                 </div>
               </DropdownMenuItem>
@@ -106,18 +81,13 @@ export function AppHeader() {
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">Llamada programada</p>
                   <p className="text-xs text-muted-foreground">
-                    Tu sesión de mentoría es mañana a las 3 PM
+                    Tu sesion de mentoria es manana a las 3 PM
                   </p>
                 </div>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-center text-sm text-primary">
-                Ver todas las notificaciones
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Profile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
@@ -139,16 +109,16 @@ export function AppHeader() {
               <DropdownMenuItem asChild>
                 <Link href="/profile">Mi perfil</Link>
               </DropdownMenuItem>
-              {showAdminBadge && (
+              {isAdmin && (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link href="/admin">Panel de administración</Link>
+                    <Link href="/admin">Panel de administracion</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                Cerrar sesión
+                Cerrar sesion
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

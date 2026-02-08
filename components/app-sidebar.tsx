@@ -4,50 +4,28 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, BookOpen, Users, Video, User, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useAdmin } from "@/hooks/use-admin"
+import { useAuth } from "@/hooks/use-auth"
 
 const navItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Cursos",
-    href: "/dashboard/courses",
-    icon: BookOpen,
-  },
-  {
-    title: "Comunidad",
-    href: "/dashboard/community",
-    icon: Users,
-  },
-  {
-    title: "Llamadas",
-    href: "/dashboard/calls",
-    icon: Video,
-  },
-  {
-    title: "Perfil",
-    href: "/profile",
-    icon: User,
-  },
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Cursos", href: "/dashboard/courses", icon: BookOpen },
+  { title: "Comunidad", href: "/dashboard/community", icon: Users },
+  { title: "Llamadas", href: "/dashboard/calls", icon: Video },
+  { title: "Perfil", href: "/profile", icon: User },
 ]
 
-const adminNavItem = {
-  title: "Administración",
-  href: "/admin",
-  icon: Shield,
-}
+const adminNavItem = { title: "Administracion", href: "/admin", icon: Shield }
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { isAdmin } = useAdmin()
+  const { profile, isAdmin } = useAuth()
+
+  const displayName = profile?.full_name || 'Usuario'
+  const displayEmail = profile?.email || ''
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-sidebar-background">
       <div className="flex h-full flex-col">
-        {/* Logo */}
         <div className="flex h-16 items-center border-b border-border px-6">
           <Link href="/dashboard" className="flex items-center gap-3">
             <img 
@@ -55,16 +33,14 @@ export function AppSidebar() {
               alt="DigiCash Academy" 
               className="h-10 w-10 object-contain"
             />
-            <span className="text-lg font-semibold text-foreground">DigiCash Academy</span>
+            <span className="text-lg font-semibold text-foreground">DigiCash</span>
           </Link>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 space-y-1 p-4">
           {navItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
             const Icon = item.icon
-
             return (
               <Link
                 key={item.href}
@@ -82,7 +58,6 @@ export function AppSidebar() {
             )
           })}
           
-          {/* Admin Link */}
           {isAdmin && (
             <>
               <div className="my-2 border-t border-border" />
@@ -102,15 +77,14 @@ export function AppSidebar() {
           )}
         </nav>
 
-        {/* Footer */}
         <div className="border-t border-border p-4">
           <div className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <span className="text-sm font-medium">U</span>
+              <span className="text-sm font-medium">{displayName[0]?.toUpperCase() || 'U'}</span>
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">Usuario</p>
-              <p className="truncate text-xs text-muted-foreground">usuario@email.com</p>
+              <p className="truncate text-sm font-medium text-foreground">{displayName}</p>
+              <p className="truncate text-xs text-muted-foreground">{displayEmail}</p>
             </div>
           </div>
         </div>

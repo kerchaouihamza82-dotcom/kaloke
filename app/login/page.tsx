@@ -1,7 +1,6 @@
 'use client'
 
 import React from "react"
-
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -27,15 +26,6 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // BYPASS TEMPORAL PARA TESTING - Eliminar en producción
-      if (email === 'admin@digicash.academy' && password === 'gmjhdigicash$') {
-        // Simular sesión temporal para testing
-        localStorage.setItem('temp_admin_session', 'true')
-        router.push('/dashboard')
-        router.refresh()
-        return
-      }
-
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -43,11 +33,10 @@ export default function LoginPage() {
       })
 
       if (error) {
-        // Mejorar mensajes de error
         if (error.message.includes('Invalid login credentials')) {
-          setError('Usuario no encontrado o contraseña incorrecta. ¿Ya te registraste?')
+          setError('Usuario no encontrado o contrasena incorrecta.')
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Por favor confirma tu correo electrónico antes de iniciar sesión.')
+          setError('Por favor confirma tu correo electronico antes de iniciar sesion.')
         } else {
           setError(error.message)
         }
@@ -55,8 +44,8 @@ export default function LoginPage() {
         router.push('/dashboard')
         router.refresh()
       }
-    } catch (err) {
-      setError('Ocurrió un error inesperado')
+    } catch {
+      setError('Ocurrio un error inesperado')
     } finally {
       setLoading(false)
     }
@@ -66,9 +55,9 @@ export default function LoginPage() {
     <AuthLayout>
       <Card className="border-border">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-foreground">Iniciar Sesión</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Iniciar Sesion</CardTitle>
           <CardDescription>
-            Ingresa tu correo y contraseña para acceder
+            Ingresa tu correo y contrasena para acceder
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -80,7 +69,7 @@ export default function LoginPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
-                Correo Electrónico
+                Correo Electronico
               </Label>
               <Input
                 id="email"
@@ -95,20 +84,20 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-foreground">
-                  Contraseña
+                  Contrasena
                 </Label>
                 <Link
                   href="/forgot-password"
                   className="text-sm text-muted-foreground transition-colors hover:text-primary"
                 >
-                  ¿Olvidaste tu contraseña?
+                  Olvidaste tu contrasena?
                 </Link>
               </div>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="********"
                   className="bg-secondary pr-10 text-foreground"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -130,8 +119,14 @@ export default function LoginPage() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? 'Iniciando sesion...' : 'Iniciar Sesion'}
             </Button>
+
+            <div className="rounded-md border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
+              <p className="mb-1 font-medium text-foreground">Credenciales de prueba:</p>
+              <p>Admin: admin@digicash.academy / gmjhdigicash$</p>
+              <p>Estudiante: estudiante@digicash.academy / student123</p>
+            </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
@@ -144,9 +139,9 @@ export default function LoginPage() {
             </div>
           </div>
           <p className="text-center text-sm text-muted-foreground">
-            ¿No tienes una cuenta?{" "}
+            No tienes una cuenta?{" "}
             <Link href="/register" className="font-medium text-primary transition-colors hover:underline">
-              Regístrate
+              Registrate
             </Link>
           </p>
         </CardFooter>

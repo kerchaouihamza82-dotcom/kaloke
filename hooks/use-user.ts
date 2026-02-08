@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
 
 interface UserProfile {
   id: string
@@ -13,12 +12,8 @@ interface UserProfile {
   updated_at: string
 }
 
-interface UserWithProfile extends User {
-  profile?: UserProfile
-}
-
 export function useUser() {
-  const [user, setUser] = useState<UserWithProfile | null>(null)
+  const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -47,7 +42,7 @@ export function useUser() {
 
     getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
       if (session?.user) {
         getUser()
       } else {
