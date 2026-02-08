@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { createClient } from "@/lib/supabase/client"
+import { fakeLogin } from "@/lib/fake-auth"
 import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
@@ -27,36 +27,16 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // BYPASS TEMPORAL PARA TESTING - Eliminar en producción
-      if (email === 'admin@digicash.academy' && password === 'gmjhdigicash$') {
-        // Simular sesión temporal para testing
-        localStorage.setItem('temp_admin_session', 'true')
-        router.push('/dashboard')
-        router.refresh()
-        return
-      }
+      const { user, error: loginError } = await fakeLogin(email, password)
 
-      const supabase = createClient()
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        // Mejorar mensajes de error
-        if (error.message.includes('Invalid login credentials')) {
-          setError('Usuario no encontrado o contraseña incorrecta. ¿Ya te registraste?')
-        } else if (error.message.includes('Email not confirmed')) {
-          setError('Por favor confirma tu correo electrónico antes de iniciar sesión.')
-        } else {
-          setError(error.message)
-        }
+      if (loginError || !user) {
+        setError(loginError || 'Usuario no encontrado o contrasena incorrecta.')
       } else {
         router.push('/dashboard')
         router.refresh()
       }
     } catch (err) {
-      setError('Ocurrió un error inesperado')
+      setError('Ocurrio un error inesperado')
     } finally {
       setLoading(false)
     }

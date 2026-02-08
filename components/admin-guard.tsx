@@ -2,31 +2,30 @@
 
 import React from "react"
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
+import { initSession, isAdminUser } from '@/lib/fake-auth'
 import { Loader2 } from 'lucide-react'
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { isAdmin, loading } = useAuth()
   const router = useRouter()
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
+    initSession()
+    if (!isAdminUser()) {
       router.push('/')
+    } else {
+      setReady(true)
     }
-  }, [isAdmin, loading, router])
+  }, [router])
 
-  if (loading) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
-  }
-
-  if (!isAdmin) {
-    return null
   }
 
   return <>{children}</>

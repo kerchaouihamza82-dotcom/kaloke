@@ -2,71 +2,34 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Shield, BookOpen, Users, MessageSquare, Calendar } from 'lucide-react'
+import { Shield, BookOpen, Users } from 'lucide-react'
 import Link from 'next/link'
+import { initSession, getCurrentUser, isAdminUser } from '@/lib/fake-auth'
+import { getStats } from '@/lib/fake-store'
 
 export default function AdminPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [stats, setStats] = useState({
-    students: 0,
-    courses: 0,
-    modules: 0,
-    lessons: 0
-  })
+  const [stats, setStats] = useState({ students: 0, courses: 0, modules: 0, lessons: 0 })
   const [loading, setLoading] = useState(true)
+  const [email, setEmail] = useState('')
 
   useEffect(() => {
-    checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
-    try {
-      const supabase = createClient()
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      
-      if (!authUser) {
-        router.push('/login')
-        return
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', authUser.id)
-        .single()
-
-      if (profile?.role !== 'admin') {
-        router.push('/')
-        return
-      }
-
-      setUser({ ...authUser, profile })
-
-      // Load stats
-      const [coursesRes, modulesRes, lessonsRes] = await Promise.all([
-        supabase.from('courses').select('id', { count: 'exact', head: true }),
-        supabase.from('modules').select('id', { count: 'exact', head: true }),
-        supabase.from('lessons').select('id', { count: 'exact', head: true })
-      ])
-
-      setStats({
-        students: 0,
-        courses: coursesRes.count || 0,
-        modules: modulesRes.count || 0,
-        lessons: lessonsRes.count || 0
-      })
-    } catch (error) {
-      console.error('[v0] Error:', error)
+    initSession()
+    if (!isAdminUser()) {
       router.push('/login')
-    } finally {
-      setLoading(false)
+      return
     }
-  }
+    const user = getCurrentUser()
+    setEmail(user?.email || '')
+
+    getStats().then((s) => {
+      setStats(s)
+      setLoading(false)
+    })
+  }, [router])
 
   if (loading) {
     return (
@@ -87,7 +50,7 @@ export default function AdminPage() {
         </div>
         <div>
           <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground">
-            Panel de Administración
+            Panel de Administracion
           </h1>
           <p className="mt-1 text-muted-foreground">
             Gestiona Digicash Academy
@@ -106,15 +69,15 @@ export default function AdminPage() {
             <p className="text-xs text-muted-foreground">Cursos activos</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Módulos</CardTitle>
+            <CardTitle className="text-sm font-medium">Modulos</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.modules}</div>
-            <p className="text-xs text-muted-foreground">Módulos creados</p>
+            <p className="text-xs text-muted-foreground">Modulos creados</p>
           </CardContent>
         </Card>
 
@@ -144,7 +107,7 @@ export default function AdminPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-foreground">Gestión de Cursos</CardTitle>
+            <CardTitle className="text-foreground">Gestion de Cursos</CardTitle>
             <CardDescription>Crea, edita y organiza cursos</CardDescription>
           </CardHeader>
           <CardContent>
@@ -160,12 +123,12 @@ export default function AdminPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-foreground">Usuario Actual</CardTitle>
-            <CardDescription>Información de tu cuenta</CardDescription>
+            <CardDescription>Informacion de tu cuenta</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
               <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium text-foreground">{user?.email}</p>
+              <p className="font-medium text-foreground">{email}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Rol</p>
@@ -176,12 +139,12 @@ export default function AdminPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-foreground">Gestión de Usuarios</CardTitle>
+            <CardTitle className="text-foreground">Gestion de Usuarios</CardTitle>
             <CardDescription>Administra estudiantes</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Próximamente disponible
+              Proximamente disponible
             </p>
           </CardContent>
         </Card>

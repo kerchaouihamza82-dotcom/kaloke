@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, MessageSquare, Video, Clock, Award, TrendingUp } from "lucide-react"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
+import { getStats } from "@/lib/fake-store"
 import Image from "next/image"
 
 export default function DashboardPage() {
@@ -24,60 +24,16 @@ export default function DashboardPage() {
 
   const loadStats = async () => {
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) return
-
-      // Get courses count
-      const { count: coursesCount } = await supabase
-        .from('courses')
-        .select('id', { count: 'exact', head: true })
-
-      // Get user enrollments
-      const { count: enrollmentsCount } = await supabase
-        .from('enrollments')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-
-      // Get completed lessons count
-      const { count: completedLessons } = await supabase
-        .from('lesson_progress')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('completed', true)
-
-      // Get total lessons count
-      const { count: totalLessons } = await supabase
-        .from('lessons')
-        .select('id', { count: 'exact', head: true })
-
-      // Calculate total hours watched
-      const { data: progress } = await supabase
-        .from('lesson_progress')
-        .select('last_position_seconds')
-        .eq('user_id', user.id)
-
-      const totalSeconds = progress?.reduce((acc, p) => acc + (p.last_position_seconds || 0), 0) || 0
-      const totalHours = Math.round((totalSeconds / 3600) * 10) / 10
-
-      console.log('[v0] Dashboard stats loaded:', {
-        coursesCount,
-        enrollmentsCount,
-        completedLessons,
-        totalLessons,
-        totalHours
-      })
-
+      const s = await getStats()
       setStats({
-        coursesAvailable: coursesCount || 0,
-        coursesInProgress: enrollmentsCount || 0,
-        totalHours,
-        lessonsCompleted: completedLessons || 0,
-        totalLessons: totalLessons || 0
+        coursesAvailable: s.courses,
+        coursesInProgress: 0,
+        totalHours: 0,
+        lessonsCompleted: 0,
+        totalLessons: s.lessons,
       })
     } catch (error) {
-      console.error('[v0] Error loading stats:', error)
+      // silently fail
     } finally {
       setLoading(false)
     }

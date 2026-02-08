@@ -4,38 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { BookOpen, Clock, BarChart3 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import { getCourses, type Course } from "@/lib/fake-store"
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<any[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadCourses()
+    getCourses()
+      .then((data) => setCourses(data))
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
-
-  const loadCourses = async () => {
-    try {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('courses')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) {
-        console.error('[v0] Error loading courses:', error)
-        return
-      }
-      
-      setCourses(data || [])
-    } catch (error) {
-      console.error('[v0] Error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const getLevelBadge = (level: string) => {
     const colors = {
@@ -70,12 +52,11 @@ export default function CoursesPage() {
             Cursos Disponibles
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Marca personal, mentalidad de éxito y sublimación profesional
+            Marca personal, mentalidad de exito y sublimacion profesional
           </p>
         </div>
       </div>
 
-      {/* Grid de Cursos */}
       {courses.length === 0 ? (
         <div className="flex min-h-[300px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
           <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -83,7 +64,7 @@ export default function CoursesPage() {
             No hay cursos disponibles
           </p>
           <p className="text-sm text-muted-foreground">
-            Los cursos aparecerán aquí cuando estén disponibles
+            Los cursos apareceran aqui cuando esten disponibles
           </p>
         </div>
       ) : (

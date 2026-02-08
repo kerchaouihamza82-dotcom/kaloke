@@ -15,37 +15,21 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { fakeLogout, getCurrentUser } from "@/lib/fake-auth"
 import { EditModeToggle } from "@/components/edit-mode-toggle"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 
 export function AppHeader() {
-  const { user, profile, isAdmin } = useAuth()
+  const { isAdmin } = useAuth()
   const router = useRouter()
-  const [tempSession, setTempSession] = useState<string | null>(null)
+  const user = getCurrentUser()
 
-  // Evitar hydration mismatch
-  useEffect(() => {
-    setTempSession(localStorage.getItem('temp_admin_session'))
-  }, [])
+  const displayEmail = user?.email || ''
+  const displayName = user?.full_name || 'Usuario'
+  const displayInitial = displayName[0]?.toUpperCase() || 'U'
 
-  const displayEmail = user?.email || (tempSession ? 'admin@digicash.academy' : '')
-  const displayName = profile?.full_name || (tempSession ? 'Administrador' : 'Usuario')
-  const displayInitial = displayName?.[0]?.toUpperCase() || 'A'
-  const showAdminBadge = isAdmin || tempSession
-
-  async function handleSignOut() {
-    // BYPASS TEMPORAL: Limpiar sesión temporal
-    if (tempSession) {
-      localStorage.removeItem('temp_admin_session')
-      router.push('/login')
-      router.refresh()
-      return
-    }
-
-    const supabase = createClient()
-    await supabase.auth.signOut()
+  function handleSignOut() {
+    fakeLogout()
     router.push('/login')
     router.refresh()
   }
@@ -76,7 +60,7 @@ export function AppHeader() {
           <EditModeToggle />
           
           {/* Admin Badge */}
-          {showAdminBadge && (
+          {isAdmin && (
             <Badge variant="secondary" className="gap-1">
               <Shield className="h-3 w-3" />
               Admin
@@ -98,7 +82,7 @@ export function AppHeader() {
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">Nuevo curso disponible</p>
                   <p className="text-xs text-muted-foreground">
-                    Se ha publicado un nuevo módulo en Cripto Avanzado
+                    Se ha publicado un nuevo modulo en Cripto Avanzado
                   </p>
                 </div>
               </DropdownMenuItem>
@@ -106,7 +90,7 @@ export function AppHeader() {
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">Llamada programada</p>
                   <p className="text-xs text-muted-foreground">
-                    Tu sesión de mentoría es mañana a las 3 PM
+                    Tu sesion de mentoria es manana a las 3 PM
                   </p>
                 </div>
               </DropdownMenuItem>
@@ -139,16 +123,16 @@ export function AppHeader() {
               <DropdownMenuItem asChild>
                 <Link href="/profile">Mi perfil</Link>
               </DropdownMenuItem>
-              {showAdminBadge && (
+              {isAdmin && (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link href="/admin">Panel de administración</Link>
+                    <Link href="/admin">Panel de administracion</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                Cerrar sesión
+                Cerrar sesion
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

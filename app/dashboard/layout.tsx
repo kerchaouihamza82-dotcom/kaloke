@@ -4,35 +4,29 @@ import React from "react"
 
 import { AppSidebar } from '@/components/app-sidebar'
 import { AppHeader } from '@/components/app-header'
-import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { initSession, getCurrentUser } from '@/lib/fake-auth'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { user, loading } = useAuth()
   const router = useRouter()
-  const [tempSession, setTempSession] = useState<string | null>(null)
-  const [mounted, setMounted] = useState(false)
-
-  // Evitar hydration mismatch: solo acceder a localStorage después del mount
-  useEffect(() => {
-    setMounted(true)
-    const session = localStorage.getItem('temp_admin_session')
-    setTempSession(session)
-  }, [])
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (mounted && !loading && !user && !tempSession) {
+    initSession()
+    const user = getCurrentUser()
+    if (!user) {
       router.push('/login')
+    } else {
+      setReady(true)
     }
-  }, [user, loading, tempSession, router, mounted])
+  }, [router])
 
-  // Mostrar loading mientras se monta el componente
-  if (!mounted || (loading && !tempSession)) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
@@ -41,10 +35,6 @@ export default function DashboardLayout({
         </div>
       </div>
     )
-  }
-
-  if (!user && !tempSession) {
-    return null
   }
 
   return (
