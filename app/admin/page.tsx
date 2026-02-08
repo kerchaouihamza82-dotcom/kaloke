@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Shield, BookOpen, Users } from 'lucide-react'
 import Link from 'next/link'
-import { initSession, getCurrentUser, isAdminUser } from '@/lib/fake-auth'
-import { getStats } from '@/lib/fake-store'
+import { createClient } from '@/lib/supabase/client'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -17,18 +16,61 @@ export default function AdminPage() {
   const [email, setEmail] = useState('')
 
   useEffect(() => {
-    initSession()
-    if (!isAdminUser()) {
-      router.push('/login')
-      return
-    }
-    const user = getCurrentUser()
-    setEmail(user?.email || '')
+    async function loadData() {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
 
-    getStats().then((s) => {
-      setStats(s)
-      setLoading(false)
-    })
+        if (!user) {
+          router.push('/login')
+          return
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.role !== 'admin') {
+          router.push('/dashboard')
+          return
+        }
+
+        setEmail(user.email || '')
+
+        // Load stats
+        const { count: coursesCount } = await supabase
+          .from('courses')
+          .select('id', { count: 'exact', head: true })
+
+        const { count: modulesCount } = await supabase
+          .from('modules')
+          .select('id', { count: 'exact', head: true })
+
+        const { count: lessonsCount } = await supabase
+          .from('lessons')
+          .select('id', { count: 'exact', head: true })
+
+        const { count: studentsCount } = await supabase
+          .from('profiles')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'student')
+
+        setStats({
+          courses: coursesCount || 0,
+          modules: modulesCount || 0,
+          lessons: lessonsCount || 0,
+          students: studentsCount || 0,
+        })
+      } catch (error) {
+        console.error('Error loading admin data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
   }, [router])
 
   if (loading) {

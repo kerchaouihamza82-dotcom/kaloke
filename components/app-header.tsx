@@ -15,21 +15,22 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
-import { fakeLogout, getCurrentUser } from "@/lib/fake-auth"
+import { createClient } from "@/lib/supabase/client"
 import { EditModeToggle } from "@/components/edit-mode-toggle"
 import Link from "next/link"
 
 export function AppHeader() {
-  const { isAdmin } = useAuth()
+  const { user, profile, isAdmin } = useAuth()
   const router = useRouter()
-  const user = getCurrentUser()
 
-  const displayEmail = user?.email || ''
-  const displayName = user?.full_name || 'Usuario'
+  const displayEmail = profile?.email || user?.email || ''
+  const displayName = profile?.full_name || 'Usuario'
   const displayInitial = displayName[0]?.toUpperCase() || 'U'
 
-  function handleSignOut() {
-    fakeLogout()
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    localStorage.removeItem('temp_admin_session')
     router.push('/login')
     router.refresh()
   }

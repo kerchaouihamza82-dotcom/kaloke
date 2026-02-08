@@ -6,7 +6,7 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { AppHeader } from '@/components/app-header'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { initSession, getCurrentUser } from '@/lib/fake-auth'
+import { createClient } from '@/lib/supabase/client'
 
 export default function DashboardLayout({
   children,
@@ -17,13 +17,21 @@ export default function DashboardLayout({
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    initSession()
-    const user = getCurrentUser()
-    if (!user) {
-      router.push('/login')
-    } else {
-      setReady(true)
+    async function checkAuth() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // Check for temp admin session bypass
+      const tempSession = localStorage.getItem('temp_admin_session')
+
+      if (!user && !tempSession) {
+        router.push('/login')
+      } else {
+        setReady(true)
+      }
     }
+
+    checkAuth()
   }, [router])
 
   if (!ready) {

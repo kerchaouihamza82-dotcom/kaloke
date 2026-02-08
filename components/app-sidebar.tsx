@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { LayoutDashboard, BookOpen, Users, Video, User, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAdmin } from "@/hooks/use-admin"
-import { getCurrentUser } from "@/lib/fake-auth"
+import { useAuth } from "@/hooks/use-auth"
 
 const navItems = [
   {
@@ -44,7 +44,7 @@ const adminNavItem = {
 export function AppSidebar() {
   const pathname = usePathname()
   const { isAdmin } = useAdmin()
-  const user = getCurrentUser()
+  const { profile } = useAuth()
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-sidebar-background">
@@ -108,11 +108,11 @@ export function AppSidebar() {
         <div className="border-t border-border p-4">
           <div className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <span className="text-sm font-medium">{user?.full_name?.[0] || 'U'}</span>
+              <span className="text-sm font-medium">{profile?.full_name?.[0] || 'U'}</span>
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">{user?.full_name || 'Usuario'}</p>
-              <p className="truncate text-xs text-muted-foreground">{user?.email || 'usuario@email.com'}</p>
+              <p className="truncate text-sm font-medium text-foreground">{profile?.full_name || 'Usuario'}</p>
+              <p className="truncate text-xs text-muted-foreground">{profile?.email || 'usuario@email.com'}</p>
             </div>
           </div>
         </div>

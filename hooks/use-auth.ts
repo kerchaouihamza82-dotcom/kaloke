@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { initSession, getCurrentUser, type FakeUser } from '@/lib/fake-auth'
+import { createClient } from '@/lib/supabase/client'
 
 interface Profile {
   id: string
@@ -12,23 +12,44 @@ interface Profile {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<FakeUser | null>(null)
+  const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const u = initSession()
-    setUser(u)
-    if (u) {
-      setProfile({
-        id: u.id,
-        email: u.email,
-        full_name: u.full_name,
-        role: u.role,
-        avatar_url: null,
-      })
+    const supabase = createClient()
+
+    async function getUser() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
+
+        if (user) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+          setProfile(profileData)
+        }
+      } catch (error) {
+        console.error('Error getting user:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-    setLoading(false)
+
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      if (!session?.user) {
+        setProfile(null)
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const isAdmin = profile?.role === 'admin'

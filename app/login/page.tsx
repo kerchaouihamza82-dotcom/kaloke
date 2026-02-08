@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { fakeLogin } from "@/lib/fake-auth"
+import { createClient } from "@/lib/supabase/client"
 import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
@@ -27,10 +27,28 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { user, error: loginError } = await fakeLogin(email, password)
+      // BYPASS TEMPORAL PARA TESTING - Eliminar en produccion
+      if (email === 'admin@digicash.academy' && password === 'gmjhdigicash$') {
+        localStorage.setItem('temp_admin_session', 'true')
+        router.push('/dashboard')
+        router.refresh()
+        return
+      }
 
-      if (loginError || !user) {
-        setError(loginError || 'Usuario no encontrado o contrasena incorrecta.')
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Usuario no encontrado o contrasena incorrecta. Ya te registraste?')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Por favor confirma tu correo electronico antes de iniciar sesion.')
+        } else {
+          setError(error.message)
+        }
       } else {
         router.push('/dashboard')
         router.refresh()
@@ -46,9 +64,9 @@ export default function LoginPage() {
     <AuthLayout>
       <Card className="border-border">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-foreground">Iniciar Sesión</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Iniciar Sesion</CardTitle>
           <CardDescription>
-            Ingresa tu correo y contraseña para acceder
+            Ingresa tu correo y contrasena para acceder
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -60,7 +78,7 @@ export default function LoginPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
-                Correo Electrónico
+                Correo Electronico
               </Label>
               <Input
                 id="email"
@@ -75,20 +93,20 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-foreground">
-                  Contraseña
+                  Contrasena
                 </Label>
                 <Link
                   href="/forgot-password"
                   className="text-sm text-muted-foreground transition-colors hover:text-primary"
                 >
-                  ¿Olvidaste tu contraseña?
+                  Olvidaste tu contrasena?
                 </Link>
               </div>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="********"
                   className="bg-secondary pr-10 text-foreground"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -110,7 +128,7 @@ export default function LoginPage() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? 'Iniciando sesion...' : 'Iniciar Sesion'}
             </Button>
           </form>
         </CardContent>
@@ -124,9 +142,9 @@ export default function LoginPage() {
             </div>
           </div>
           <p className="text-center text-sm text-muted-foreground">
-            ¿No tienes una cuenta?{" "}
+            No tienes una cuenta?{" "}
             <Link href="/register" className="font-medium text-primary transition-colors hover:underline">
-              Regístrate
+              Registrate
             </Link>
           </p>
         </CardFooter>

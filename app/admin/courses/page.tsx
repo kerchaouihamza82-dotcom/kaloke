@@ -13,35 +13,39 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus, Pencil, Trash2, FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import {
-  getCourses,
-  createCourse,
-  updateCourse,
-  deleteCourse,
-  getModulesCountForCourse,
-  type Course,
-} from '@/lib/fake-store'
+import { createClient } from '@/lib/supabase/client'
 
-interface CourseWithCount extends Course {
-  modules_count: number
+interface Course {
+  id: string
+  title: string
+  description: string
+  level: 'beginner' | 'intermediate' | 'advanced'
+  duration_hours: number
+  modules_count?: number
 }
 
 export default function AdminCoursesPage() {
-  const [courses, setCourses] = useState<CourseWithCount[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
 
   const loadCourses = useCallback(async () => {
     try {
-      const data = await getCourses()
-      const withCounts = await Promise.all(
-        data.map(async (c) => ({
-          ...c,
-          modules_count: await getModulesCountForCourse(c.id),
-        }))
-      )
-      setCourses(withCounts)
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*, modules(count)')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      const coursesWithCount = (data || []).map((c: any) => ({
+        ...c,
+        modules_count: c.modules?.[0]?.count || 0,
+      }))
+
+      setCourses(coursesWithCount)
     } catch (error) {
       toast.error('Error al cargar cursos')
     } finally {
@@ -60,16 +64,27 @@ export default function AdminCoursesPage() {
     const courseData = {
       title: formData.get('title') as string,
       description: formData.get('description') as string,
-      level: formData.get('level') as 'beginner' | 'intermediate' | 'advanced',
+      level: formData.get('level') as string,
       duration_hours: parseFloat(formData.get('duration_hours') as string),
     }
 
     try {
+      const supabase = createClient()
+
       if (editingCourse) {
-        await updateCourse(editingCourse.id, courseData)
+        const { error } = await supabase
+          .from('courses')
+          .update(courseData)
+          .eq('id', editingCourse.id)
+
+        if (error) throw error
         toast.success('Curso actualizado exitosamente')
       } else {
-        await createCourse(courseData)
+        const { error } = await supabase
+          .from('courses')
+          .insert(courseData)
+
+        if (error) throw error
         toast.success('Curso creado exitosamente')
       }
 
@@ -85,7 +100,9 @@ export default function AdminCoursesPage() {
     if (!confirm('Estas seguro de eliminar este curso? Se eliminaran todos sus modulos y lecciones.')) return
 
     try {
-      await deleteCourse(courseId)
+      const supabase = createClient()
+      const { error } = await supabase.from('courses').delete().eq('id', courseId)
+      if (error) throw error
       toast.success('Curso eliminado')
       loadCourses()
     } catch (error) {

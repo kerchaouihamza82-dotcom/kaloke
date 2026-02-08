@@ -4,7 +4,7 @@ import React from "react"
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { initSession, isAdminUser } from '@/lib/fake-auth'
+import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -12,12 +12,33 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    initSession()
-    if (!isAdminUser()) {
-      router.push('/')
-    } else {
-      setReady(true)
+    async function checkAdmin() {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (!user) {
+          router.push('/login')
+          return
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.role !== 'admin') {
+          router.push('/')
+        } else {
+          setReady(true)
+        }
+      } catch (error) {
+        router.push('/login')
+      }
     }
+
+    checkAdmin()
   }, [router])
 
   if (!ready) {
