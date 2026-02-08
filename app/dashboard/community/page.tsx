@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { MessageSquare, ThumbsUp, Users, Plus, Trash2, Send } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { createClient } from "@/lib/supabase/client"
-import { addRealtimeSubscription } from "@/lib/fake-supabase/client"
 import { toast } from 'sonner'
 
 export default function CommunityPage() {
@@ -29,15 +28,6 @@ export default function CommunityPage() {
   useEffect(() => {
     loadPosts()
     loadMessages()
-
-    // Subscribe to realtime messages
-    const unsub = addRealtimeSubscription('community_messages', (payload) => {
-      if (payload.eventType === 'INSERT') {
-        setMessages((prev) => [...prev, payload.new])
-      }
-    })
-
-    return () => { unsub() }
   }, [])
 
   useEffect(() => {

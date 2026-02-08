@@ -1,10 +1,9 @@
-// ==========================================================
-// Supabase Client – Simulation Layer
-// Swap this file's contents with the real createBrowserClient
-// when connecting to production Supabase.
-// ==========================================================
-import { createFakeClient } from '@/lib/fake-supabase/client'
+import { createBrowserClient } from '@supabase/ssr'
+import { supabaseConfig } from './config'
 
 export function createClient() {
-  return createFakeClient()
+  return createBrowserClient(
+    supabaseConfig.url,
+    supabaseConfig.anonKey
+  )
 }

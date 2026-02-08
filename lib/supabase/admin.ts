@@ -1,9 +1,15 @@
-// ==========================================================
-// Supabase Admin Client – Simulation Layer
-// In production, replace with createClient using SERVICE_ROLE_KEY.
-// ==========================================================
-import { createFakeClient } from '@/lib/fake-supabase/client'
+import { createClient } from '@supabase/supabase-js'
+import { supabaseConfig } from './config'
 
 export function createAdminClient() {
-  return createFakeClient()
+  return createClient(
+    supabaseConfig.url,
+    supabaseConfig.serviceRoleKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
 }
