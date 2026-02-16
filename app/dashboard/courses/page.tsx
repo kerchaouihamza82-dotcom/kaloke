@@ -3,13 +3,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { BookOpen, Clock, BarChart3 } from "lucide-react"
+import { BookOpen, User, Tag } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 
+interface Curso {
+  id: string
+  titulo: string
+  descripcion: string
+  instructor: string
+  categoria: string
+  fecha_creacion: string
+}
+
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<any[]>([])
+  const [courses, setCourses] = useState<Curso[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -20,9 +29,9 @@ export default function CoursesPage() {
     try {
       const supabase = createClient()
       const { data, error } = await supabase
-        .from('courses')
+        .from('cursos')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('fecha_creacion', { ascending: false })
       
       if (error) {
         console.error('[v0] Error loading courses:', error)
@@ -35,20 +44,6 @@ export default function CoursesPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const getLevelBadge = (level: string) => {
-    const colors = {
-      beginner: 'bg-green-500/10 text-green-600 dark:text-green-400',
-      intermediate: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
-      advanced: 'bg-red-500/10 text-red-600 dark:text-red-400'
-    }
-    const labels = {
-      beginner: 'Principiante',
-      intermediate: 'Intermedio',
-      advanced: 'Avanzado'
-    }
-    return { color: colors[level as keyof typeof colors], label: labels[level as keyof typeof labels] }
   }
 
   if (loading) {
@@ -70,7 +65,7 @@ export default function CoursesPage() {
             Cursos Disponibles
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Marca personal, mentalidad de éxito y sublimación profesional
+            Explora nuestro catálogo de cursos y comienza a aprender
           </p>
         </div>
       </div>
@@ -88,37 +83,32 @@ export default function CoursesPage() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => {
-            const levelBadge = getLevelBadge(course.level)
-            return (
-              <Card key={course.id} className="group cursor-pointer transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
+          {courses.map((course) => (
+            <Link key={course.id} href={`/dashboard/courses/${course.id}`}>
+              <Card className="group h-full cursor-pointer transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
                 <CardHeader>
                   <div className="flex items-start justify-between">
-                    <Badge className={levelBadge.color}>
-                      {levelBadge.label}
+                    <Badge className="bg-primary/10 text-primary">
+                      {course.categoria}
                     </Badge>
                   </div>
-                  <CardTitle className="mt-2">{course.title}</CardTitle>
-                  <CardDescription>{course.description}</CardDescription>
+                  <CardTitle className="mt-2">{course.titulo}</CardTitle>
+                  <CardDescription className="line-clamp-2">{course.descripcion}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {course.duration_hours && (
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{course.duration_hours}h</span>
-                      </div>
-                    )}
                     <div className="flex items-center gap-1">
-                      <BarChart3 className="h-4 w-4" />
-                      <span>{levelBadge.label}</span>
+                      <User className="h-4 w-4" />
+                      <span>{course.instructor}</span>
                     </div>
                   </div>
-                  <Button className="mt-4 w-full">Ver Curso</Button>
+                  <Button className="mt-4 w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                    Ver Curso
+                  </Button>
                 </CardContent>
               </Card>
-            )
-          })}
+            </Link>
+          ))}
         </div>
       )}
     </div>

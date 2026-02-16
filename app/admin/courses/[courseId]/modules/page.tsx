@@ -17,16 +17,15 @@ import { useParams } from 'next/navigation'
 
 interface Module {
   id: string
-  title: string
-  description: string
-  order_index: number
-  lessons_count?: number
+  titulo: string
+  orden_index: number
+  sesiones_count?: number
 }
 
 interface Course {
   id: string
-  title: string
-  description: string
+  titulo: string
+  descripcion: string
 }
 
 export default function CourseModulesPage() {
@@ -49,7 +48,7 @@ export default function CourseModulesPage() {
       
       // Load course info
       const { data: courseData, error: courseError } = await supabase
-        .from('courses')
+        .from('cursos')
         .select('*')
         .eq('id', courseId)
         .single()
@@ -59,19 +58,19 @@ export default function CourseModulesPage() {
 
       // Load modules
       const { data: modulesData, error: modulesError } = await supabase
-        .from('modules')
+        .from('modulos')
         .select(`
           *,
-          lessons:lessons(count)
+          sesiones:sesiones(count)
         `)
-        .eq('course_id', courseId)
-        .order('order_index', { ascending: true })
+        .eq('curso_id', courseId)
+        .order('orden_index', { ascending: true })
 
       if (modulesError) throw modulesError
 
       const formattedModules = modulesData?.map(module => ({
         ...module,
-        lessons_count: module.lessons?.[0]?.count || 0
+        sesiones_count: module.sesiones?.[0]?.count || 0
       }))
 
       setModules(formattedModules || [])
@@ -88,10 +87,9 @@ export default function CourseModulesPage() {
     const formData = new FormData(e.currentTarget)
     
     const moduleData = {
-      course_id: courseId,
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      order_index: editingModule?.order_index || modules.length + 1
+      curso_id: courseId,
+      titulo: formData.get('titulo') as string,
+      orden_index: editingModule?.orden_index || modules.length + 1
     }
 
     try {
@@ -99,7 +97,7 @@ export default function CourseModulesPage() {
 
       if (editingModule) {
         const { error } = await supabase
-          .from('modules')
+          .from('modulos')
           .update(moduleData)
           .eq('id', editingModule.id)
 
@@ -107,7 +105,7 @@ export default function CourseModulesPage() {
         toast.success('Módulo actualizado')
       } else {
         const { error } = await supabase
-          .from('modules')
+          .from('modulos')
           .insert([moduleData])
 
         if (error) throw error
@@ -124,12 +122,12 @@ export default function CourseModulesPage() {
   }
 
   const handleDelete = async (moduleId: string) => {
-    if (!confirm('¿Eliminar este módulo y todas sus lecciones?')) return
+    if (!confirm('¿Eliminar este módulo y todas sus sesiones?')) return
 
     try {
       const supabase = createClient()
       const { error } = await supabase
-        .from('modules')
+        .from('modulos')
         .delete()
         .eq('id', moduleId)
 
@@ -153,7 +151,7 @@ export default function CourseModulesPage() {
         </Link>
         <div className="flex-1">
           <h1 className="text-balance text-3xl font-bold tracking-tight">
-            {course?.title}
+            {course?.titulo}
           </h1>
           <p className="mt-2 text-muted-foreground">
             Gestiona los módulos del curso
@@ -175,21 +173,13 @@ export default function CourseModulesPage() {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título del Módulo</Label>
+                <Label htmlFor="titulo">Título del Módulo</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  defaultValue={editingModule?.title}
+                  id="titulo"
+                  name="titulo"
+                  defaultValue={editingModule?.titulo}
+                  placeholder="Ej: Introducción al Trading"
                   required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  rows={3}
-                  defaultValue={editingModule?.description}
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -237,11 +227,8 @@ export default function CourseModulesPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-lg">
-                          Módulo {index + 1}: {module.title}
+                          Módulo {index + 1}: {module.titulo}
                         </CardTitle>
-                        {module.description && (
-                          <CardDescription className="mt-1">{module.description}</CardDescription>
-                        )}
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -271,12 +258,12 @@ export default function CourseModulesPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {module.lessons_count || 0} lecciones
+                    {module.sesiones_count || 0} sesiones
                   </span>
                   <Link href={`/admin/courses/${courseId}/modules/${module.id}/lessons`}>
                     <Button size="sm">
                       <Video className="mr-2 h-4 w-4" />
-                      Gestionar Lecciones
+                      Gestionar Sesiones
                     </Button>
                   </Link>
                 </div>

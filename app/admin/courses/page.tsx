@@ -17,10 +17,12 @@ import Link from 'next/link'
 
 interface Course {
   id: string
-  title: string
-  description: string
-  level: 'beginner' | 'intermediate' | 'advanced'
-  duration_hours: number
+  titulo: string
+  descripcion: string
+  instructor: string
+  categoria: string
+  url_del_curso?: string
+  fecha_creacion?: string
   modules_count?: number
 }
 
@@ -38,18 +40,18 @@ export default function AdminCoursesPage() {
     try {
       const supabase = createClient()
       const { data, error } = await supabase
-        .from('courses')
+        .from('cursos')
         .select(`
           *,
-          modules:modules(count)
+          modulos:modulos(count)
         `)
-        .order('created_at', { ascending: false })
+        .order('fecha_creacion', { ascending: false })
 
       if (error) throw error
 
       const formattedCourses = data?.map(course => ({
         ...course,
-        modules_count: course.modules?.[0]?.count || 0
+        modules_count: course.modulos?.[0]?.count || 0
       }))
 
       setCourses(formattedCourses || [])
@@ -66,10 +68,12 @@ export default function AdminCoursesPage() {
     const formData = new FormData(e.currentTarget)
     
     const courseData = {
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      level: formData.get('level') as string,
-      duration_hours: parseFloat(formData.get('duration_hours') as string)
+      titulo: formData.get('titulo') as string,
+      descripcion: formData.get('descripcion') as string,
+      instructor: formData.get('instructor') as string,
+      categoria: formData.get('categoria') as string,
+      url_del_curso: formData.get('url_del_curso') as string || null,
+      fecha_creacion: new Date().toISOString()
     }
 
     try {
@@ -77,7 +81,7 @@ export default function AdminCoursesPage() {
 
       if (editingCourse) {
         const { error } = await supabase
-          .from('courses')
+          .from('cursos')
           .update(courseData)
           .eq('id', editingCourse.id)
 
@@ -85,7 +89,7 @@ export default function AdminCoursesPage() {
         toast.success('Curso actualizado exitosamente')
       } else {
         const { error } = await supabase
-          .from('courses')
+          .from('cursos')
           .insert([courseData])
 
         if (error) throw error
@@ -102,12 +106,12 @@ export default function AdminCoursesPage() {
   }
 
   const handleDelete = async (courseId: string) => {
-    if (!confirm('¿Estás seguro de eliminar este curso? Se eliminarán todos sus módulos y lecciones.')) return
+    if (!confirm('¿Estás seguro de eliminar este curso? Se eliminarán todos sus módulos y sesiones.')) return
 
     try {
       const supabase = createClient()
       const { error } = await supabase
-        .from('courses')
+        .from('cursos')
         .delete()
         .eq('id', courseId)
 
@@ -147,49 +151,57 @@ export default function AdminCoursesPage() {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título del Curso</Label>
+                <Label htmlFor="titulo">Título del Curso</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  defaultValue={editingCourse?.title}
+                  id="titulo"
+                  name="titulo"
+                  defaultValue={editingCourse?.titulo}
+                  placeholder="Ej: Fundamentos de Trading"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
+                <Label htmlFor="descripcion">Descripción</Label>
                 <Textarea
-                  id="description"
-                  name="description"
+                  id="descripcion"
+                  name="descripcion"
                   rows={3}
-                  defaultValue={editingCourse?.description}
+                  defaultValue={editingCourse?.descripcion}
+                  placeholder="Describe el contenido del curso..."
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="level">Nivel</Label>
-                  <Select name="level" defaultValue={editingCourse?.level || 'beginner'} required>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Principiante</SelectItem>
-                      <SelectItem value="intermediate">Intermedio</SelectItem>
-                      <SelectItem value="advanced">Avanzado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="duration_hours">Duración (horas)</Label>
+                  <Label htmlFor="instructor">Instructor</Label>
                   <Input
-                    id="duration_hours"
-                    name="duration_hours"
-                    type="number"
-                    step="0.5"
-                    defaultValue={editingCourse?.duration_hours}
+                    id="instructor"
+                    name="instructor"
+                    defaultValue={editingCourse?.instructor}
+                    placeholder="Nombre del instructor"
                     required
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="categoria">Categoría</Label>
+                  <Input
+                    id="categoria"
+                    name="categoria"
+                    defaultValue={editingCourse?.categoria}
+                    placeholder="Ej: Trading, Inversión"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="url_del_curso">URL del Curso (opcional)</Label>
+                <Input
+                  id="url_del_curso"
+                  name="url_del_curso"
+                  type="url"
+                  defaultValue={editingCourse?.url_del_curso}
+                  placeholder="https://..."
+                />
               </div>
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
@@ -230,20 +242,20 @@ export default function AdminCoursesPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{course.title}</CardTitle>
-                    <CardDescription className="mt-1">{course.description}</CardDescription>
+                    <CardTitle className="text-lg">{course.titulo}</CardTitle>
+                    <CardDescription className="mt-1">{course.descripcion}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Nivel:</span>
-                    <span className="font-medium capitalize">{course.level}</span>
+                    <span className="text-muted-foreground">Instructor:</span>
+                    <span className="font-medium">{course.instructor}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Duración:</span>
-                    <span className="font-medium">{course.duration_hours}h</span>
+                    <span className="text-muted-foreground">Categoría:</span>
+                    <span className="font-medium">{course.categoria}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Módulos:</span>
