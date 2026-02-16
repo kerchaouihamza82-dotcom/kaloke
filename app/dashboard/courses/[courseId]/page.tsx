@@ -320,17 +320,17 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Contenido del curso */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle>Contenido del Curso</CardTitle>
-              <CardDescription>
-                {modules.length} módulos • {getTotalSesiones()} sesiones
-              </CardDescription>
-            </div>
-            {isAdmin && (
+      {/* Contenido del curso - Solo visible para admins */}
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Contenido del Curso</CardTitle>
+                <CardDescription>
+                  {modules.length} módulos • {getTotalSesiones()} sesiones
+                </CardDescription>
+              </div>
               <Dialog open={moduleDialogOpen} onOpenChange={setModuleDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => setEditingModule(null)} size="sm">
@@ -367,9 +367,8 @@ export default function CourseDetailPage() {
                   </form>
                 </DialogContent>
               </Dialog>
-            )}
-          </div>
-        </CardHeader>
+            </div>
+          </CardHeader>
         <CardContent>
           {modules.length === 0 ? (
             <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
@@ -499,6 +498,7 @@ export default function CourseDetailPage() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Dialog para Sesiones */}
       {isAdmin && (
