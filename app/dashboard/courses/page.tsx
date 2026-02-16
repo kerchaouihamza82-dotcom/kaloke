@@ -3,10 +3,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { BookOpen, User, Tag } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { BookOpen, User, Plus, Pencil, Trash2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import { useAdmin } from "@/hooks/use-admin"
+import { toast } from "sonner"
 
 interface Curso {
   id: string
@@ -20,6 +26,9 @@ interface Curso {
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Curso[]>([])
   const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingCourse, setEditingCourse] = useState<Curso | null>(null)
+  const { isAdmin } = useAdmin()
 
   useEffect(() => {
     loadCourses()
@@ -46,6 +55,77 @@ export default function CoursesPage() {
     }
   }
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    const courseData = {
+      titulo: formData.get('titulo') as string,
+      descripcion: formData.get('descripcion') as string,
+      instructor: formData.get('instructor') as string,
+      categoria: formData.get('categoria') as string,
+      url_del_curso: formData.get('url_del_curso') as string || null,
+      fecha_creacion: editingCourse?.fecha_creacion || new Date().toISOString()
+    }
+
+    try {
+      const supabase = createClient()
+
+      if (editingCourse) {
+        const { error } = await supabase
+          .from('cursos')
+          .update(courseData)
+          .eq('id', editingCourse.id)
+
+        if (error) throw error
+        toast.success('Curso actualizado exitosamente')
+      } else {
+        const { error } = await supabase
+          .from('cursos')
+          .insert([courseData])
+
+        if (error) throw error
+        toast.success('Curso creado exitosamente')
+      }
+
+      setDialogOpen(false)
+      setEditingCourse(null)
+      loadCourses()
+    } catch (error) {
+      console.error('[v0] Error saving course:', error)
+      toast.error('Error al guardar curso')
+    }
+  }
+
+  const handleDelete = async (e: React.MouseEvent, courseId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!confirm('¿Estás seguro de eliminar este curso? Se eliminarán todos sus módulos y sesiones.')) return
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('cursos')
+        .delete()
+        .eq('id', courseId)
+
+      if (error) throw error
+      toast.success('Curso eliminado')
+      loadCourses()
+    } catch (error) {
+      console.error('[v0] Error deleting course:', error)
+      toast.error('Error al eliminar curso')
+    }
+  }
+
+  const handleEdit = (e: React.MouseEvent, course: Curso) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setEditingCourse(course)
+    setDialogOpen(true)
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center p-8">
@@ -68,6 +148,87 @@ export default function CoursesPage() {
             Explora nuestro catálogo de cursos y comienza a aprender
           </p>
         </div>
+        {isAdmin && (
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => setEditingCourse(null)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nuevo Curso
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>{editingCourse ? 'Editar Curso' : 'Crear Nuevo Curso'}</DialogTitle>
+                <DialogDescription>
+                  Completa la información del curso
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="titulo">Título del Curso</Label>
+                  <Input
+                    id="titulo"
+                    name="titulo"
+                    defaultValue={editingCourse?.titulo}
+                    placeholder="Ej: Fundamentos de Trading"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="descripcion">Descripción</Label>
+                  <Textarea
+                    id="descripcion"
+                    name="descripcion"
+                    rows={3}
+                    defaultValue={editingCourse?.descripcion}
+                    placeholder="Describe el contenido del curso..."
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="instructor">Instructor</Label>
+                    <Input
+                      id="instructor"
+                      name="instructor"
+                      defaultValue={editingCourse?.instructor}
+                      placeholder="Nombre del instructor"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="categoria">Categoría</Label>
+                    <Input
+                      id="categoria"
+                      name="categoria"
+                      defaultValue={editingCourse?.categoria}
+                      placeholder="Ej: Trading, Inversión"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="url_del_curso">URL del Curso (opcional)</Label>
+                  <Input
+                    id="url_del_curso"
+                    name="url_del_curso"
+                    type="url"
+                    defaultValue={editingCourse?.url_del_curso}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit">
+                    {editingCourse ? 'Actualizar' : 'Crear'}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Grid de Cursos */}
@@ -91,6 +252,26 @@ export default function CoursesPage() {
                     <Badge className="bg-primary/10 text-primary">
                       {course.categoria}
                     </Badge>
+                    {isAdmin && (
+                      <div className="flex gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => handleEdit(e, course)}
+                          className="h-7 w-7 bg-transparent p-0"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => handleDelete(e, course.id)}
+                          className="h-7 w-7 bg-transparent p-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <CardTitle className="mt-2">{course.titulo}</CardTitle>
                   <CardDescription className="line-clamp-2">{course.descripcion}</CardDescription>
