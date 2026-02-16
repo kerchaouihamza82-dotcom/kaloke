@@ -28,15 +28,15 @@ export default function LandingPage() {
             <Link href="#testimonios" className="text-sm font-medium transition-colors hover:text-primary">
               Testimonios
             </Link>
-            <Link href="/auth/login">
+            <Link href="/login">
               <Button variant="ghost">Iniciar Sesión</Button>
             </Link>
-            <Link href="/auth/signup">
+            <Link href="/register">
               <Button>Comenzar</Button>
             </Link>
           </nav>
           <div className="flex items-center gap-3 md:hidden">
-            <Link href="/auth/login">
+            <Link href="/login">
               <Button variant="outline" size="sm" className="bg-transparent">
                 Entrar
               </Button>
@@ -66,13 +66,13 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link href="/auth/signup" className="flex-1 sm:flex-initial">
+                <Link href="/register" className="flex-1 sm:flex-initial">
                   <Button size="lg" className="w-full sm:w-auto">
                     Comenzar Ahora
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="/auth/login" className="flex-1 sm:flex-initial">
+                <Link href="/login" className="flex-1 sm:flex-initial">
                   <Button size="lg" variant="outline" className="w-full bg-transparent sm:w-auto">
                     Iniciar Sesión
                   </Button>
@@ -262,7 +262,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   
-                  <Link href="/auth/signup">
+                  <Link href="/register">
                     <Button size="lg" className="w-full md:w-auto md:min-w-[300px]">
                       Comenzar Ahora
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -371,13 +371,13 @@ export default function LandingPage() {
               Únete a miles de estudiantes que ya están alcanzando sus metas profesionales
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Link href="/auth/signup">
+              <Link href="/register">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                   Crear Cuenta Gratis
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button size="lg" variant="outline" className="w-full border-primary-foreground bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary sm:w-auto">
                   Ya Tengo Cuenta
                 </Button>
@@ -411,12 +411,12 @@ export default function LandingPage() {
               <h4 className="mb-4 font-semibold">Plataforma</h4>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/auth/login" className="transition-colors hover:text-primary">
+                  <Link href="/login" className="transition-colors hover:text-primary">
                     Iniciar Sesión
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/signup" className="transition-colors hover:text-primary">
+                  <Link href="/register" className="transition-colors hover:text-primary">
                     Registrarse
                   </Link>
                 </li>
