@@ -307,6 +307,16 @@ export default function CourseDetailPage() {
               <span>{getTotalSesiones()} sesiones</span>
             </div>
           </div>
+          {!isAdmin && getTotalSesiones() > 0 && (
+            <div className="mt-6">
+              <Link href={`/dashboard/courses/${courseId}/view`}>
+                <Button size="lg" className="gap-2">
+                  <PlayCircle className="h-5 w-5" />
+                  Ver Curso
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
