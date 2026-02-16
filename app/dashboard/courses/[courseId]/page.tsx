@@ -21,6 +21,7 @@ interface Curso {
   descripcion: string
   instructor: string
   categoria: string
+  imagen_url?: string
 }
 
 interface Modulo {
@@ -260,15 +261,33 @@ export default function CourseDetailPage() {
 
   return (
     <div className="space-y-8 p-8">
-      {/* Header */}
-      <div className="flex items-start gap-4">
+      {/* Back Button */}
+      <div>
         <Link href="/dashboard/courses">
           <Button variant="outline" size="sm" className="bg-transparent">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver
           </Button>
         </Link>
-        <div className="flex-1">
+      </div>
+
+      {/* Course Header with Image */}
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Image */}
+        {course.imagen_url && (
+          <div className="lg:col-span-1">
+            <div className="overflow-hidden rounded-xl border shadow-lg">
+              <img
+                src={course.imagen_url}
+                alt={course.titulo}
+                className="aspect-video w-full object-cover"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Course Info */}
+        <div className={course.imagen_url ? "lg:col-span-2" : "lg:col-span-3"}>
           <div className="mb-3 flex items-center gap-2">
             <Badge className="bg-primary/10 text-primary">{course.categoria}</Badge>
           </div>

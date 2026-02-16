@@ -7,12 +7,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { BookOpen, User, Plus, Pencil, Trash2 } from "lucide-react"
+import { BookOpen, User, Plus, Pencil, Trash2, Upload, Image as ImageIcon } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAdmin } from "@/hooks/use-admin"
 import { toast } from "sonner"
+import { upload } from '@vercel/blob/client'
 
 interface Curso {
   id: string
@@ -21,6 +22,7 @@ interface Curso {
   instructor: string
   categoria: string
   fecha_creacion: string
+  imagen_url?: string
 }
 
 export default function CoursesPage() {
@@ -28,11 +30,22 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Curso | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { isAdmin } = useAdmin()
 
   useEffect(() => {
     loadCourses()
   }, [])
+
+  useEffect(() => {
+    if (editingCourse?.imagen_url) {
+      setImagePreview(editingCourse.imagen_url)
+    } else {
+      setImagePreview(null)
+    }
+  }, [editingCourse])
 
   const loadCourses = async () => {
     try {
@@ -55,20 +68,67 @@ export default function CoursesPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    
-    const courseData = {
-      titulo: formData.get('titulo') as string,
-      descripcion: formData.get('descripcion') as string,
-      instructor: formData.get('instructor') as string,
-      categoria: formData.get('categoria') as string,
-      url_del_curso: formData.get('url_del_curso') as string || null,
-      fecha_creacion: editingCourse?.fecha_creacion || new Date().toISOString()
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor selecciona una imagen válida')
+      return
     }
 
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen debe ser menor a 5MB')
+      return
+    }
+
+    // Show preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setUploading(true)
+
     try {
+      const formData = new FormData(e.currentTarget)
+      let imagenUrl = editingCourse?.imagen_url || null
+
+      // Upload image if a new one was selected
+      const fileInput = fileInputRef.current
+      const file = fileInput?.files?.[0]
+      
+      if (file) {
+        try {
+          const newBlob = await upload(file.name, file, {
+            access: 'public',
+            handleUploadUrl: '/api/upload',
+          })
+          imagenUrl = newBlob.url
+        } catch (uploadError) {
+          console.error('[v0] Error uploading image:', uploadError)
+          toast.error('Error al subir la imagen')
+          setUploading(false)
+          return
+        }
+      }
+
+      const courseData = {
+        titulo: formData.get('titulo') as string,
+        descripcion: formData.get('descripcion') as string,
+        instructor: formData.get('instructor') as string,
+        categoria: formData.get('categoria') as string,
+        url_del_curso: formData.get('url_del_curso') as string || null,
+        imagen_url: imagenUrl,
+        fecha_creacion: editingCourse?.fecha_creacion || new Date().toISOString()
+      }
+
       const supabase = createClient()
 
       if (editingCourse) {
@@ -90,10 +150,14 @@ export default function CoursesPage() {
 
       setDialogOpen(false)
       setEditingCourse(null)
+      setImagePreview(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
       loadCourses()
     } catch (error) {
       console.error('[v0] Error saving course:', error)
       toast.error('Error al guardar curso')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -165,6 +229,53 @@ export default function CoursesPage() {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="imagen">Imagen del Curso</Label>
+                  <div className="flex flex-col gap-4">
+                    {imagePreview ? (
+                      <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="h-full w-full object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute right-2 top-2"
+                          onClick={() => {
+                            setImagePreview(null)
+                            if (fileInputRef.current) fileInputRef.current.value = ''
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex aspect-video w-full items-center justify-center rounded-lg border-2 border-dashed">
+                        <div className="text-center">
+                          <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            No hay imagen seleccionada
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <Input
+                      ref={fileInputRef}
+                      id="imagen"
+                      name="imagen"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Formatos: JPG, PNG, WEBP. Máximo 5MB
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="titulo">Título del Curso</Label>
                   <Input
                     id="titulo"
@@ -218,11 +329,27 @@ export default function CoursesPage() {
                   />
                 </div>
                 <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setDialogOpen(false)
+                      setImagePreview(null)
+                      if (fileInputRef.current) fileInputRef.current.value = ''
+                    }}
+                    disabled={uploading}
+                  >
                     Cancelar
                   </Button>
-                  <Button type="submit">
-                    {editingCourse ? 'Actualizar' : 'Crear'}
+                  <Button type="submit" disabled={uploading}>
+                    {uploading ? (
+                      <>
+                        <Upload className="mr-2 h-4 w-4 animate-spin" />
+                        Subiendo...
+                      </>
+                    ) : (
+                      editingCourse ? 'Actualizar' : 'Crear'
+                    )}
                   </Button>
                 </div>
               </form>
@@ -246,7 +373,16 @@ export default function CoursesPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {courses.map((course) => (
             <Link key={course.id} href={`/dashboard/courses/${course.id}`}>
-              <Card className="group h-full cursor-pointer transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
+              <Card className="group h-full cursor-pointer overflow-hidden transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
+                {course.imagen_url && (
+                  <div className="aspect-video w-full overflow-hidden bg-muted">
+                    <img
+                      src={course.imagen_url}
+                      alt={course.titulo}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <Badge className="bg-primary/10 text-primary">
