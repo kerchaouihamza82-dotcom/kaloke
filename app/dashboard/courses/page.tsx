@@ -372,59 +372,59 @@ export default function CoursesPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {courses.map((course) => (
-            <Link key={course.id} href={`/dashboard/courses/${course.id}`}>
-              <Card className="group h-full cursor-pointer overflow-hidden transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
-                {course.imagen_url && (
-                  <div className="aspect-video w-full overflow-hidden bg-muted">
-                    <img
-                      src={course.imagen_url}
-                      alt={course.titulo}
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <Badge className="bg-primary/10 text-primary">
-                      {course.categoria}
-                    </Badge>
-                    {isAdmin && (
-                      <div className="flex gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => handleEdit(e, course)}
-                          className="h-7 w-7 bg-transparent p-0"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => handleDelete(e, course.id)}
-                          className="h-7 w-7 bg-transparent p-0"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  <CardTitle className="mt-2">{course.titulo}</CardTitle>
-                  <CardDescription className="line-clamp-2">{course.descripcion}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      <span>{course.instructor}</span>
+            <Card key={course.id} className="group h-full overflow-hidden transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/10">
+              {course.imagen_url && (
+                <div className="aspect-video w-full overflow-hidden bg-muted">
+                  <img
+                    src={course.imagen_url}
+                    alt={course.titulo}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <Badge className="bg-primary/10 text-primary">
+                    {course.categoria}
+                  </Badge>
+                  {isAdmin && (
+                    <div className="flex gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleEdit(e, course)}
+                        className="h-7 w-7 bg-transparent p-0"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleDelete(e, course.id)}
+                        className="h-7 w-7 bg-transparent p-0"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
+                  )}
+                </div>
+                <CardTitle className="mt-2">{course.titulo}</CardTitle>
+                <CardDescription className="line-clamp-2">{course.descripcion}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <User className="h-4 w-4" />
+                    <span>{course.instructor}</span>
                   </div>
-                  <Button className="mt-4 w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                </div>
+                <Link href={isAdmin ? `/dashboard/courses/${course.id}` : `/dashboard/courses/${course.id}/view`} className="mt-4 block w-full">
+                  <Button className="w-full">
                     Ver Curso
                   </Button>
-                </CardContent>
-              </Card>
-            </Link>
+                </Link>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

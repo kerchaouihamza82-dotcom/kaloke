@@ -15,6 +15,7 @@ interface Curso {
   id: string
   titulo: string
   instructor: string
+  imagen_url?: string
 }
 
 interface Modulo {
@@ -53,7 +54,7 @@ export default function CourseViewerPage() {
       
       const { data: cursoData, error: cursoError } = await supabase
         .from('cursos')
-        .select('id, titulo, instructor')
+        .select('id, titulo, instructor, imagen_url')
         .eq('id', courseId)
         .single()
 
@@ -199,11 +200,20 @@ export default function CourseViewerPage() {
         {/* Header */}
         <div className="border-b border-gray-800 p-4">
           <div className="flex items-center gap-4">
-            <Link href={`/dashboard/courses/${courseId}`}>
+            <Link href="/dashboard/courses">
               <Button variant="ghost" size="sm" className="text-white hover:bg-gray-800">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
+            {course.imagen_url && (
+              <div className="h-10 w-16 overflow-hidden rounded">
+                <img
+                  src={course.imagen_url}
+                  alt={course.titulo}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
             <h1 className="text-xl font-bold">{course.titulo}</h1>
           </div>
         </div>
