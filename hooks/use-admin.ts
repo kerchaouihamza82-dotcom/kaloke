@@ -27,8 +27,8 @@ export function useAdmin() {
                          user.user_metadata?.role === 'admin'
       
       // Also check by email as fallback
-      const adminEmails = ['admin@digicash.academy', 'hamzakerchaoui11@gmail.com']
-      const emailIsAdmin = adminEmails.includes(user.email || '')
+      const adminEmail = 'hamzakerchaoui85@gmail.com'
+      const emailIsAdmin = user.email === adminEmail
       
       setIsAdmin(userIsAdmin || emailIsAdmin)
       
