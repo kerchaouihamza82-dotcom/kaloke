@@ -53,7 +53,8 @@ export function AppSidebar() {
             <img 
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sc-Photoroom-dyXvi00u3VQhtKjUqhzpGXU13MJGbc.png" 
               alt="DigiCash Academy" 
-              className="h-10 w-10 object-contain"
+              className="h-10 object-contain"
+              style={{ width: 'auto' }}
             />
             <span className="text-lg font-semibold text-foreground">DigiCash Academy</span>
           </Link>
