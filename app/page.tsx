@@ -14,7 +14,8 @@ export default function LandingPage() {
             <img 
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sc-Photoroom-dyXvi00u3VQhtKjUqhzpGXU13MJGbc.png" 
               alt="DigiCash Academy" 
-              className="h-12 w-12 object-contain"
+              className="h-12 object-contain"
+              style={{ width: 'auto' }}
             />
             <span className="text-xl font-bold text-foreground">DigiCash Academy</span>
           </div>
@@ -397,7 +398,8 @@ export default function LandingPage() {
                 <img 
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sc-Photoroom-dyXvi00u3VQhtKjUqhzpGXU13MJGbc.png" 
                   alt="DigiCash Academy" 
-                  className="h-10 w-10 object-contain"
+                  className="h-10 object-contain"
+                  style={{ width: 'auto' }}
                 />
                 <span className="text-xl font-bold">DigiCash Academy</span>
               </div>
