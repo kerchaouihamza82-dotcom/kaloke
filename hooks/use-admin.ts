@@ -22,21 +22,15 @@ export function useAdmin() {
         return
       }
 
-      // Check if user is admin from database
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      if (error) {
-        console.error('[v0] Error fetching profile:', error)
-        // Fallback to email check
-        const adminEmails = ['admin@digicash.academy', 'hamzakerchaoui11@gmail.com']
-        setIsAdmin(adminEmails.includes(user.email || ''))
-      } else {
-        setIsAdmin(profile?.role === 'admin')
-      }
+      // Check if user is admin from user_metadata
+      const userIsAdmin = user.user_metadata?.is_admin === true || 
+                         user.user_metadata?.role === 'admin'
+      
+      // Also check by email as fallback
+      const adminEmails = ['admin@digicash.academy', 'hamzakerchaoui11@gmail.com']
+      const emailIsAdmin = adminEmails.includes(user.email || '')
+      
+      setIsAdmin(userIsAdmin || emailIsAdmin)
       
     } catch (error) {
       console.error('[v0] Error checking admin status:', error)
