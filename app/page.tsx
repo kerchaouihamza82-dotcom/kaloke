@@ -125,7 +125,7 @@ export default function LandingPage() {
               </video>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-16">
               <Link href="/inscribete">
                 <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
                   Empieza hoy
@@ -359,7 +359,7 @@ export default function LandingPage() {
             <p className="text-lg text-gray-400">
             Datos extraídos directamente de Instagram Analytics. Estas son métricas reales de cuentas manejadas por estudiantes.
           </p>
-          <div className="mt-8">
+          <div className="mt-12">
             <Link href="/inscribete">
               <Button size="lg" className="h-12 bg-red-600 px-10 text-base font-medium transition-transform hover:scale-105">
                 Acceder ahora
@@ -571,7 +571,7 @@ export default function LandingPage() {
             <p className="text-lg leading-relaxed text-gray-400">
             Únete a estudiantes que están construyendo su futuro digital.
           </p>
-          <div className="mt-10">
+          <div className="mt-16">
             <Link href="/inscribete">
               <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
                 Inscríbete ahora
