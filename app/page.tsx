@@ -503,32 +503,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Logros */}
-      <section className="py-24 md:py-40">
-        <div className="container mx-auto px-6">
-          <div className="mb-20 space-y-6 text-center">
-            <h2 className="text-4xl font-light md:text-5xl">
-              Logros dentro de DigiCash Academy
-            </h2>
-            <p className="mx-auto max-w-3xl text-lg font-light leading-relaxed text-gray-400">
-              No necesitas un título universitario para desarrollar habilidades valiosas. Nuestros estudiantes lo demuestran cada día.
-            </p>
-          </div>
-
-          {/* Galería de testimonios */}
-          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="border border-white/5 bg-gray-950">
-                <CardContent className="p-6">
-                  <div className="mb-4 aspect-square w-full rounded-xl bg-gray-900" />
-                  <p className="text-sm font-light text-gray-500">Testimonio #{i}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* FAQ */}
       <section id="faq" className="border-y border-white/5 py-24 md:py-40">
         <div className="container mx-auto px-6">
