@@ -87,7 +87,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 py-32 md:py-48">
           <div className="mx-auto max-w-6xl space-y-16 text-center">
             <div className="space-y-8">
-              <h1 className="bg-gradient-to-b from-white via-white to-gray-400 bg-clip-text text-6xl font-bold tracking-tight text-transparent md:text-7xl lg:text-8xl">
+              <h1 className="text-6xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl">
                 Aprende a generar ingresos online
               </h1>
               <p className="mx-auto max-w-3xl text-xl font-normal leading-relaxed text-gray-300 md:text-2xl">
@@ -143,7 +143,7 @@ export default function LandingPage() {
       <section className="border-y border-white/5 py-32 md:py-48">
         <div className="container mx-auto px-6">
           <div className="mx-auto max-w-4xl space-y-10 text-center">
-            <h2 className="bg-gradient-to-b from-white to-gray-300 bg-clip-text text-5xl font-bold leading-tight text-transparent md:text-6xl">
+            <h2 className="text-5xl font-bold leading-tight text-white md:text-6xl">
               El mundo digital avanza más rápido que la educación tradicional
             </h2>
             <p className="text-xl font-normal leading-relaxed text-gray-300">
@@ -170,7 +170,7 @@ export default function LandingPage() {
           </div>
           
           <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2">
-            <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+            <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
               <CardContent className="space-y-8 p-12">
                 <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
                   <Brain className="h-8 w-8 text-blue-400" />
@@ -184,7 +184,7 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+            <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
               <CardContent className="space-y-8 p-12">
                 <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
                   <Users className="h-8 w-8 text-blue-400" />
@@ -198,7 +198,7 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+            <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
               <CardContent className="space-y-8 p-12">
                 <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
                   <Zap className="h-8 w-8 text-blue-400" />
@@ -212,7 +212,7 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+            <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
               <CardContent className="space-y-8 p-12">
                 <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
                   <Globe className="h-8 w-8 text-blue-400" />
@@ -357,7 +357,7 @@ export default function LandingPage() {
             </h2>
             
             <div className="grid gap-8 md:grid-cols-3">
-              <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+              <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
                 <CardContent className="space-y-8 p-12 text-center">
                   <div className="flex justify-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
@@ -368,7 +368,7 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+              <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
                 <CardContent className="space-y-8 p-12 text-center">
                   <div className="flex justify-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
@@ -379,7 +379,7 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="group overflow-hidden border border-white/10 bg-gradient-to-br from-gray-950 via-black to-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
+              <Card className="group overflow-hidden border border-white/10 bg-gray-950 shadow-xl transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20">
                 <CardContent className="space-y-8 p-12 text-center">
                   <div className="flex justify-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/10 shadow-lg shadow-blue-500/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-blue-500/40">
