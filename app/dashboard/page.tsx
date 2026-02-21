@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, MessageSquare, Video, Clock, Award, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import Image from "next/image"
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -87,12 +86,11 @@ export default function DashboardPage() {
     <div className="space-y-8 p-8">
       {/* Welcome Section with Logo */}
       <div className="flex items-center gap-6">
-        <Image 
+        <img 
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sc-Photoroom-dyXvi00u3VQhtKjUqhzpGXU13MJGbc.png" 
           alt="DigiCash Academy" 
-          width={80}
-          height={80}
-          className="rounded-xl"
+          className="h-20 rounded-xl object-contain"
+          style={{ width: 'auto' }}
         />
         <div className="space-y-2">
           <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground">
