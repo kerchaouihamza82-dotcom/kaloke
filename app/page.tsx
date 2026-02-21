@@ -426,12 +426,12 @@ export default function LandingPage() {
             <p className="text-lg font-medium text-gray-400">Empieza hoy a desarrollar habilidades digitales rentables</p>
           </div>
 
-          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
-            <Card className="relative overflow-hidden border-2 border-blue-500/50 bg-gray-950 shadow-2xl shadow-blue-500/20">
+          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:items-stretch">
+            <Card className="relative flex overflow-hidden border-2 border-blue-500/50 bg-gray-950 shadow-2xl shadow-blue-500/20">
               <div className="absolute right-4 top-4">
                 <Badge className="bg-blue-600 text-xs font-semibold">Más Popular</Badge>
               </div>
-              <CardContent className="flex flex-col gap-6 p-8">
+              <CardContent className="flex w-full flex-col p-8">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-semibold">Suscripción Mensual</h3>
                   <div className="flex items-baseline gap-1">
@@ -439,7 +439,7 @@ export default function LandingPage() {
                     <span className="text-gray-400">/mes</span>
                   </div>
                 </div>
-                <ul className="space-y-3">
+                <ul className="mt-8 space-y-3">
                   <li className="flex items-start gap-3">
                     <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
                     <span className="text-gray-300">Acceso a todos los campus</span>
@@ -457,16 +457,18 @@ export default function LandingPage() {
                     <span className="text-gray-300">Cancela cuando quieras</span>
                   </li>
                 </ul>
-                <Link href="/inscribete" className="mt-auto">
-                  <Button className="h-12 w-full bg-blue-600 font-medium transition-transform hover:scale-105">
-                    Acceder ahora
-                  </Button>
-                </Link>
+                <div className="mt-auto pt-8">
+                  <Link href="/inscribete">
+                    <Button className="h-12 w-full bg-blue-600 font-medium transition-transform hover:scale-105">
+                      Acceder ahora
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
-              <CardContent className="flex flex-col gap-6 p-8">
+            <Card className="flex overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+              <CardContent className="flex w-full flex-col p-8">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-semibold">Acceso Completo</h3>
                   <div className="flex items-baseline gap-1">
@@ -474,7 +476,7 @@ export default function LandingPage() {
                     <span className="text-gray-400">único</span>
                   </div>
                 </div>
-                <ul className="space-y-3">
+                <ul className="mt-8 space-y-3">
                   <li className="flex items-start gap-3">
                     <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
                     <span className="text-gray-300">Acceso de por vida</span>
@@ -496,11 +498,13 @@ export default function LandingPage() {
                     <span className="text-gray-300">Futuros campus incluidos</span>
                   </li>
                 </ul>
-                <Link href="/inscribete" className="mt-auto">
-                  <Button className="h-12 w-full bg-red-600 font-medium transition-transform hover:scale-105">
-                    Acceder ahora
-                  </Button>
-                </Link>
+                <div className="mt-auto pt-8">
+                  <Link href="/inscribete">
+                    <Button className="h-12 w-full bg-red-600 font-medium transition-transform hover:scale-105">
+                      Acceder ahora
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </div>
