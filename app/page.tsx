@@ -84,12 +84,30 @@ export default function LandingPage() {
       <section id="inicio" className="relative overflow-hidden pt-32">
         <div className="container mx-auto px-6 py-24 md:py-32">
           <div className="mx-auto max-w-6xl space-y-12 text-center">
-            <div className="space-y-6">
-              <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl">
-                Aprende a generar ingresos online
+            <div className="space-y-8">
+              <h1 className="text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+                <span className="relative inline-block text-white">
+                  GANA DINERO{" "}
+                  <span className="relative inline-block">
+                    HOY
+                    <span className="absolute bottom-0 left-0 h-1 w-full bg-red-600"></span>
+                  </span>
+                </span>
               </h1>
-              <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400 md:text-xl">
-                La educación tradicional avanza demasiado lento. Cuatro años es demasiado tiempo cuando puedes aprender habilidades rentables hoy y aplicarlas mañana.
+              <p className="mx-auto max-w-3xl text-base leading-relaxed text-gray-400 md:text-lg">
+                La educación moderna es demasiado lenta—cuatro años es demasiado tiempo.
+              </p>
+              <p className="mx-auto max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
+                Aprende habilidades{" "}
+                <span className="relative inline-block font-bold text-white">
+                  REALES HOY
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-red-600"></span>
+                </span>{" "}
+                que te harán ganar dinero{" "}
+                <span className="relative inline-block font-bold text-white">
+                  MAÑANA
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full bg-red-600"></span>
+                </span>
               </p>
             </div>
 
