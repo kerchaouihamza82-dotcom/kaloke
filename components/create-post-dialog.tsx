@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -29,14 +29,48 @@ interface CreatePostDialogProps {
   onPostCreated?: () => void
 }
 
+interface Curso {
+  id: string
+  titulo: string
+}
+
 export function CreatePostDialog({ onPostCreated }: CreatePostDialogProps) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('')
   const [loading, setLoading] = useState(false)
+  const [cursos, setCursos] = useState<Curso[]>([])
+  const [loadingCursos, setLoadingCursos] = useState(true)
   const supabase = createClient()
   const { toast } = useToast()
+
+  useEffect(() => {
+    const fetchCursos = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cursos')
+          .select('id, titulo')
+          .order('titulo', { ascending: true })
+
+        if (error) throw error
+        setCursos(data || [])
+      } catch (error) {
+        console.error('[v0] Error fetching courses:', error)
+        toast({
+          title: 'Error',
+          description: 'No se pudieron cargar los cursos',
+          variant: 'destructive',
+        })
+      } finally {
+        setLoadingCursos(false)
+      }
+    }
+
+    if (open) {
+      fetchCursos()
+    }
+  }, [open, supabase, toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -132,20 +166,23 @@ export function CreatePostDialog({ onPostCreated }: CreatePostDialogProps) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="category">Categoría</Label>
-              <Select value={category} onValueChange={setCategory}>
+              <Label htmlFor="category">Curso</Label>
+              <Select value={category} onValueChange={setCategory} disabled={loadingCursos}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecciona una categoría" />
+                  <SelectValue placeholder={loadingCursos ? "Cargando cursos..." : "Selecciona un curso"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Trading">Trading</SelectItem>
-                  <SelectItem value="DeFi">DeFi</SelectItem>
-                  <SelectItem value="Bitcoin">Bitcoin</SelectItem>
-                  <SelectItem value="Ethereum">Ethereum</SelectItem>
-                  <SelectItem value="NFTs">NFTs</SelectItem>
-                  <SelectItem value="Análisis">Análisis</SelectItem>
-                  <SelectItem value="Tutoriales">Tutoriales</SelectItem>
-                  <SelectItem value="General">General</SelectItem>
+                  {cursos.length > 0 ? (
+                    cursos.map((curso) => (
+                      <SelectItem key={curso.id} value={curso.titulo}>
+                        {curso.titulo}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="general" disabled>
+                      No hay cursos disponibles
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
