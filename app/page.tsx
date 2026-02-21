@@ -49,9 +49,9 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/80 backdrop-blur-2xl">
+      <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/90 backdrop-blur-md">
         <div className="container mx-auto flex h-24 items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <img 
@@ -137,14 +137,10 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        
-        {/* Decorative gradients */}
-        <div className="absolute right-0 top-0 -z-10 h-[800px] w-[800px] rounded-full bg-gradient-to-br from-blue-600/20 to-purple-600/10 blur-[180px]" />
-        <div className="absolute left-0 bottom-0 -z-10 h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-blue-600/10 to-cyan-600/10 blur-[160px]" />
       </section>
 
       {/* Mensaje de Conciencia */}
-      <section className="border-y border-white/5 bg-gradient-to-b from-transparent via-gray-950/50 to-transparent py-32 md:py-48">
+      <section className="border-y border-white/5 py-32 md:py-48">
         <div className="container mx-auto px-6">
           <div className="mx-auto max-w-4xl space-y-10 text-center">
             <h2 className="bg-gradient-to-b from-white to-gray-300 bg-clip-text text-5xl font-bold leading-tight text-transparent md:text-6xl">
