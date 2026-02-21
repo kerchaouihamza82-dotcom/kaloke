@@ -39,7 +39,7 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
   }
 
   return (
-    <div className="group relative mx-auto max-w-4xl">
+    <div className="group relative mx-auto max-w-3xl">
       {/* Image Container */}
       <div
         className="relative overflow-hidden rounded-2xl"
@@ -57,8 +57,7 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="h-full w-full object-cover"
-                  style={{ width: 'auto' }}
+                  className="h-auto w-full object-contain"
                 />
               </div>
             </div>
