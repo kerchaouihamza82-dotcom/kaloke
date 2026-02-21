@@ -6,9 +6,28 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { MessageSquare, ThumbsUp, Users, Plus, Edit, Trash2, Shield } from "lucide-react"
 import { useAdmin } from "@/hooks/use-admin"
+import { CommunityChat } from "@/components/community-chat"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 export default function CommunityPage() {
   const { isAdmin } = useAdmin()
+  const [userName, setUserName] = useState('Usuario')
+  const supabase = createClient()
+
+  useEffect(() => {
+    const getUserName = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const displayName = user.user_metadata?.display_name || 
+                          user.user_metadata?.name || 
+                          user.email?.split('@')[0] || 
+                          'Usuario'
+        setUserName(displayName)
+      }
+    }
+    getUserName()
+  }, [])
 
   return (
     <div className="space-y-8 p-8">
@@ -67,6 +86,14 @@ export default function CommunityPage() {
             <p className="text-xs text-muted-foreground">+3 esta semana</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Chat en Tiempo Real */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Chat Comunitario</h2>
+        <div className="h-[600px]">
+          <CommunityChat currentUserName={userName} />
+        </div>
       </div>
 
       {/* Publicaciones */}
