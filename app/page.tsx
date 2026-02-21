@@ -81,23 +81,23 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section id="inicio" className="relative overflow-hidden pt-32">
-        <div className="container mx-auto px-6 py-24 md:py-32">
-          <div className="mx-auto max-w-6xl space-y-12 text-center">
-            <div className="space-y-8">
-              <h1 className="text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+      <section id="inicio" className="relative overflow-hidden pt-24 sm:pt-32">
+        <div className="container mx-auto px-4 py-16 sm:px-6 md:py-24 lg:py-32">
+          <div className="mx-auto max-w-6xl space-y-8 text-center sm:space-y-12">
+            <div className="space-y-6 sm:space-y-8">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                 <span className="relative inline-block text-white">
                   GANA DINERO{" "}
                   <span className="relative inline-block">
                     HOY
-                    <span className="absolute bottom-0 left-0 h-1 w-full bg-red-600"></span>
+                    <span className="absolute bottom-0 left-0 h-0.5 w-full bg-red-600 sm:h-1"></span>
                   </span>
                 </span>
               </h1>
-              <p className="mx-auto max-w-3xl text-base leading-relaxed text-gray-400 md:text-lg">
+              <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-gray-400 sm:text-base md:text-lg">
                 La educación moderna es demasiado lenta—cuatro años es demasiado tiempo.
               </p>
-              <p className="mx-auto max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
+              <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-gray-300 sm:text-base md:text-lg">
                 Aprende habilidades{" "}
                 <span className="relative inline-block font-bold text-white">
                   REALES HOY
@@ -112,7 +112,7 @@ export default function LandingPage() {
             </div>
 
             {/* Video VSL */}
-            <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl shadow-2xl shadow-blue-500/10 ring-1 ring-white/10">
+            <div className="mx-auto max-w-4xl overflow-hidden rounded-xl shadow-2xl shadow-blue-500/10 ring-1 ring-white/10 sm:rounded-2xl">
               <video 
                 ref={videoRef}
                 controls 
@@ -125,32 +125,32 @@ export default function LandingPage() {
               </video>
             </div>
 
-            <div className="mt-16">
+            <div className="mt-10 sm:mt-16">
               <Link href="/inscribete">
-                <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
+                <Button size="lg" className="h-12 bg-red-600 px-8 text-sm font-medium transition-transform hover:scale-105 sm:h-14 sm:px-12 sm:text-base">
                   Empieza hoy
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </Link>
             </div>
 
             {/* Métricas */}
-            <div className="grid grid-cols-2 gap-8 pt-12 md:grid-cols-4">
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-blue-400">25</div>
-                <div className="text-sm font-medium text-gray-400">Estudiantes Inscritos</div>
+            <div className="grid grid-cols-2 gap-4 pt-8 sm:gap-8 sm:pt-12 md:grid-cols-4">
+              <div className="space-y-1 sm:space-y-2">
+                <div className="text-3xl font-bold text-blue-400 sm:text-4xl">25</div>
+                <div className="text-xs font-medium text-gray-400 sm:text-sm">Estudiantes Inscritos</div>
               </div>
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-blue-400">17</div>
-                <div className="text-sm font-medium text-gray-400">Historias de Éxito</div>
+              <div className="space-y-1 sm:space-y-2">
+                <div className="text-3xl font-bold text-blue-400 sm:text-4xl">17</div>
+                <div className="text-xs font-medium text-gray-400 sm:text-sm">Historias de Éxito</div>
               </div>
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-blue-400">5</div>
-                <div className="text-sm font-medium text-gray-400">Métodos de Creación de Riqueza</div>
+              <div className="space-y-1 sm:space-y-2">
+                <div className="text-3xl font-bold text-blue-400 sm:text-4xl">5</div>
+                <div className="text-xs font-medium text-gray-400 sm:text-sm">Métodos de Creación de Riqueza</div>
               </div>
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-blue-400">25</div>
-                <div className="text-sm font-medium text-gray-400">Estudiantes Activos</div>
+              <div className="space-y-1 sm:space-y-2">
+                <div className="text-3xl font-bold text-blue-400 sm:text-4xl">25</div>
+                <div className="text-xs font-medium text-gray-400 sm:text-sm">Estudiantes Activos</div>
               </div>
             </div>
           </div>
@@ -158,21 +158,21 @@ export default function LandingPage() {
       </section>
 
       {/* Mensaje de Conciencia */}
-      <section className="border-y border-white/5 py-24 md:py-32">
-        <div className="container mx-auto px-6">
-          <div className="mx-auto max-w-4xl space-y-8 text-center">
-            <h2 className="text-4xl font-bold leading-tight text-white md:text-5xl">
+      <section className="border-y border-white/5 py-16 sm:py-24 md:py-32">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="mx-auto max-w-4xl space-y-6 text-center sm:space-y-8">
+            <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
               El mundo digital avanza más rápido que la educación tradicional
             </h2>
-            <p className="text-lg leading-relaxed text-gray-400">
+            <p className="text-base leading-relaxed text-gray-400 sm:text-lg">
               Actualizamos el contenido cada día a las 8 a.m. para mantener a los estudiantes al día con las últimas herramientas digitales, automatización e inteligencia artificial aplicadas a negocios online.
             </p>
-            <p className="text-base font-medium text-blue-400">
+            <p className="text-sm font-medium text-blue-400 sm:text-base">
                   Información práctica. Resultados reales. Sin teoría innecesaria.
                 </p>
-                <div className="mt-8">
+                <div className="mt-6 sm:mt-8">
                   <Link href="/inscribete">
-                    <Button size="lg" className="h-12 bg-red-600 px-10 text-base font-medium transition-transform hover:scale-105">
+                    <Button size="lg" className="h-11 bg-red-600 px-8 text-sm font-medium transition-transform hover:scale-105 sm:h-12 sm:px-10 sm:text-base">
                       Empieza ahora
                     </Button>
                   </Link>
@@ -182,22 +182,22 @@ export default function LandingPage() {
       </section>
 
       {/* Accede a 5 Campus */}
-      <section id="profesiones" className="py-24 md:py-32">
-        <div className="container mx-auto px-6">
-          <div className="mb-16 space-y-4 text-center">
-            <h2 className="text-4xl font-bold md:text-5xl">Accede a 5 campus especializados</h2>
-            <p className="text-lg font-medium text-gray-400">Habilidades que puedes aplicar de inmediato</p>
+      <section id="profesiones" className="py-16 sm:py-24 md:py-32">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="mb-12 space-y-3 text-center sm:mb-16 sm:space-y-4">
+            <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">Accede a 5 campus especializados</h2>
+            <p className="text-base font-medium text-gray-400 sm:text-lg">Habilidades que puedes aplicar de inmediato</p>
           </div>
           
-          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2">
+          <div className="mx-auto grid max-w-6xl gap-4 sm:gap-6 md:grid-cols-2">
             <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
-              <CardContent className="flex flex-col gap-6 p-8">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
-                  <Brain className="h-7 w-7 text-blue-400" />
+              <CardContent className="flex flex-col gap-4 p-6 sm:gap-6 sm:p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+                  <Brain className="h-6 w-6 text-blue-400 sm:h-7 sm:w-7" />
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold">Agencia Automatizada con IA</h3>
-                  <p className="leading-relaxed text-gray-400">
+                <div className="space-y-2 sm:space-y-3">
+                  <h3 className="text-xl font-semibold sm:text-2xl">Agencia Automatizada con IA</h3>
+                  <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
                     Crea sistemas automatizados que puedes ofrecer a negocios online o usar para tu propio proyecto.
                   </p>
                 </div>
@@ -205,13 +205,13 @@ export default function LandingPage() {
             </Card>
 
             <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
-              <CardContent className="flex flex-col gap-6 p-8">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
-                  <Users className="h-7 w-7 text-blue-400" />
+              <CardContent className="flex flex-col gap-4 p-6 sm:gap-6 sm:p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+                  <Users className="h-6 w-6 text-blue-400 sm:h-7 sm:w-7" />
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold">Campus de Instagram</h3>
-                  <p className="leading-relaxed text-gray-400">
+                <div className="space-y-2 sm:space-y-3">
+                  <h3 className="text-xl font-semibold sm:text-2xl">Campus de Instagram</h3>
+                  <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
                     Estrategias de venta online sin necesidad de mostrar tu rostro.
                   </p>
                 </div>
@@ -219,13 +219,13 @@ export default function LandingPage() {
             </Card>
 
             <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
-              <CardContent className="flex flex-col gap-6 p-8">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
-                  <Zap className="h-7 w-7 text-blue-400" />
+              <CardContent className="flex flex-col gap-4 p-6 sm:gap-6 sm:p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+                  <Zap className="h-6 w-6 text-blue-400 sm:h-7 sm:w-7" />
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold">Adquisición de Clientes Automatizada</h3>
-                  <p className="leading-relaxed text-gray-400">
+                <div className="space-y-2 sm:space-y-3">
+                  <h3 className="text-xl font-semibold sm:text-2xl">Adquisición de Clientes Automatizada</h3>
+                  <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
                     Sistemas eficientes para conseguir y mantener clientes.
                   </p>
                 </div>
