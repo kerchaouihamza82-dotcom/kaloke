@@ -125,12 +125,14 @@ export default function LandingPage() {
               </video>
             </div>
 
-            <Link href="/inscribete">
-              <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
-                Empieza hoy
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <div className="mt-10">
+              <Link href="/inscribete">
+                <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
+                  Empieza hoy
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
 
             {/* Métricas */}
             <div className="grid grid-cols-2 gap-8 pt-12 md:grid-cols-4">
@@ -166,13 +168,15 @@ export default function LandingPage() {
               Actualizamos el contenido cada día a las 8 a.m. para mantener a los estudiantes al día con las últimas herramientas digitales, automatización e inteligencia artificial aplicadas a negocios online.
             </p>
             <p className="text-base font-medium text-blue-400">
-              Información práctica. Resultados reales. Sin teoría innecesaria.
-            </p>
-            <Link href="/inscribete">
-              <Button size="lg" className="mt-4 h-12 bg-red-600 px-10 text-base font-medium transition-transform hover:scale-105">
-                Empieza ahora
-              </Button>
-            </Link>
+                  Información práctica. Resultados reales. Sin teoría innecesaria.
+                </p>
+                <div className="mt-8">
+                  <Link href="/inscribete">
+                    <Button size="lg" className="h-12 bg-red-600 px-10 text-base font-medium transition-transform hover:scale-105">
+                      Empieza ahora
+                    </Button>
+                  </Link>
+                </div>
           </div>
         </div>
       </section>
@@ -353,13 +357,15 @@ export default function LandingPage() {
 
           <div className="space-y-6 text-center">
             <p className="text-lg text-gray-400">
-              Datos extraídos directamente de Instagram Analytics. Estas son métricas reales de cuentas manejadas por estudiantes.
-            </p>
+            Datos extraídos directamente de Instagram Analytics. Estas son métricas reales de cuentas manejadas por estudiantes.
+          </p>
+          <div className="mt-8">
             <Link href="/inscribete">
               <Button size="lg" className="h-12 bg-red-600 px-10 text-base font-medium transition-transform hover:scale-105">
                 Acceder ahora
               </Button>
             </Link>
+          </div>
           </div>
         </div>
       </section>
@@ -563,14 +569,16 @@ export default function LandingPage() {
               Empieza a desarrollar habilidades digitales rentables hoy
             </h2>
             <p className="text-lg leading-relaxed text-gray-400">
-              Únete a estudiantes que están construyendo su futuro digital.
-            </p>
+            Únete a estudiantes que están construyendo su futuro digital.
+          </p>
+          <div className="mt-10">
             <Link href="/inscribete">
               <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
                 Inscríbete ahora
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
+          </div>
           </div>
         </div>
       </section>
