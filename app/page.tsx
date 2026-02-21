@@ -249,42 +249,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Plataforma Personalizada */}
-      <section className="border-y border-white/5 py-24 md:py-40">
-        <div className="container mx-auto px-6">
-          <div className="mx-auto max-w-4xl space-y-8 text-center">
-            <h2 className="text-4xl font-light leading-tight md:text-5xl">
-              Una plataforma diseñada para tu progreso
-            </h2>
-            <p className="text-lg font-light leading-relaxed text-gray-400">
-              Nuestra plataforma está diseñada para facilitar el aprendizaje práctico, el seguimiento del progreso y la aplicación inmediata de lo aprendido.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonios en Video */}
-      <section className="py-24 md:py-40">
-        <div className="container mx-auto px-6">
-          <div className="mb-20 space-y-6 text-center">
-            <h2 className="text-4xl font-light md:text-5xl">
-              Logros dentro de DigiCash Academy
-            </h2>
-            <p className="mx-auto max-w-3xl text-lg font-light leading-relaxed text-gray-400">
-              Conoce las historias de estudiantes que han transformado sus vidas aplicando lo aprendido.
-            </p>
-          </div>
-
-          <VideoCarousel
-            videos={[
-              { id: "nJSlxXc6RrM", title: "Testimonio 1" },
-              { id: "r1tYJ6loZXU", title: "Testimonio 2" },
-              { id: "wHqnIV7CD5I", title: "Testimonio 3" }
-            ]}
-          />
-        </div>
-      </section>
-
       {/* Prueba Social - Resultados Reales */}
       <section id="reseñas" className="py-24 md:py-40">
         <div className="container mx-auto px-6">
