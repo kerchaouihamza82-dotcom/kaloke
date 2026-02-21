@@ -181,7 +181,6 @@ export default function LandingPage() {
                   <p className="font-light leading-relaxed text-gray-500">
                     Crea sistemas automatizados que puedes ofrecer a negocios online o usar para tu propio proyecto.
                   </p>
-                  <p className="text-lg font-medium text-blue-500">$9.99/mes</p>
                 </div>
               </CardContent>
             </Card>
@@ -196,7 +195,6 @@ export default function LandingPage() {
                   <p className="font-light leading-relaxed text-gray-500">
                     Estrategias de venta online sin necesidad de mostrar tu rostro.
                   </p>
-                  <p className="text-lg font-medium text-blue-500">$9.99/mes</p>
                 </div>
               </CardContent>
             </Card>
@@ -211,7 +209,6 @@ export default function LandingPage() {
                   <p className="font-light leading-relaxed text-gray-500">
                     Sistemas eficientes para conseguir y mantener clientes.
                   </p>
-                  <p className="text-lg font-medium text-blue-500">$9.99/mes</p>
                 </div>
               </CardContent>
             </Card>
@@ -226,7 +223,6 @@ export default function LandingPage() {
                   <p className="font-light leading-relaxed text-gray-500">
                     Acceso a comunidad, mentorías y oportunidades de colaboración.
                   </p>
-                  <p className="text-lg font-medium text-blue-500">$9.99/mes</p>
                 </div>
               </CardContent>
             </Card>
@@ -241,7 +237,6 @@ export default function LandingPage() {
                   <p className="font-light leading-relaxed text-gray-500">
                     Acceso a contenido especializado y recursos exclusivos.
                   </p>
-                  <p className="text-lg font-medium text-blue-500">$9.99/mes</p>
                 </div>
               </CardContent>
             </Card>
