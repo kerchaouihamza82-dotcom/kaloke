@@ -17,6 +17,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import { VideoCarousel } from "@/components/video-carousel"
+import { ImageCarousel } from "@/components/image-carousel"
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -261,6 +263,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonios en Video */}
+      <section className="py-24 md:py-40">
+        <div className="container mx-auto px-6">
+          <div className="mb-20 space-y-6 text-center">
+            <h2 className="text-4xl font-light md:text-5xl">
+              Logros dentro de DigiCash Academy
+            </h2>
+            <p className="mx-auto max-w-3xl text-lg font-light leading-relaxed text-gray-400">
+              Conoce las historias de estudiantes que han transformado sus vidas aplicando lo aprendido.
+            </p>
+          </div>
+
+          <VideoCarousel
+            videos={[
+              { id: "nJSlxXc6RrM", title: "Testimonio 1" },
+              { id: "r1tYJ6loZXU", title: "Testimonio 2" },
+              { id: "wHqnIV7CD5I", title: "Testimonio 3" }
+            ]}
+          />
+        </div>
+      </section>
+
       {/* Prueba Social - Resultados Reales */}
       <section id="reseñas" className="py-24 md:py-40">
         <div className="container mx-auto px-6">
@@ -273,88 +297,48 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Resultados Reales - Grid de Imágenes */}
-          <div className="mx-auto mb-16 grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%282%29-RdT0lMNaDXSfFqnm5vdJvaVkt492lQ.png"
-                alt="2.2M cuentas alcanzadas"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%281%29-WYuptIkHwaNUicmiGVB4MGRcaR2bCj.png"
-                alt="12.8M cuentas alcanzadas"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%288%29-Yw6qupx9FT3ulDrtHqkYnNV76I6h6m.png"
-                alt="284.1 mil visualizaciones"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%286%29-Xl7upPzVNw4wnQ1AvBDDJaBicxnJKL.png"
-                alt="10,946 seguidores con 8.9% crecimiento"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%284%29-FnbGZLeaA5KtsSeEvm4NmlqoCy1IfO.png"
-                alt="39M visualizaciones"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%287%29-AvaVsazfRe04h8VTYS1eHY17dpEbLV.png"
-                alt="14.1M cuentas alcanzadas"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%285%29-1INhzzj2sz8i6Svpe1oXN5WL1F2wN1.png"
-                alt="4.4M visualizaciones en 30 días"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY-cwAK7G1GJdC5fPqZ6xtJacsTi9D0E1.png"
-                alt="556K cuentas interactuaron"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
-
-            <div className="group overflow-hidden rounded-2xl border border-white/5 bg-gray-950 transition-all hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%283%29-Zj7sCHuzYoQEP3YNPkRlxWG8Nhimxo.png"
-                alt="Gráfico de crecimiento de seguidores"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                style={{ width: 'auto' }}
-              />
-            </div>
+          {/* Resultados Reales - Carrusel de Imágenes */}
+          <div className="mb-16">
+            <ImageCarousel
+              images={[
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%282%29-RdT0lMNaDXSfFqnm5vdJvaVkt492lQ.png",
+                  alt: "2.2M cuentas alcanzadas"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%281%29-WYuptIkHwaNUicmiGVB4MGRcaR2bCj.png",
+                  alt: "12.8M cuentas alcanzadas"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%288%29-Yw6qupx9FT3ulDrtHqkYnNV76I6h6m.png",
+                  alt: "284.1 mil visualizaciones"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%286%29-Xl7upPzVNw4wnQ1AvBDDJaBicxnJKL.png",
+                  alt: "10,946 seguidores con 8.9% crecimiento"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%284%29-FnbGZLeaA5KtsSeEvm4NmlqoCy1IfO.png",
+                  alt: "39M visualizaciones"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%287%29-AvaVsazfRe04h8VTYS1eHY17dpEbLV.png",
+                  alt: "14.1M cuentas alcanzadas"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%285%29-1INhzzj2sz8i6Svpe1oXN5WL1F2wN1.png",
+                  alt: "4.4M visualizaciones en 30 días"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY-cwAK7G1GJdC5fPqZ6xtJacsTi9D0E1.png",
+                  alt: "556K cuentas interactuaron"
+                },
+                {
+                  src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DIGICASH%20ACADEMY%20%283%29-Zj7sCHuzYoQEP3YNPkRlxWG8Nhimxo.png",
+                  alt: "Gráfico de crecimiento de seguidores"
+                }
+              ]}
+            />
           </div>
 
           <div className="space-y-8 text-center">
