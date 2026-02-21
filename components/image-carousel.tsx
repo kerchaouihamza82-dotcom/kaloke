@@ -39,7 +39,7 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
   }
 
   return (
-    <div className="group relative mx-auto max-w-3xl">
+    <div className="group relative mx-auto max-w-2xl">
       {/* Image Container */}
       <div
         className="relative overflow-hidden rounded-2xl"
@@ -53,11 +53,11 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
         >
           {images.map((image, index) => (
             <div key={index} className="min-w-full">
-              <div className="overflow-hidden rounded-2xl border border-white/5 bg-gray-950">
+              <div className="overflow-hidden rounded-2xl border border-white/5 bg-gray-950 p-4">
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="h-auto w-full object-contain"
+                  className="mx-auto h-auto max-h-[500px] w-auto object-contain"
                 />
               </div>
             </div>
