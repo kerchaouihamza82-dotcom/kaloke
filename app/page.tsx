@@ -16,12 +16,35 @@ import {
   ChevronDown
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { VideoCarousel } from "@/components/video-carousel"
 import { ImageCarousel } from "@/components/image-carousel"
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = true
+    video.play().catch(err => console.log('[v0] Video autoplay prevented:', err))
+
+    const handleScroll = () => {
+      const rect = video.getBoundingClientRect()
+      const isVisible = rect.top < window.innerHeight && rect.bottom > 0
+
+      if (isVisible && video.paused) {
+        video.play().catch(err => console.log('[v0] Video play error:', err))
+      } else if (!isVisible && !video.paused) {
+        video.pause()
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -72,15 +95,16 @@ export default function LandingPage() {
 
             {/* Video VSL */}
             <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl shadow-2xl shadow-blue-500/10 ring-1 ring-white/10">
-              <div className="relative" style={{ padding: '56.25% 0 0 0' }}>
-                <iframe 
-                  src="https://player.vimeo.com/video/1166945011?badge=0&autopause=0&player_id=0&app_id=58479"
-                  frameBorder="0"
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  title="VSL DigiCash Academy"
-                ></iframe>
-              </div>
+              <video 
+                ref={videoRef}
+                controls 
+                className="w-full"
+                playsInline
+                preload="metadata"
+              >
+                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/VSL_v2%20%281%29-JoZvEKb3RqhOkT2JMKF8zzumN1yLBj.mp4" type="video/mp4" />
+                Tu navegador no soporta el elemento de video.
+              </video>
             </div>
 
             <Link href="/inscribete">
