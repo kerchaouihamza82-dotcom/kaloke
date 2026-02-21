@@ -67,40 +67,40 @@ export function VideoCarousel({ videos }: VideoCarouselProps) {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Navigation Buttons - Always Visible */}
       {videos.length > 1 && (
         <>
           <Button
             variant="ghost"
             size="icon"
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white backdrop-blur-md transition-all hover:bg-black/60 opacity-0 group-hover:opacity-100"
+            className="absolute left-2 top-1/2 z-10 h-12 w-12 -translate-y-1/2 rounded-full border-2 border-white/20 bg-black/60 text-white shadow-xl backdrop-blur-md transition-all hover:scale-110 hover:border-blue-500/50 hover:bg-black/80 md:left-4"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-7 w-7" />
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white backdrop-blur-md transition-all hover:bg-black/60 opacity-0 group-hover:opacity-100"
+            className="absolute right-2 top-1/2 z-10 h-12 w-12 -translate-y-1/2 rounded-full border-2 border-white/20 bg-black/60 text-white shadow-xl backdrop-blur-md transition-all hover:scale-110 hover:border-blue-500/50 hover:bg-black/80 md:right-4"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-7 w-7" />
           </Button>
         </>
       )}
 
       {/* Indicators */}
       {videos.length > 1 && (
-        <div className="mt-6 flex justify-center gap-2">
+        <div className="mt-8 flex justify-center gap-3">
           {videos.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`h-2 rounded-full transition-all ${
+              className={`h-3 rounded-full transition-all duration-300 ${
                 index === currentIndex
-                  ? 'w-8 bg-blue-500'
-                  : 'w-2 bg-white/30 hover:bg-white/50'
+                  ? 'w-12 bg-blue-500 shadow-lg shadow-blue-500/50'
+                  : 'w-3 bg-white/40 hover:w-6 hover:bg-white/70'
               }`}
               aria-label={`Go to video ${index + 1}`}
             />
