@@ -16,7 +16,7 @@ import {
   ChevronDown
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { VideoCarousel } from "@/components/video-carousel"
 import { ImageCarousel } from "@/components/image-carousel"
 import { ThemeToggle } from "@/components/theme-toggle"
