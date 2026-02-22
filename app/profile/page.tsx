@@ -59,13 +59,20 @@ export default function ProfilePage() {
         return
       }
 
+      // Load profile from user_profiles table
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+
       const userProfile: UserProfile = {
         id: authUser.id,
         email: authUser.email || '',
-        full_name: authUser.user_metadata?.full_name || null,
-        avatar_url: authUser.user_metadata?.avatar_url || null,
+        full_name: profile?.full_name || null,
+        avatar_url: profile?.avatar_url || null,
         phone: authUser.user_metadata?.phone || null,
-        bio: authUser.user_metadata?.bio || null
+        bio: profile?.bio || null
       }
 
       setUser(userProfile)
@@ -73,7 +80,8 @@ export default function ProfilePage() {
         full_name: userProfile.full_name || '',
         email: userProfile.email,
         phone: userProfile.phone || '',
-        bio: userProfile.bio || ''
+        bio: userProfile.bio || '',
+        avatar_url: userProfile.avatar_url || ''
       })
     } catch (error) {
       console.error('[v0] Error loading profile:', error)

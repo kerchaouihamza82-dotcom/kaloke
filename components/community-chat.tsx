@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Send, Loader2 } from 'lucide-react'
 import { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -12,6 +13,7 @@ interface Message {
   id: number
   content: string
   user_name: string
+  avatar_url: string | null
   created_at: string
 }
 
@@ -24,9 +26,29 @@ export function CommunityChat({ currentUserName }: CommunityChatProps) {
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [userAvatar, setUserAvatar] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const channelRef = useRef<RealtimeChannel | null>(null)
   const supabase = createClient()
+
+  // Load user profile for avatar
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .single()
+        
+        if (profile) {
+          setUserAvatar(profile.avatar_url)
+        }
+      }
+    }
+    loadUserProfile()
+  }, [])
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -96,6 +118,7 @@ export function CommunityChat({ currentUserName }: CommunityChatProps) {
       const { error } = await supabase.from('messages').insert({
         content: newMessage.trim(),
         user_name: currentUserName,
+        avatar_url: userAvatar,
       })
 
       if (error) throw error
@@ -137,11 +160,21 @@ export function CommunityChat({ currentUserName }: CommunityChatProps) {
         ) : (
           messages.map((message) => {
             const isOwnMessage = message.user_name === currentUserName
+            const userInitial = message.user_name.charAt(0).toUpperCase()
+            
             return (
               <div
                 key={message.id}
-                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-2 ${isOwnMessage ? 'justify-end flex-row-reverse' : 'justify-start'}`}
               >
+                <Avatar className="h-8 w-8 shrink-0">
+                  {message.avatar_url && (
+                    <AvatarImage src={message.avatar_url} alt={message.user_name} />
+                  )}
+                  <AvatarFallback className="text-xs">
+                    {userInitial}
+                  </AvatarFallback>
+                </Avatar>
                 <div
                   className={`max-w-[70%] rounded-2xl px-4 py-2 ${
                     isOwnMessage
