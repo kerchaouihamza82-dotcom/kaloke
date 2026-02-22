@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { upload } from '@vercel/blob/client'
+import { NotificationsList } from "@/components/notifications-list"
 
 interface UserProfile {
   id: string
@@ -406,8 +407,20 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Preferencias de Notificación
+                Notificaciones Recientes
               </CardTitle>
+              <CardDescription>
+                Gestiona y revisa tus notificaciones más recientes
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <NotificationsList />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Preferencias de Notificación</CardTitle>
               <CardDescription>
                 Controla cómo y cuándo recibes notificaciones
               </CardDescription>
