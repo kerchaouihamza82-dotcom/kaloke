@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,6 @@ import {
   ChevronDown
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useRef, useEffect } from "react"
 import { VideoCarousel } from "@/components/video-carousel"
 import { ImageCarousel } from "@/components/image-carousel"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -89,7 +89,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl space-y-8 text-center sm:space-y-12">
             <div className="space-y-6 sm:space-y-8">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                <span className="relative inline-block text-white">
+                <span className="relative inline-block text-foreground">
                   GANA DINERO{" "}
                   <span className="relative inline-block">
                     HOY
@@ -97,17 +97,17 @@ export default function LandingPage() {
                   </span>
                 </span>
               </h1>
-              <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-gray-400 sm:text-base md:text-lg">
+              <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
                 La educación moderna es demasiado lenta—cuatro años es demasiado tiempo.
               </p>
-              <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-gray-300 sm:text-base md:text-lg">
+              <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
                 Aprende habilidades{" "}
-                <span className="relative inline-block font-bold text-white">
+                <span className="relative inline-block font-bold text-foreground">
                   REALES HOY
                   <span className="absolute bottom-0 left-0 h-0.5 w-full bg-red-600"></span>
                 </span>{" "}
                 que te harán ganar dinero{" "}
-                <span className="relative inline-block font-bold text-white">
+                <span className="relative inline-block font-bold text-foreground">
                   MAÑANA
                   <span className="absolute bottom-0 left-0 h-0.5 w-full bg-red-600"></span>
                 </span>
@@ -141,19 +141,19 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 gap-4 pt-8 sm:gap-8 sm:pt-12 md:grid-cols-4">
               <div className="space-y-1 sm:space-y-2">
                 <div className="text-3xl font-bold text-blue-400 sm:text-4xl">25</div>
-                <div className="text-xs font-medium text-gray-400 sm:text-sm">Estudiantes Inscritos</div>
+                <div className="text-xs font-medium text-muted-foreground sm:text-sm">Estudiantes Inscritos</div>
               </div>
               <div className="space-y-1 sm:space-y-2">
                 <div className="text-3xl font-bold text-blue-400 sm:text-4xl">17</div>
-                <div className="text-xs font-medium text-gray-400 sm:text-sm">Historias de Éxito</div>
+                <div className="text-xs font-medium text-muted-foreground sm:text-sm">Historias de Éxito</div>
               </div>
               <div className="space-y-1 sm:space-y-2">
                 <div className="text-3xl font-bold text-blue-400 sm:text-4xl">5</div>
-                <div className="text-xs font-medium text-gray-400 sm:text-sm">Métodos de Creación de Riqueza</div>
+                <div className="text-xs font-medium text-muted-foreground sm:text-sm">Métodos de Creación de Riqueza</div>
               </div>
               <div className="space-y-1 sm:space-y-2">
                 <div className="text-3xl font-bold text-blue-400 sm:text-4xl">25</div>
-                <div className="text-xs font-medium text-gray-400 sm:text-sm">Estudiantes Activos</div>
+                <div className="text-xs font-medium text-muted-foreground sm:text-sm">Estudiantes Activos</div>
               </div>
             </div>
           </div>
@@ -164,10 +164,10 @@ export default function LandingPage() {
       <section className="border-y border-white/5 py-16 sm:py-24 md:py-32">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="mx-auto max-w-4xl space-y-6 text-center sm:space-y-8">
-            <h2 className="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+            <h2 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl">
               El mundo digital avanza más rápido que la educación tradicional
             </h2>
-            <p className="text-base leading-relaxed text-gray-400 sm:text-lg">
+            <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
               Actualizamos el contenido cada día a las 8 a.m. para mantener a los estudiantes al día con las últimas herramientas digitales, automatización e inteligencia artificial aplicadas a negocios online.
             </p>
             <p className="text-sm font-medium text-blue-400 sm:text-base">
@@ -189,74 +189,74 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="mb-12 space-y-3 text-center sm:mb-16 sm:space-y-4">
             <h2 className="text-3xl font-bold sm:text-4xl md:text-5xl">Accede a 5 campus especializados</h2>
-            <p className="text-base font-medium text-gray-400 sm:text-lg">Habilidades que puedes aplicar de inmediato</p>
+            <p className="text-base font-medium text-muted-foreground sm:text-lg">Habilidades que puedes aplicar de inmediato</p>
           </div>
           
           <div className="mx-auto grid max-w-6xl gap-4 sm:gap-6 md:grid-cols-2">
-            <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+            <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
               <CardContent className="flex flex-col gap-4 p-6 sm:gap-6 sm:p-8">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
                   <Brain className="h-6 w-6 text-blue-400 sm:h-7 sm:w-7" />
                 </div>
                 <div className="space-y-2 sm:space-y-3">
                   <h3 className="text-xl font-semibold sm:text-2xl">Agencia Automatizada con IA</h3>
-                  <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
+                  <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                     Crea sistemas automatizados que puedes ofrecer a negocios online o usar para tu propio proyecto.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+            <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
               <CardContent className="flex flex-col gap-4 p-6 sm:gap-6 sm:p-8">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
                   <Users className="h-6 w-6 text-blue-400 sm:h-7 sm:w-7" />
                 </div>
                 <div className="space-y-2 sm:space-y-3">
                   <h3 className="text-xl font-semibold sm:text-2xl">Campus de Instagram</h3>
-                  <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
+                  <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                     Estrategias de venta online sin necesidad de mostrar tu rostro.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+            <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
               <CardContent className="flex flex-col gap-4 p-6 sm:gap-6 sm:p-8">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
                   <Zap className="h-6 w-6 text-blue-400 sm:h-7 sm:w-7" />
                 </div>
                 <div className="space-y-2 sm:space-y-3">
                   <h3 className="text-xl font-semibold sm:text-2xl">Adquisición de Clientes Automatizada</h3>
-                  <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
+                  <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                     Sistemas eficientes para conseguir y mantener clientes.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+            <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
               <CardContent className="flex flex-col gap-6 p-8">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
                   <Globe className="h-7 w-7 text-blue-400" />
                 </div>
                 <div className="space-y-3">
                   <h3 className="text-2xl font-semibold">Bolsa de Trabajo Experta</h3>
-                  <p className="leading-relaxed text-gray-400">
+                  <p className="leading-relaxed text-muted-foreground">
                     Acceso a comunidad, mentorías y oportunidades de colaboración.
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10 md:col-span-2">
+            <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10 md:col-span-2">
               <CardContent className="flex flex-col gap-6 p-8">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
                   <DollarSign className="h-7 w-7 text-blue-400" />
                 </div>
                 <div className="space-y-3">
                   <h3 className="text-2xl font-semibold">Campus adicional</h3>
-                  <p className="leading-relaxed text-gray-400">
+                  <p className="leading-relaxed text-muted-foreground">
                     Acceso a contenido especializado y recursos exclusivos.
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold leading-tight md:text-5xl">
               Una plataforma diseñada para tu progreso
             </h2>
-            <p className="text-lg leading-relaxed text-gray-400">
+            <p className="text-lg leading-relaxed text-muted-foreground">
               Nuestra plataforma está diseñada para facilitar el aprendizaje práctico, el seguimiento del progreso y la aplicación inmediata de lo aprendido.
             </p>
           </div>
@@ -287,7 +287,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold md:text-5xl">
               Logros dentro de DigiCash Academy
             </h2>
-            <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
+            <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground">
               Conoce las historias de estudiantes que han transformado sus vidas aplicando lo aprendido.
             </p>
           </div>
@@ -309,7 +309,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold md:text-5xl">
               Resultados verificables
             </h2>
-            <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
+            <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground">
               Métricas reales de cuentas gestionadas por estudiantes que aplicaron lo aprendido en DigiCash Academy.
             </p>
           </div>
@@ -359,7 +359,7 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-6 text-center">
-            <p className="text-lg text-gray-400">
+            <p className="text-lg text-muted-foreground">
             Datos extraídos directamente de Instagram Analytics. Estas son métricas reales de cuentas manejadas por estudiantes.
           </p>
           <div className="mt-12">
@@ -382,7 +382,7 @@ export default function LandingPage() {
             </h2>
             
             <div className="grid gap-6 md:grid-cols-3">
-              <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+              <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
                 <CardContent className="flex flex-col items-center gap-6 p-8 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
                     <CheckCircle className="h-8 w-8 text-blue-400" />
@@ -391,7 +391,7 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+              <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
                 <CardContent className="flex flex-col items-center gap-6 p-8 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
                     <TrendingUp className="h-8 w-8 text-blue-400" />
@@ -400,7 +400,7 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="group overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+              <Card className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
                 <CardContent className="flex flex-col items-center gap-6 p-8 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10 transition-transform duration-300 group-hover:scale-110">
                     <MessageSquare className="h-8 w-8 text-blue-400" />
@@ -420,7 +420,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold leading-tight md:text-5xl">
               Una comunidad privada de estudiantes enfocados
             </h2>
-            <p className="text-lg leading-relaxed text-gray-400">
+            <p className="text-lg leading-relaxed text-muted-foreground">
               Conecta con otros estudiantes, comparte conocimientos y colabora en proyectos reales.
             </p>
           </div>
@@ -432,7 +432,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="mb-16 space-y-4 text-center">
             <h2 className="text-4xl font-bold md:text-5xl">Elige tu acceso</h2>
-            <p className="text-lg font-medium text-gray-400">Empieza hoy a desarrollar habilidades digitales rentables</p>
+            <p className="text-lg font-medium text-muted-foreground">Empieza hoy a desarrollar habilidades digitales rentables</p>
           </div>
 
           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:items-stretch">
@@ -445,7 +445,7 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-semibold">Suscripción Mensual</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-bold text-blue-400">$9.99</span>
-                    <span className="text-gray-400">/mes</span>
+                    <span className="text-muted-foreground">/mes</span>
                   </div>
                 </div>
                 <ul className="mt-8 space-y-3">
@@ -476,13 +476,13 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="flex overflow-hidden border border-white/10 bg-gray-950 transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
+            <Card className="flex overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
               <CardContent className="flex w-full flex-col p-8">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-semibold">Acceso Completo</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-bold text-blue-400">$2,500</span>
-                    <span className="text-gray-400">único</span>
+                    <span className="text-muted-foreground">único</span>
                   </div>
                 </div>
                 <ul className="mt-8 space-y-3">
@@ -549,14 +549,14 @@ export default function LandingPage() {
               <button
                 key={i}
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full rounded-xl border border-white/10 bg-gray-950 p-6 text-left transition-all duration-300 hover:border-blue-500/30"
+                className="w-full rounded-xl border border-border bg-card p-6 text-left transition-all duration-300 hover:border-blue-500/30"
               >
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-semibold">{faq.q}</h3>
                   <ChevronDown className={`h-5 w-5 shrink-0 text-blue-400 transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
                 </div>
                 {openFaq === i && (
-                  <p className="mt-4 leading-relaxed text-gray-400">{faq.a}</p>
+                  <p className="mt-4 leading-relaxed text-muted-foreground">{faq.a}</p>
                 )}
               </button>
             ))}
@@ -571,7 +571,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold leading-tight md:text-5xl">
               Empieza a desarrollar habilidades digitales rentables hoy
             </h2>
-            <p className="text-lg leading-relaxed text-gray-400">
+            <p className="text-lg leading-relaxed text-muted-foreground">
             Únete a estudiantes que están construyendo su futuro digital.
           </p>
           <div className="mt-16">
@@ -600,12 +600,12 @@ export default function LandingPage() {
               <span className="text-sm font-medium">DigiCash Academy</span>
             </div>
             <div className="flex gap-6">
-              <a href="#inicio" className="text-sm text-gray-400 transition-colors hover:text-white">Inicio</a>
-              <a href="#profesiones" className="text-sm text-gray-400 transition-colors hover:text-white">Profesiones</a>
-              <a href="#reseñas" className="text-sm text-gray-400 transition-colors hover:text-white">Reseñas</a>
-              <a href="#información" className="text-sm text-gray-400 transition-colors hover:text-white">Información</a>
+              <a href="#inicio" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Inicio</a>
+              <a href="#profesiones" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Profesiones</a>
+              <a href="#reseñas" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Reseñas</a>
+              <a href="#información" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Información</a>
             </div>
-            <p className="text-sm text-gray-400">© 2024 DigiCash Academy. Todos los derechos reservados.</p>
+            <p className="text-sm text-muted-foreground">© 2024 DigiCash Academy. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
