@@ -106,13 +106,22 @@ export default function ProfilePage() {
       })
 
       const supabase = createClient()
-      const { error } = await supabase.auth.updateUser({
-        data: { avatar_url: newBlob.url }
-      })
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      
+      if (!currentUser) throw new Error('No user found')
+
+      // Update user_profiles table with new avatar
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: currentUser.id,
+          avatar_url: newBlob.url
+        })
 
       if (error) throw error
 
       setUser(prev => prev ? { ...prev, avatar_url: newBlob.url } : null)
+      setFormData(prev => ({ ...prev, avatar_url: newBlob.url }))
       toast.success('Foto de perfil actualizada')
     } catch (error) {
       console.error('[v0] Error uploading avatar:', error)
@@ -128,16 +137,30 @@ export default function ProfilePage() {
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.updateUser({
-        email: formData.email,
-        data: {
-          full_name: formData.full_name,
-          phone: formData.phone,
-          bio: formData.bio
-        }
-      })
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('No user found')
 
-      if (error) throw error
+      // Update email in auth if changed
+      if (formData.email !== user.email) {
+        const { error } = await supabase.auth.updateUser({
+          email: formData.email
+        })
+        if (error) throw error
+      }
+
+      // Update user_profiles table
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: user.id,
+          full_name: formData.full_name,
+          bio: formData.bio,
+          avatar_url: formData.avatar_url
+        })
+
+      if (profileError) throw profileError
 
       toast.success('Perfil actualizado exitosamente')
       loadUserProfile()

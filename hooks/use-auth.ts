@@ -6,10 +6,9 @@ import type { User } from '@supabase/supabase-js'
 
 interface Profile {
   id: string
-  email: string
   full_name: string | null
-  role: 'student' | 'admin'
   avatar_url: string | null
+  bio: string | null
 }
 
 export function useAuth() {
@@ -20,20 +19,22 @@ export function useAuth() {
   useEffect(() => {
     const supabase = createClient()
 
+    const loadProfile = async (userId: string) => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      setProfile(data)
+      setLoading(false)
+    }
+
     // Get initial user
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
       if (user) {
-        // Get user profile
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-          .then(({ data }) => {
-            setProfile(data)
-            setLoading(false)
-          })
+        loadProfile(user.id)
       } else {
         setLoading(false)
       }
@@ -45,25 +46,37 @@ export function useAuth() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data }) => {
-            setProfile(data)
-          })
+        loadProfile(session.user.id)
       } else {
         setProfile(null)
       }
     })
 
+    // Subscribe to profile changes in real-time
+    const channel = supabase
+      .channel('user_profile_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_profiles'
+        },
+        (payload) => {
+          if (payload.new && user && (payload.new as any).id === user.id) {
+            setProfile(payload.new as Profile)
+          }
+        }
+      )
+      .subscribe()
+
     return () => {
       subscription.unsubscribe()
+      supabase.removeChannel(channel)
     }
-  }, [])
+  }, [user?.id])
 
-  const isAdmin = profile?.role === 'admin'
+  const isAdmin = user?.user_metadata?.role === 'admin'
 
   return { user, profile, loading, isAdmin }
 }
