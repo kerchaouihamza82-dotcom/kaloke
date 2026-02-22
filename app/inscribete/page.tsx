@@ -88,12 +88,11 @@ export default function InscribetePage() {
 
                 {/* CTA */}
                 <div className="mt-auto space-y-4 pt-8">
-                  <Button 
-                    className="w-full bg-red-600 py-6 text-lg font-medium hover:bg-red-700"
-                    onClick={() => alert('Próximamente: Integración con Stripe')}
-                  >
-                    Acceder ahora
-                  </Button>
+                  <Link href="/checkout/plan-mensual">
+                    <Button className="w-full bg-red-600 py-6 text-lg font-medium hover:bg-red-700">
+                      Acceder ahora
+                    </Button>
+                  </Link>
 
                   <p className="text-center text-sm font-light text-muted-foreground">
                     7 días de garantía de devolución
@@ -138,12 +137,11 @@ export default function InscribetePage() {
 
                 {/* CTA */}
                 <div className="mt-auto space-y-4 pt-8">
-                  <Button 
-                    className="w-full border border-white bg-white py-6 text-lg font-medium text-black hover:bg-gray-200"
-                    onClick={() => alert('Próximamente: Integración con Stripe')}
-                  >
-                    Acceder ahora
-                  </Button>
+                  <Link href="/checkout/plan-completo">
+                    <Button className="w-full border border-foreground bg-foreground py-6 text-lg font-medium text-background hover:bg-foreground/90">
+                      Acceder ahora
+                    </Button>
+                  </Link>
 
                   <p className="text-center text-sm font-light text-muted-foreground">
                     Pago único, sin cargos recurrentes
