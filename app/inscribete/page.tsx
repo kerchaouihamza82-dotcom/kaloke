@@ -44,15 +44,15 @@ export default function InscribetePage() {
           </div>
 
           {/* Plans Grid */}
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
             {/* Plan Mensual */}
-            <Card className="relative border-2 border-blue-500/30 bg-gradient-to-br from-blue-950/20 to-gray-950">
+            <Card className="relative flex border-2 border-blue-500/30 bg-gradient-to-br from-blue-950/20 to-gray-950">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-blue-500 px-6 py-2 text-sm font-medium text-white">
                   RECOMENDADO
                 </Badge>
               </div>
-              <CardContent className="space-y-8 p-10 pt-12">
+              <CardContent className="flex w-full flex-col p-10 pt-12">
                 {/* Header */}
                 <div className="space-y-4 text-center">
                   <h2 className="text-2xl font-light text-blue-400">Plan Mensual</h2>
@@ -66,7 +66,7 @@ export default function InscribetePage() {
                 </div>
 
                 {/* Benefits */}
-                <div className="space-y-4">
+                <div className="flex-grow space-y-4">
                   <h3 className="text-lg font-light">Lo que incluye:</h3>
                   <ul className="space-y-3">
                     {[
@@ -87,22 +87,24 @@ export default function InscribetePage() {
                 </div>
 
                 {/* CTA */}
-                <Button 
-                  className="w-full bg-red-600 py-6 text-lg font-medium hover:bg-red-700"
-                  onClick={() => alert('Próximamente: Integración con Stripe')}
-                >
-                  Acceder ahora
-                </Button>
+                <div className="mt-auto space-y-4 pt-8">
+                  <Button 
+                    className="w-full bg-red-600 py-6 text-lg font-medium hover:bg-red-700"
+                    onClick={() => alert('Próximamente: Integración con Stripe')}
+                  >
+                    Acceder ahora
+                  </Button>
 
-                <p className="text-center text-sm font-light text-gray-500">
-                  7 días de garantía de devolución
-                </p>
+                  <p className="text-center text-sm font-light text-gray-500">
+                    7 días de garantía de devolución
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
             {/* Plan Completo */}
-            <Card className="border border-white/5 bg-gray-950">
-              <CardContent className="space-y-8 p-10">
+            <Card className="flex border border-white/5 bg-gray-950">
+              <CardContent className="flex w-full flex-col p-10">
                 {/* Header */}
                 <div className="space-y-4 text-center">
                   <h2 className="text-2xl font-light text-gray-400">Plan Completo</h2>
@@ -113,7 +115,7 @@ export default function InscribetePage() {
                 </div>
 
                 {/* Benefits */}
-                <div className="space-y-4">
+                <div className="flex-grow space-y-4">
                   <h3 className="text-lg font-light">Lo que incluye:</h3>
                   <ul className="space-y-3">
                     {[
@@ -135,16 +137,18 @@ export default function InscribetePage() {
                 </div>
 
                 {/* CTA */}
-                <Button 
-                  className="w-full border border-white bg-white py-6 text-lg font-medium text-black hover:bg-gray-200"
-                  onClick={() => alert('Próximamente: Integración con Stripe')}
-                >
-                  Acceder ahora
-                </Button>
+                <div className="mt-auto space-y-4 pt-8">
+                  <Button 
+                    className="w-full border border-white bg-white py-6 text-lg font-medium text-black hover:bg-gray-200"
+                    onClick={() => alert('Próximamente: Integración con Stripe')}
+                  >
+                    Acceder ahora
+                  </Button>
 
-                <p className="text-center text-sm font-light text-gray-500">
-                  Pago único, sin cargos recurrentes
-                </p>
+                  <p className="text-center text-sm font-light text-gray-500">
+                    Pago único, sin cargos recurrentes
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
