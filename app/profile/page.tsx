@@ -36,7 +36,8 @@ export default function ProfilePage() {
     full_name: '',
     email: '',
     phone: '',
-    bio: ''
+    bio: '',
+    avatar_url: ''
   })
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -106,19 +107,23 @@ export default function ProfilePage() {
     }
 
     setUploadingAvatar(true)
+    console.log('[v0] Starting upload for:', file.name)
 
     try {
       const newBlob = await upload(file.name, file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
       })
+      console.log('[v0] Upload successful, URL:', newBlob.url)
 
       const supabase = createClient()
       const { data: { user: currentUser } } = await supabase.auth.getUser()
       
       if (!currentUser) throw new Error('No user found')
+      console.log('[v0] User ID:', currentUser.id)
 
       // Update user_profiles table with new avatar
+      console.log('[v0] Updating user_profiles with avatar:', newBlob.url)
       const { error } = await supabase
         .from('user_profiles')
         .upsert({
@@ -126,14 +131,18 @@ export default function ProfilePage() {
           avatar_url: newBlob.url
         })
 
-      if (error) throw error
+      if (error) {
+        console.error('[v0] Supabase error:', error)
+        throw error
+      }
+      console.log('[v0] Profile updated successfully')
 
       setUser(prev => prev ? { ...prev, avatar_url: newBlob.url } : null)
       setFormData(prev => ({ ...prev, avatar_url: newBlob.url }))
       toast.success('Foto de perfil actualizada')
     } catch (error) {
       console.error('[v0] Error uploading avatar:', error)
-      toast.error('Error al subir la imagen')
+      toast.error('Error al subir la imagen: ' + (error as Error).message)
     } finally {
       setUploadingAvatar(false)
     }
