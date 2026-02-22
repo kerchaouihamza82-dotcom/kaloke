@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { EditModeToggle } from "@/components/edit-mode-toggle"
+import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
@@ -72,6 +73,9 @@ export function AppHeader() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          
           {/* Edit Mode Toggle */}
           <EditModeToggle />
           

@@ -16,9 +16,10 @@ import {
   ChevronDown
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { VideoCarousel } from "@/components/video-carousel"
 import { ImageCarousel } from "@/components/image-carousel"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -47,9 +48,9 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/90 backdrop-blur-md">
+      <header className="fixed top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-md">
         <div className="container mx-auto flex h-20 items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <img 
@@ -60,19 +61,21 @@ export default function LandingPage() {
             />
             <span className="text-lg font-medium">DigiCash Academy</span>
           </div>
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-6 lg:flex">
             <a href="#inicio" className="text-sm font-medium transition-colors hover:text-blue-400">Inicio</a>
             <a href="#profesiones" className="text-sm font-medium transition-colors hover:text-blue-400">Profesiones</a>
             <a href="#reseñas" className="text-sm font-medium transition-colors hover:text-blue-400">Reseñas</a>
             <a href="#información" className="text-sm font-medium transition-colors hover:text-blue-400">Información</a>
             <Link href="/login" className="text-sm font-medium transition-colors hover:text-blue-400">Acceso</Link>
+            <ThemeToggle />
             <Link href="/inscribete">
               <Button className="h-10 bg-red-600 px-6 font-medium transition-transform hover:scale-105">
                 Inscríbete Ahora
               </Button>
             </Link>
           </nav>
-          <div className="lg:hidden">
+          <div className="flex items-center gap-3 lg:hidden">
+            <ThemeToggle />
             <Link href="/inscribete">
               <Button className="h-10 bg-red-600 px-4 transition-transform hover:scale-105">Inscríbete</Button>
             </Link>
