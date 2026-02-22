@@ -23,29 +23,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.muted = true
-    video.play().catch(err => console.log('[v0] Video autoplay prevented:', err))
-
-    const handleScroll = () => {
-      const rect = video.getBoundingClientRect()
-      const isVisible = rect.top < window.innerHeight && rect.bottom > 0
-
-      if (isVisible && video.paused) {
-        video.play().catch(err => console.log('[v0] Video play error:', err))
-      } else if (!isVisible && !video.paused) {
-        video.pause()
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -117,7 +94,6 @@ export default function LandingPage() {
             {/* Video VSL */}
             <div className="mx-auto max-w-4xl overflow-hidden rounded-xl shadow-2xl shadow-blue-500/10 ring-1 ring-white/10 sm:rounded-2xl">
               <video 
-                ref={videoRef}
                 controls 
                 className="w-full"
                 playsInline
