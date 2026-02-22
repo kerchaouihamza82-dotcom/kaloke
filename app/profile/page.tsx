@@ -269,23 +269,20 @@ export default function ProfilePage() {
                   {getInitials(user.full_name)}
                 </AvatarFallback>
               </Avatar>
-              <label htmlFor="avatar-upload">
-                <Button
-                  size="icon"
-                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
-                  variant="secondary"
-                  disabled={uploadingAvatar}
-                  asChild
-                >
-                  <div>
-                    {uploadingAvatar ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Camera className="h-4 w-4" />
-                    )}
-                  </div>
-                </Button>
-              </label>
+              <Button
+                size="icon"
+                className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
+                variant="secondary"
+                disabled={uploadingAvatar}
+                onClick={() => document.getElementById('avatar-upload')?.click()}
+                type="button"
+              >
+                {uploadingAvatar ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+              </Button>
               <input
                 id="avatar-upload"
                 type="file"

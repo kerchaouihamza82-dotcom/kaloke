@@ -18,6 +18,7 @@ export function useAuth() {
 
   useEffect(() => {
     const supabase = createClient()
+    let currentUserId: string | null = null
 
     const loadProfile = async (userId: string) => {
       const { data } = await supabase
@@ -26,13 +27,16 @@ export function useAuth() {
         .eq('id', userId)
         .single()
 
-      setProfile(data)
+      if (data) {
+        setProfile(data)
+      }
       setLoading(false)
     }
 
     // Get initial user
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
+      currentUserId = user?.id || null
       if (user) {
         loadProfile(user.id)
       } else {
@@ -45,6 +49,7 @@ export function useAuth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      currentUserId = session?.user?.id || null
       if (session?.user) {
         loadProfile(session.user.id)
       } else {
@@ -63,7 +68,7 @@ export function useAuth() {
           table: 'user_profiles'
         },
         (payload) => {
-          if (payload.new && user && (payload.new as any).id === user.id) {
+          if (payload.new && currentUserId && (payload.new as any).id === currentUserId) {
             setProfile(payload.new as Profile)
           }
         }
@@ -74,7 +79,7 @@ export function useAuth() {
       subscription.unsubscribe()
       supabase.removeChannel(channel)
     }
-  }, [user?.id])
+  }, [])
 
   const isAdmin = user?.user_metadata?.role === 'admin'
 
