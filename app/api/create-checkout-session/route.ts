@@ -10,22 +10,28 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const { priceId, userId, userEmail } = await request.json()
+    const { productId, userId } = await request.json()
 
-    if (!priceId || !userId || !userEmail) {
+    if (!productId || !userId) {
       return NextResponse.json(
-        { error: 'Missing required fields: priceId, userId, userEmail' },
+        { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    // Find the product by its Stripe price ID
-    const product = PRODUCTS.find((p) => p.stripePriceId === priceId)
+    // Find the product by ID
+    const product = PRODUCTS.find((p) => p.id === productId)
     if (!product) {
       return NextResponse.json(
-        { error: 'Invalid price ID' },
+        { error: 'Invalid product' },
         { status: 400 }
       )
+    }
+
+    // Get user email from Supabase auth
+    const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 400 })
     }
 
     // Check if user already has a Stripe customer ID
@@ -37,62 +43,45 @@ export async function POST(request: NextRequest) {
 
     let customerId = profile?.stripe_customer_id
 
-    // Create Stripe customer if it doesn't exist
+    // Create Stripe customer if needed
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: userEmail,
+        email: user.email,
         metadata: { supabase_uid: userId },
       })
       customerId = customer.id
 
-      // Save the customer ID in the profile
       await supabaseAdmin
         .from('user_profiles')
-        .upsert({
-          id: userId,
-          stripe_customer_id: customerId,
-        })
+        .upsert({ id: userId, stripe_customer_id: customerId })
     }
 
-    // Build the checkout session params
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    const sessionParams: Record<string, unknown> = {
+    // Create embedded checkout session
+    const session = await stripe.checkout.sessions.create({
+      ui_mode: 'embedded',
       customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: product.stripePriceId, quantity: 1 }],
       mode: product.type === 'subscription' ? 'subscription' : 'payment',
-      success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/inscribete?cancelled=true`,
+      return_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       metadata: {
         userId,
         productId: product.id,
         subscriptionType: product.type,
       },
-    }
-
-    // For subscriptions, add subscription metadata too
-    if (product.type === 'subscription') {
-      sessionParams.subscription_data = {
-        metadata: {
-          userId,
-          productId: product.id,
+      ...(product.type === 'subscription' ? {
+        subscription_data: {
+          metadata: { userId, productId: product.id },
         },
-      }
-    }
-
-    // For one-time payments, add payment intent metadata
-    if (product.type === 'one-time') {
-      sessionParams.payment_intent_data = {
-        metadata: {
-          userId,
-          productId: product.id,
+      } : {
+        payment_intent_data: {
+          metadata: { userId, productId: product.id },
         },
-      }
-    }
+      }),
+    })
 
-    const session = await stripe.checkout.sessions.create(sessionParams as any)
-
-    return NextResponse.json({ url: session.url })
+    return NextResponse.json({ clientSecret: session.client_secret })
   } catch (error) {
     console.error('[Stripe] Error creating checkout session:', error)
     return NextResponse.json(

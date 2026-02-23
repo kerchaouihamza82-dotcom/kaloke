@@ -4,7 +4,7 @@ import React from "react"
 
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AuthLayout } from "@/components/auth-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,8 @@ import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const plan = searchParams.get('plan')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -27,15 +29,6 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // BYPASS TEMPORAL PARA TESTING - Eliminar en producción
-      if (email === 'admin@digicash.academy' && password === 'gmjhdigicash$') {
-        // Simular sesión temporal para testing
-        localStorage.setItem('temp_admin_session', 'true')
-        router.push('/dashboard')
-        router.refresh()
-        return
-      }
-
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -43,20 +36,24 @@ export default function LoginPage() {
       })
 
       if (error) {
-        // Mejorar mensajes de error
         if (error.message.includes('Invalid login credentials')) {
-          setError('Usuario no encontrado o contraseña incorrecta. ¿Ya te registraste?')
+          setError('Usuario no encontrado o contrasena incorrecta.')
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Por favor confirma tu correo electrónico antes de iniciar sesión.')
+          setError('Por favor confirma tu correo electronico antes de iniciar sesion.')
         } else {
           setError(error.message)
         }
       } else {
-        router.push('/dashboard')
+        // If user came from a plan selection, redirect to checkout
+        if (plan) {
+          router.push(`/checkout/${plan}`)
+        } else {
+          router.push('/dashboard')
+        }
         router.refresh()
       }
     } catch (err) {
-      setError('Ocurrió un error inesperado')
+      setError('Ocurrio un error inesperado')
     } finally {
       setLoading(false)
     }
@@ -145,8 +142,8 @@ export default function LoginPage() {
           </div>
           <p className="text-center text-sm text-muted-foreground">
             ¿No tienes una cuenta?{" "}
-            <Link href="/register" className="font-medium text-primary transition-colors hover:underline">
-              Regístrate
+            <Link href={plan ? `/register?plan=${plan}` : '/register'} className="font-medium text-primary transition-colors hover:underline">
+              {'Registrate'}
             </Link>
           </p>
         </CardFooter>

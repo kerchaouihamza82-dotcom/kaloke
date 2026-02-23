@@ -4,7 +4,7 @@ import React from "react"
 
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AuthLayout } from "@/components/auth-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,8 @@ import { Eye, EyeOff } from "lucide-react"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const plan = searchParams.get('plan')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -44,11 +46,15 @@ export default function RegisterPage() {
 
     try {
       const supabase = createClient()
+      const redirectUrl = plan
+        ? `${window.location.origin}/checkout/${plan}`
+        : `${window.location.origin}/dashboard`
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: redirectUrl,
           data: {
             full_name: name,
           },
@@ -79,14 +85,15 @@ export default function RegisterPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para activar tu cuenta.
+              {'Revisa tu bandeja de entrada y haz clic en el enlace de confirmacion para activar tu cuenta.'}
+              {plan && ' Despues de confirmar, seras redirigido al checkout para completar tu compra.'}
             </p>
             <Button
               variant="outline"
               className="w-full bg-transparent"
-              onClick={() => router.push('/login')}
+              onClick={() => router.push(plan ? `/login?plan=${plan}` : '/login')}
             >
-              Ir a Iniciar Sesión
+              {'Ir a Iniciar Sesion'}
             </Button>
           </CardContent>
         </Card>
@@ -230,8 +237,8 @@ export default function RegisterPage() {
           </div>
           <p className="text-center text-sm text-muted-foreground">
             ¿Ya tienes una cuenta?{" "}
-            <Link href="/login" className="font-medium text-primary transition-colors hover:underline">
-              Inicia sesión
+            <Link href={plan ? `/login?plan=${plan}` : '/login'} className="font-medium text-primary transition-colors hover:underline">
+              {'Inicia sesion'}
             </Link>
           </p>
         </CardFooter>

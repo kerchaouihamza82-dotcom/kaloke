@@ -34,41 +34,47 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protect dashboard routes
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+  const pathname = request.nextUrl.pathname
+  const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/profile') || pathname.startsWith('/admin')
+  const isAuthRoute = pathname === '/login' || pathname === '/register'
+
+  // Protect dashboard/profile/admin routes
+  if (isProtectedRoute) {
     if (!user) {
-      // Redirect to login if not authenticated
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/login'
-      redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
+      redirectUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(redirectUrl)
     }
 
-    // Check if user has paid access
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('has_access')
-      .eq('id', user.id)
-      .single()
+    // Check if user has paid access (skip for admin routes - admin check is done in admin pages)
+    if (!pathname.startsWith('/admin')) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('has_access')
+        .eq('id', user.id)
+        .single()
 
-    if (!profile?.has_access) {
-      // Redirect to pricing page if no access
-      const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/inscribete'
-      return NextResponse.redirect(redirectUrl)
+      if (!profile?.has_access) {
+        return NextResponse.redirect(new URL('/inscribete', request.url))
+      }
     }
   }
 
   // Redirect authenticated users with access away from login/register
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('has_access')
-      .eq('id', user.id)
-      .single()
+  // But allow if they have a plan param (they need to complete checkout)
+  if (isAuthRoute && user) {
+    const hasPlanParam = request.nextUrl.searchParams.has('plan')
+    if (!hasPlanParam) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('has_access')
+        .eq('id', user.id)
+        .single()
 
-    if (profile?.has_access) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      if (profile?.has_access) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
     }
   }
 
@@ -78,6 +84,8 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
+    '/profile/:path*',
+    '/admin/:path*',
     '/login',
     '/register',
   ],
