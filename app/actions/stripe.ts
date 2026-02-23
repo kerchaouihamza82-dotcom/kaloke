@@ -13,21 +13,7 @@ export async function startCheckoutSession(productId: string, userId: string) {
     ui_mode: 'embedded',
     line_items: [
       {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: product.name,
-            description: product.description,
-          },
-          unit_amount: product.priceInCents,
-          ...(product.type === 'subscription' && product.interval
-            ? {
-                recurring: {
-                  interval: product.interval,
-                },
-              }
-            : {}),
-        },
+        price: product.stripePriceId,
         quantity: 1,
       },
     ],
@@ -36,6 +22,7 @@ export async function startCheckoutSession(productId: string, userId: string) {
     metadata: {
       userId,
       productId,
+      subscriptionType: product.type,
     },
   })
 
