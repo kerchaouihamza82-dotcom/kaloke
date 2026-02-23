@@ -141,10 +141,10 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="mx-auto max-w-4xl space-y-6 text-center sm:space-y-8">
             <h2 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl">
-              El mundo digital avanza más rápido que la educación tradicional
+              {'El mundo digital avanza más rápido que la educación tradicional'}
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Actualizamos el contenido cada día a las 8 a.m. para mantener a los estudiantes al día con las últimas herramientas digitales, automatización e inteligencia artificial aplicadas a negocios online.
+              {'Actualizamos el contenido cada día a las 8 a.m. para mantener a los estudiantes al día con las últimas herramientas digitales, automatización e inteligencia artificial aplicadas a negocios online.'}
             </p>
             <p className="text-sm font-medium text-blue-400 sm:text-base">
                   Información práctica. Resultados reales. Sin teoría innecesaria.
