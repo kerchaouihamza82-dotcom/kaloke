@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Loader2, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-)
+const STRIPE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 
+  'pk_live_51RTVmQBNyZln5VT1UxulM980MhDBKbMzKKxuGZG27Km7xPVAkjNfhL5TyWPpKAJTs784CtHkM1fCQEWw7aeNDPYm00PzbYTcpy'
+
+console.log('[v0] Stripe key being used:', STRIPE_KEY.substring(0, 20) + '...')
+const stripePromise = loadStripe(STRIPE_KEY)
 
 export default function CheckoutPage({ params }: { params: Promise<{ productId: string }> }) {
   const resolvedParams = use(params)
