@@ -17,16 +17,17 @@ export const PRODUCTS: Product[] = [
     priceInCents: 999, // $9.99
     type: 'subscription',
     interval: 'month',
-    stripePriceId: 'price_1T45v8CYzThxiyRJCXiIfyb5',
-    stripeProductId: 'prod_U2ABUpsjW3OxdT',
+    stripePriceId: 'price_1T47coCYzThxiyRJjvJQQdsF',
+    stripeProductId: 'prod_U2C0aP4F36loA6',
   },
   {
     id: 'plan-completo',
     name: 'Plan Completo',
-    description: 'Acceso de por vida a DigiCash Academy',
+    description: 'Acceso anual a DigiCash Academy',
     priceInCents: 250000, // $2,500
-    type: 'one-time',
-    stripePriceId: 'price_1T45wGCYzThxiyRJNHBsbKSR',
-    stripeProductId: 'prod_U2ABjVW8xN5RU2',
+    type: 'subscription',
+    interval: 'year',
+    stripePriceId: 'price_1T47coCYzThxiyRJivPjnnkh',
+    stripeProductId: 'prod_U2C0T76GCy1vAu',
   },
 ]
