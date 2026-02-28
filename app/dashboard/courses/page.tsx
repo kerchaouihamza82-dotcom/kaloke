@@ -35,9 +35,8 @@ export default function CoursesPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { isAdmin } = useAdmin()
-  const { isEditMode } = useEditMode()
-  // Admin can edit only when edit mode is active
-  const canEdit = isAdmin && isEditMode
+  // Admin always sees edit controls — no toggle needed
+  const canEdit = isAdmin
 
   useEffect(() => {
     loadCourses()

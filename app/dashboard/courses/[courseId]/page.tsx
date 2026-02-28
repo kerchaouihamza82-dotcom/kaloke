@@ -52,8 +52,7 @@ export default function CourseDetailPage() {
   const [editingModule, setEditingModule] = useState<Modulo | null>(null)
   const [editingSesion, setEditingSesion] = useState<{ sesion: Sesion | null, moduleId: string | null }>({ sesion: null, moduleId: null })
   const { isAdmin } = useAdmin()
-  const { isEditMode } = useEditMode()
-  const canEdit = isAdmin && isEditMode
+  const canEdit = isAdmin
 
   useEffect(() => {
     loadCourseData()
