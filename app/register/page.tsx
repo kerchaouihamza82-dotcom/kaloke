@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react"
+import React, { Suspense } from "react"
 
 import Link from "next/link"
 import { useState } from "react"
@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { createClient } from "@/lib/supabase/client"
 import { Eye, EyeOff } from "lucide-react"
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const plan = searchParams.get('plan')
@@ -96,10 +96,18 @@ export default function RegisterPage() {
               {'Ir a Iniciar Sesion'}
             </Button>
           </CardContent>
-        </Card>
-      </AuthLayout>
-    )
-  }
+          </Card>
+    </AuthLayout>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<AuthLayout><div className="h-96 animate-pulse rounded-lg bg-secondary" /></AuthLayout>}>
+      <RegisterForm />
+    </Suspense>
+  )
+}
 
   return (
     <AuthLayout>
