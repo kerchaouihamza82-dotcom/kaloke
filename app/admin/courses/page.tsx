@@ -85,14 +85,22 @@ export default function AdminCoursesPage() {
           .update(courseData)
           .eq('id', editingCourse.id)
 
-        if (error) throw error
+        if (error) {
+          console.error('[v0] Update error:', JSON.stringify(error))
+          throw error
+        }
         toast.success('Curso actualizado exitosamente')
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('cursos')
           .insert([courseData])
+          .select()
 
-        if (error) throw error
+        if (error) {
+          console.error('[v0] Insert error code:', error.code, 'message:', error.message, 'details:', error.details, 'hint:', error.hint)
+          throw error
+        }
+        console.error('[v0] Insert success:', data)
         toast.success('Curso creado exitosamente')
       }
 
