@@ -47,16 +47,28 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
 
-    // Check if user has paid access (skip for admin routes - admin check is done in admin pages)
+    // Check if user has paid access OR is admin
     if (!pathname.startsWith('/admin')) {
       const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('has_access')
+        .from('profiles')
+        .select('role, has_access')
         .eq('id', user.id)
         .single()
 
-      if (!profile?.has_access) {
-        return NextResponse.redirect(new URL('/inscribete', request.url))
+      const isAdmin = profile?.role === 'admin'
+      const hasAccess = profile?.has_access === true
+
+      if (!isAdmin && !hasAccess) {
+        // Also check user_profiles table as fallback
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('has_access')
+          .eq('id', user.id)
+          .single()
+
+        if (!userProfile?.has_access) {
+          return NextResponse.redirect(new URL('/inscribete', request.url))
+        }
       }
     }
   }
@@ -67,12 +79,25 @@ export async function middleware(request: NextRequest) {
     const hasPlanParam = request.nextUrl.searchParams.has('plan')
     if (!hasPlanParam) {
       const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, has_access')
+        .eq('id', user.id)
+        .single()
+
+      const isAdmin = profile?.role === 'admin'
+
+      if (isAdmin) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
+
+      // Also check user_profiles for paid access
+      const { data: userProfile } = await supabase
         .from('user_profiles')
         .select('has_access')
         .eq('id', user.id)
         .single()
 
-      if (profile?.has_access) {
+      if (profile?.has_access || userProfile?.has_access) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
     }
