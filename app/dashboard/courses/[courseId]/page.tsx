@@ -76,7 +76,7 @@ export default function CourseDetailPage() {
       }))
       setModules(formatted)
     } catch (error) {
-      console.error('[v0] Error loading course:', error)
+      console.error('Error loading course:', error)
     } finally {
       setLoading(false)
     }
@@ -98,41 +98,21 @@ export default function CourseDetailPage() {
   }
 
   const handleSaveModule = async () => {
-    console.log('[v0] handleSaveModule CALLED - moduleTitle:', moduleTitle)
     if (!moduleTitle.trim()) {
-      alert('ERROR: El titulo del modulo esta vacio')
+      toast.error('El titulo es obligatorio')
       return
     }
     setSavingModule(true)
     try {
       const supabase = getSupabase()
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      console.log('[v0] Supabase URL:', supabaseUrl)
-
       if (editingModule) {
         const { error } = await supabase.from('modulos').update({ titulo: moduleTitle.trim() }).eq('id', editingModule.id)
-        if (error) {
-          alert('ERROR al actualizar modulo: ' + error.message + ' | Code: ' + error.code)
-          console.error('[v0] Update module error:', error)
-          return
-        }
-        alert('EXITO: Modulo actualizado correctamente')
+        if (error) { toast.error('Error: ' + error.message); return }
         toast.success('Modulo actualizado')
       } else {
         const insertData = { curso_id: courseId, titulo: moduleTitle.trim(), orden_index: modules.length + 1 }
-        console.log('[v0] INSERT DATA:', JSON.stringify(insertData))
-        alert('Intentando crear modulo: ' + moduleTitle.trim() + ' en curso: ' + courseId)
-        
-        const { data, error } = await supabase.from('modulos').insert([insertData]).select()
-        
-        console.log('[v0] INSERT RESULT - data:', JSON.stringify(data), 'error:', error ? JSON.stringify(error) : 'null')
-        
-        if (error) {
-          alert('ERROR al crear modulo: ' + error.message + '\nCode: ' + error.code + '\nDetails: ' + (error.details || 'none') + '\nHint: ' + (error.hint || 'none'))
-          console.error('[v0] Insert module error:', error)
-          return
-        }
-        alert('EXITO: Modulo creado! ID: ' + (data?.[0]?.id || 'unknown'))
+        const { error } = await supabase.from('modulos').insert([insertData]).select()
+        if (error) { toast.error('Error: ' + error.message); return }
         toast.success('Modulo creado correctamente')
       }
       setModuleDialogOpen(false)
@@ -140,8 +120,7 @@ export default function CourseDetailPage() {
       setModuleTitle('')
       await loadAll()
     } catch (err: any) {
-      alert('EXCEPCION: ' + err.message)
-      console.error('[v0] Unexpected module error:', err)
+      toast.error('Error inesperado: ' + err.message)
     } finally {
       setSavingModule(false)
     }
@@ -173,9 +152,8 @@ export default function CourseDetailPage() {
   }
 
   const handleSaveSesion = async () => {
-    console.log('[v0] handleSaveSesion CALLED')
     if (!sesionTitle.trim()) {
-      alert('ERROR: El titulo de la sesion esta vacio')
+      toast.error('El titulo es obligatorio')
       return
     }
     setSavingSesion(true)
@@ -183,26 +161,14 @@ export default function CourseDetailPage() {
       const supabase = getSupabase()
       if (editingSesion.sesion) {
         const { error } = await supabase.from('sesiones').update({ titulo: sesionTitle.trim(), video_url: sesionUrl.trim() }).eq('id', editingSesion.sesion.id)
-        if (error) {
-          alert('ERROR al actualizar sesion: ' + error.message)
-          return
-        }
-        alert('EXITO: Sesion actualizada')
+        if (error) { toast.error('Error: ' + error.message); return }
         toast.success('Sesion actualizada')
       } else {
         const mod = modules.find(m => m.id === editingSesion.moduleId)
         const ordenIndex = (mod?.sesiones.length || 0) + 1
         const insertData = { modulos_id: editingSesion.moduleId!, titulo: sesionTitle.trim(), video_url: sesionUrl.trim(), orden_index: ordenIndex }
-        
-        alert('Intentando crear sesion: ' + sesionTitle.trim() + ' en modulo: ' + editingSesion.moduleId)
-        
-        const { data, error } = await supabase.from('sesiones').insert([insertData]).select()
-        
-        if (error) {
-          alert('ERROR al crear sesion: ' + error.message + '\nCode: ' + error.code)
-          return
-        }
-        alert('EXITO: Sesion creada! ID: ' + (data?.[0]?.id || 'unknown'))
+        const { error } = await supabase.from('sesiones').insert([insertData]).select()
+        if (error) { toast.error('Error: ' + error.message); return }
         toast.success('Sesion creada correctamente')
       }
       setSesionDialogOpen(false)
@@ -211,8 +177,7 @@ export default function CourseDetailPage() {
       setSesionUrl('')
       await loadAll()
     } catch (err: any) {
-      alert('EXCEPCION en sesion: ' + err.message)
-      console.error('[v0] Unexpected sesion error:', err)
+      toast.error('Error inesperado: ' + err.message)
     } finally {
       setSavingSesion(false)
     }
