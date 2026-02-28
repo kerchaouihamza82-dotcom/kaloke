@@ -1,83 +1,50 @@
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-async function getAuthenticatedAdmin() {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll() {},
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') return null
-  return user
-}
+import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const admin = await getAuthenticatedAdmin()
-  if (!admin) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const { action, table, data, id } = await request.json()
-
   try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[v0] admin/write - missing env vars', { supabaseUrl: !!supabaseUrl, serviceRoleKey: !!serviceRoleKey })
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+
+    const body = await request.json()
+    const { action, table, data, id } = body
+    console.log('[v0] admin/write - action:', action, 'table:', table, 'data:', JSON.stringify(data))
+
+    let result: any
+
     if (action === 'insert') {
-      const { data: result, error } = await supabaseAdmin
-        .from(table)
-        .insert(data)
-        .select()
-        .single()
-
-      if (error) throw error
-      return Response.json({ data: result })
+      result = await supabaseAdmin.from(table).insert([data]).select()
+    } else if (action === 'update') {
+      result = await supabaseAdmin.from(table).update(data).eq('id', id).select()
+    } else if (action === 'delete') {
+      result = await supabaseAdmin.from(table).delete().eq('id', id)
+    } else {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-    if (action === 'update') {
-      const { data: result, error } = await supabaseAdmin
-        .from(table)
-        .update(data)
-        .eq('id', id)
-        .select()
-        .single()
+    console.log('[v0] admin/write - error:', result.error?.message, 'data:', JSON.stringify(result.data))
 
-      if (error) throw error
-      return Response.json({ data: result })
+    if (result.error) {
+      return NextResponse.json({
+        error: result.error.message,
+        details: result.error.details,
+        hint: result.error.hint,
+      }, { status: 400 })
     }
 
-    if (action === 'delete') {
-      const { error } = await supabaseAdmin
-        .from(table)
-        .delete()
-        .eq('id', id)
+    return NextResponse.json({ data: result.data })
 
-      if (error) throw error
-      return Response.json({ success: true })
-    }
-
-    return Response.json({ error: 'Invalid action' }, { status: 400 })
-  } catch (error: any) {
-    console.error('[Admin API] Error:', error)
-    return Response.json({ error: error.message }, { status: 500 })
+  } catch (err: any) {
+    console.error('[v0] admin/write - unexpected error:', err.message)
+    return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }

@@ -13,7 +13,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ArrowLeft, PlayCircle, ExternalLink, User, Plus, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useAdmin } from '@/hooks/use-admin'
-import { useEditMode } from '@/hooks/use-edit-mode'
 import { toast } from 'sonner'
 import { adminWrite } from '@/lib/admin-write'
 

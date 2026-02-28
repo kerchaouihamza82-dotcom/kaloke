@@ -24,9 +24,12 @@ export async function adminWrite<T = unknown>(params: AdminWriteParams): Promise
   })
 
   const result = await response.json()
+  console.log('[v0] adminWrite response:', response.status, JSON.stringify(result))
 
   if (!response.ok) {
-    return { error: result.error || 'Operation failed' }
+    const errMsg = result.error || result.details || result.hint || 'Operation failed'
+    console.error('[v0] adminWrite failed:', errMsg)
+    return { error: errMsg }
   }
 
   return result
