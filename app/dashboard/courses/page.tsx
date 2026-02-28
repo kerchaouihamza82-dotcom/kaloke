@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useAdmin } from "@/hooks/use-admin"
+import { useEditMode } from "@/hooks/use-edit-mode"
 import { toast } from "sonner"
 import { upload } from '@vercel/blob/client'
 
@@ -34,6 +35,9 @@ export default function CoursesPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { isAdmin } = useAdmin()
+  const { isEditMode } = useEditMode()
+  // Admin can edit only when edit mode is active
+  const canEdit = isAdmin && isEditMode
 
   useEffect(() => {
     loadCourses()
@@ -212,7 +216,7 @@ export default function CoursesPage() {
             Explora nuestro catálogo de cursos y comienza a aprender
           </p>
         </div>
-        {isAdmin && (
+        {canEdit && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => setEditingCourse(null)}>
@@ -387,7 +391,7 @@ export default function CoursesPage() {
                   <Badge className="bg-primary/10 text-primary">
                     {course.categoria}
                   </Badge>
-                  {isAdmin && (
+                  {canEdit && (
                     <div className="flex gap-1">
                       <Button
                         variant="outline"
@@ -418,7 +422,7 @@ export default function CoursesPage() {
                     <span>{course.instructor}</span>
                   </div>
                 </div>
-                <Link href={isAdmin ? `/dashboard/courses/${course.id}` : `/dashboard/courses/${course.id}/view`} className="mt-4 block w-full">
+                <Link href={canEdit ? `/dashboard/courses/${course.id}` : `/dashboard/courses/${course.id}/view`} className="mt-4 block w-full">
                   <Button className="w-full">
                     Ver Curso
                   </Button>

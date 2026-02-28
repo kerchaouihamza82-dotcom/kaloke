@@ -13,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ArrowLeft, PlayCircle, ExternalLink, User, Plus, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useAdmin } from '@/hooks/use-admin'
+import { useEditMode } from '@/hooks/use-edit-mode'
 import { toast } from 'sonner'
 
 interface Curso {
@@ -50,6 +51,8 @@ export default function CourseDetailPage() {
   const [editingModule, setEditingModule] = useState<Modulo | null>(null)
   const [editingSesion, setEditingSesion] = useState<{ sesion: Sesion | null, moduleId: string | null }>({ sesion: null, moduleId: null })
   const { isAdmin } = useAdmin()
+  const { isEditMode } = useEditMode()
+  const canEdit = isAdmin && isEditMode
 
   useEffect(() => {
     loadCourseData()
@@ -307,7 +310,7 @@ export default function CourseDetailPage() {
               <span>{getTotalSesiones()} sesiones</span>
             </div>
           </div>
-          {!isAdmin && getTotalSesiones() > 0 && (
+          {!canEdit && getTotalSesiones() > 0 && (
             <div className="mt-6">
               <Link href={`/dashboard/courses/${courseId}/view`}>
                 <Button size="lg" className="gap-2">
@@ -320,8 +323,8 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Contenido del curso - Solo visible para admins */}
-      {isAdmin && (
+      {/* Contenido del curso - Solo visible en modo edición para admins */}
+      {canEdit && (
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -397,7 +400,7 @@ export default function CourseDetailPage() {
                           </p>
                         </div>
                       </div>
-                      {isAdmin && (
+                        {canEdit && (
                         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                           <Button
                             variant="outline"
@@ -424,7 +427,7 @@ export default function CourseDetailPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-3 pl-11 pr-4">
-                      {isAdmin && (
+                      {canEdit && (
                         <Button
                           variant="outline"
                           size="sm"
@@ -463,7 +466,7 @@ export default function CourseDetailPage() {
                                 </div>
                                 <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                               </a>
-                              {isAdmin && (
+                              {canEdit && (
                                 <div className="ml-2 flex gap-1">
                                   <Button
                                     variant="outline"
@@ -501,7 +504,7 @@ export default function CourseDetailPage() {
       )}
 
       {/* Dialog para Sesiones */}
-      {isAdmin && (
+      {canEdit && (
         <Dialog open={sesionDialogOpen} onOpenChange={setSesionDialogOpen}>
           <DialogContent>
             <DialogHeader>
