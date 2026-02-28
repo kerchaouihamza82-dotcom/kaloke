@@ -12,7 +12,6 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useAdmin } from "@/hooks/use-admin"
-import { useEditMode } from "@/hooks/use-edit-mode"
 import { toast } from "sonner"
 import { upload } from '@vercel/blob/client'
 

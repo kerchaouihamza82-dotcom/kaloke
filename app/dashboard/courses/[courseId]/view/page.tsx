@@ -92,7 +92,7 @@ export default function CourseViewerPage() {
         setCurrentModuleId(formattedModulos[0].id)
       }
     } catch (error) {
-      console.error('[v0] Error loading course data:', error)
+      console.error('Error loading course data:', error)
     } finally {
       setLoading(false)
     }
