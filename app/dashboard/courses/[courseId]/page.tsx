@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAdmin } from '@/hooks/use-admin'
 import { useEditMode } from '@/hooks/use-edit-mode'
 import { toast } from 'sonner'
+import { adminWrite } from '@/lib/admin-write'
 
 interface Curso {
   id: string
@@ -121,25 +122,15 @@ export default function CourseDetailPage() {
     }
 
     try {
-      const supabase = createClient()
-
       if (editingModule) {
-        const { error } = await supabase
-          .from('modulos')
-          .update(moduleData)
-          .eq('id', editingModule.id)
-
-        if (error) throw error
+        const { error } = await adminWrite({ action: 'update', table: 'modulos', data: moduleData, id: editingModule.id })
+        if (error) throw new Error(error)
         toast.success('Módulo actualizado')
       } else {
-        const { error } = await supabase
-          .from('modulos')
-          .insert([moduleData])
-
-        if (error) throw error
+        const { error } = await adminWrite({ action: 'insert', table: 'modulos', data: moduleData })
+        if (error) throw new Error(error)
         toast.success('Módulo creado')
       }
-
       setModuleDialogOpen(false)
       setEditingModule(null)
       loadCourseData()
@@ -151,15 +142,9 @@ export default function CourseDetailPage() {
 
   const handleDeleteModule = async (moduleId: string) => {
     if (!confirm('¿Eliminar este módulo y todas sus sesiones?')) return
-
     try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('modulos')
-        .delete()
-        .eq('id', moduleId)
-
-      if (error) throw error
+      const { error } = await adminWrite({ action: 'delete', table: 'modulos', id: moduleId })
+      if (error) throw new Error(error)
       toast.success('Módulo eliminado')
       loadCourseData()
     } catch (error) {
@@ -185,25 +170,15 @@ export default function CourseDetailPage() {
     }
 
     try {
-      const supabase = createClient()
-
       if (editingSesion.sesion) {
-        const { error } = await supabase
-          .from('sesiones')
-          .update(sesionData)
-          .eq('id', editingSesion.sesion.id)
-
-        if (error) throw error
+        const { error } = await adminWrite({ action: 'update', table: 'sesiones', data: sesionData, id: editingSesion.sesion.id })
+        if (error) throw new Error(error)
         toast.success('Sesión actualizada')
       } else {
-        const { error } = await supabase
-          .from('sesiones')
-          .insert([sesionData])
-
-        if (error) throw error
+        const { error } = await adminWrite({ action: 'insert', table: 'sesiones', data: sesionData })
+        if (error) throw new Error(error)
         toast.success('Sesión creada')
       }
-
       setSesionDialogOpen(false)
       setEditingSesion({ sesion: null, moduleId: null })
       loadCourseData()
@@ -216,17 +191,10 @@ export default function CourseDetailPage() {
   const handleDeleteSesion = async (e: React.MouseEvent, sesionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    
     if (!confirm('¿Eliminar esta sesión?')) return
-
     try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('sesiones')
-        .delete()
-        .eq('id', sesionId)
-
-      if (error) throw error
+      const { error } = await adminWrite({ action: 'delete', table: 'sesiones', id: sesionId })
+      if (error) throw new Error(error)
       toast.success('Sesión eliminada')
       loadCourseData()
     } catch (error) {

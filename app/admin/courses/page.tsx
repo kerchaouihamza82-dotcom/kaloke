@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus, Pencil, Trash2, FolderOpen, Video } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { adminWrite } from '@/lib/admin-write'
 
 interface Course {
   id: string
@@ -77,30 +78,22 @@ export default function AdminCoursesPage() {
     }
 
     try {
-      const supabase = createClient()
-
       if (editingCourse) {
-        const { error } = await supabase
-          .from('cursos')
-          .update(courseData)
-          .eq('id', editingCourse.id)
-
-        if (error) {
-          console.error('[v0] Update error:', JSON.stringify(error))
-          throw error
-        }
+        const { error } = await adminWrite({
+          action: 'update',
+          table: 'cursos',
+          data: courseData,
+          id: editingCourse.id,
+        })
+        if (error) throw new Error(error)
         toast.success('Curso actualizado exitosamente')
       } else {
-        const { data, error } = await supabase
-          .from('cursos')
-          .insert([courseData])
-          .select()
-
-        if (error) {
-          console.error('[v0] Insert error code:', error.code, 'message:', error.message, 'details:', error.details, 'hint:', error.hint)
-          throw error
-        }
-        console.error('[v0] Insert success:', data)
+        const { error } = await adminWrite({
+          action: 'insert',
+          table: 'cursos',
+          data: courseData,
+        })
+        if (error) throw new Error(error)
         toast.success('Curso creado exitosamente')
       }
 
@@ -117,13 +110,8 @@ export default function AdminCoursesPage() {
     if (!confirm('¿Estás seguro de eliminar este curso? Se eliminarán todos sus módulos y sesiones.')) return
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('cursos')
-        .delete()
-        .eq('id', courseId)
-
-      if (error) throw error
+      const { error } = await adminWrite({ action: 'delete', table: 'cursos', id: courseId })
+      if (error) throw new Error(error)
       toast.success('Curso eliminado')
       loadCourses()
     } catch (error) {
