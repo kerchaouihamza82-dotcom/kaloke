@@ -47,7 +47,7 @@ export default function LandingPage() {
             <ThemeToggle />
             <Link href="/inscribete">
               <Button className="h-10 bg-red-600 px-6 font-medium transition-transform hover:scale-105">
-                Inscríbete Ahora
+                {'Inscríbete Ahora'}
               </Button>
             </Link>
           </nav>
@@ -75,7 +75,7 @@ export default function LandingPage() {
                 </span>
               </h1>
               <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
-                La educación moderna es demasiado lenta—cuatro años es demasiado tiempo.
+                {'La educación moderna es demasiado lenta—cuatro años es demasiado tiempo.'}
               </p>
               <p className="mx-auto max-w-3xl px-4 text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
                 Aprende habilidades{" "}
@@ -85,7 +85,7 @@ export default function LandingPage() {
                 </span>{" "}
                 que te harán ganar dinero{" "}
                 <span className="relative inline-block font-bold text-foreground">
-                  MAÑANA
+                    {'MAÑANA'}
                   <span className="absolute bottom-0 left-0 h-0.5 w-full bg-red-600"></span>
                 </span>
               </p>
@@ -147,7 +147,7 @@ export default function LandingPage() {
               {'Actualizamos el contenido cada día a las 8 a.m. para mantener a los estudiantes al día con las últimas herramientas digitales, automatización e inteligencia artificial aplicadas a negocios online.'}
             </p>
             <p className="text-sm font-medium text-blue-400 sm:text-base">
-                  Información práctica. Resultados reales. Sin teoría innecesaria.
+                  {'Información práctica. Resultados reales. Sin teoría innecesaria.'}
                 </p>
                 <div className="mt-6 sm:mt-8">
                   <Link href="/inscribete">
@@ -219,7 +219,7 @@ export default function LandingPage() {
                 <div className="space-y-3">
                   <h3 className="text-2xl font-semibold">Bolsa de Trabajo Experta</h3>
                   <p className="leading-relaxed text-muted-foreground">
-                    Acceso a comunidad, mentorías y oportunidades de colaboración.
+                    {'Acceso a comunidad, mentorías y oportunidades de colaboración.'}
                   </p>
                 </div>
               </CardContent>
@@ -247,10 +247,10 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="mx-auto max-w-4xl space-y-6 text-center">
             <h2 className="text-4xl font-bold leading-tight md:text-5xl">
-              Una plataforma diseñada para tu progreso
+              {'Una plataforma diseñada para tu progreso'}
             </h2>
             <p className="text-lg leading-relaxed text-muted-foreground">
-              Nuestra plataforma está diseñada para facilitar el aprendizaje práctico, el seguimiento del progreso y la aplicación inmediata de lo aprendido.
+              {'Nuestra plataforma está diseñada para facilitar el aprendizaje práctico, el seguimiento del progreso y la aplicación inmediata de lo aprendido.'}
             </p>
           </div>
         </div>
@@ -286,7 +286,7 @@ export default function LandingPage() {
               Resultados verificables
             </h2>
             <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground">
-              Métricas reales de cuentas gestionadas por estudiantes que aplicaron lo aprendido en DigiCash Academy.
+              {'Métricas reales de cuentas gestionadas por estudiantes que aplicaron lo aprendido en DigiCash Academy.'}
             </p>
           </div>
 
@@ -336,7 +336,7 @@ export default function LandingPage() {
 
           <div className="space-y-6 text-center">
             <p className="text-lg text-muted-foreground">
-            Datos extraídos directamente de Instagram Analytics. Estas son métricas reales de cuentas manejadas por estudiantes.
+            {'Datos extraídos directamente de Instagram Analytics. Estas son métricas reales de cuentas manejadas por estudiantes.'}
           </p>
           <div className="mt-12">
             <Link href="/inscribete">
@@ -548,12 +548,12 @@ export default function LandingPage() {
               Empieza a desarrollar habilidades digitales rentables hoy
             </h2>
             <p className="text-lg leading-relaxed text-muted-foreground">
-            Únete a estudiantes que están construyendo su futuro digital.
+              {'Únete a estudiantes que están construyendo su futuro digital.'}
           </p>
           <div className="mt-16">
             <Link href="/inscribete">
               <Button size="lg" className="h-14 bg-red-600 px-12 text-base font-medium transition-transform hover:scale-105">
-                Inscríbete ahora
+                  {'Inscríbete ahora'}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
