@@ -285,6 +285,7 @@ export default function CourseViewerPage() {
               </div>
             </div>
           ) : (
+          <>
           <VideoPlayer videoUrl={currentSesion.video_url} title={currentSesion.titulo} />
           
           {/* Lesson Title and Controls */}
@@ -327,6 +328,7 @@ export default function CourseViewerPage() {
               <Progress value={getProgress()} className="h-2" />
             </div>
           </div>
+          </>
           )}
         </div>
       </div>
