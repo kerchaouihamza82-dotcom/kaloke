@@ -6,15 +6,13 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { ArrowLeft, PlayCircle, ExternalLink, User, Plus, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { useAdmin } from '@/hooks/use-admin'
 import { toast } from 'sonner'
-import { adminWrite } from '@/lib/admin-write'
 
 interface Curso {
   id: string
@@ -42,26 +40,47 @@ interface Sesion {
 export default function CourseDetailPage() {
   const params = useParams()
   const courseId = params.courseId as string
-  
+
   const [course, setCourse] = useState<Curso | null>(null)
   const [modules, setModules] = useState<Modulo[]>([])
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  // Module dialog state
   const [moduleDialogOpen, setModuleDialogOpen] = useState(false)
-  const [sesionDialogOpen, setSesionDialogOpen] = useState(false)
   const [editingModule, setEditingModule] = useState<Modulo | null>(null)
-  const [editingSesion, setEditingSesion] = useState<{ sesion: Sesion | null, moduleId: string | null }>({ sesion: null, moduleId: null })
-  const { isAdmin } = useAdmin()
-  const canEdit = isAdmin
+  const [moduleTitle, setModuleTitle] = useState('')
+  const [savingModule, setSavingModule] = useState(false)
+
+  // Session dialog state
+  const [sesionDialogOpen, setSesionDialogOpen] = useState(false)
+  const [editingSesion, setEditingSesion] = useState<{ sesion: Sesion | null; moduleId: string | null }>({ sesion: null, moduleId: null })
+  const [sesionTitle, setSesionTitle] = useState('')
+  const [sesionUrl, setSesionUrl] = useState('')
+  const [savingSesion, setSavingSesion] = useState(false)
 
   useEffect(() => {
-    loadCourseData()
+    checkAdminAndLoad()
   }, [courseId])
+
+  const checkAdminAndLoad = async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      setIsAdmin(profile?.role === 'admin')
+    }
+    await loadCourseData()
+  }
 
   const loadCourseData = async () => {
     try {
       const supabase = createClient()
-      
-      // Cargar información del curso
+
       const { data: cursoData, error: cursoError } = await supabase
         .from('cursos')
         .select('*')
@@ -71,143 +90,161 @@ export default function CourseDetailPage() {
       if (cursoError) throw cursoError
       setCourse(cursoData)
 
-      // Cargar módulos con sus sesiones
       const { data: modulosData, error: modulosError } = await supabase
         .from('modulos')
-        .select(`
-          id,
-          titulo,
-          orden_index,
-          sesiones (
-            id,
-            titulo,
-            video_url,
-            orden_index
-          )
-        `)
+        .select('id, titulo, orden_index, sesiones(id, titulo, video_url, orden_index)')
         .eq('curso_id', courseId)
         .order('orden_index', { ascending: true })
 
       if (modulosError) throw modulosError
 
-      // Ordenar sesiones dentro de cada módulo
-      const formattedModulos = modulosData?.map(modulo => ({
-        ...modulo,
-        sesiones: (modulo.sesiones as Sesion[]).sort((a, b) => a.orden_index - b.orden_index)
-      })) || []
-
-      setModules(formattedModulos)
+      const formatted = (modulosData || []).map(m => ({
+        ...m,
+        sesiones: ((m.sesiones as Sesion[]) || []).sort((a, b) => a.orden_index - b.orden_index),
+      }))
+      setModules(formatted)
     } catch (error) {
-      console.error('[v0] Error loading course data:', error)
+      console.error('[v0] Error loading course:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const getTotalSesiones = () => {
-    return modules.reduce((total, modulo) => total + modulo.sesiones.length, 0)
+  const getTotalSesiones = () => modules.reduce((t, m) => t + m.sesiones.length, 0)
+
+  // --- Module CRUD ---
+  const openNewModule = () => {
+    setEditingModule(null)
+    setModuleTitle('')
+    setModuleDialogOpen(true)
   }
 
-  // CRUD Módulos
-  const handleSubmitModule = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    
-    const moduleData = {
-      curso_id: courseId,
-      titulo: formData.get('titulo') as string,
-      orden_index: editingModule?.orden_index || modules.length + 1
-    }
+  const openEditModule = (modulo: Modulo) => {
+    setEditingModule(modulo)
+    setModuleTitle(modulo.titulo)
+    setModuleDialogOpen(true)
+  }
 
+  const handleSaveModule = async () => {
+    if (!moduleTitle.trim()) return toast.error('El título es obligatorio')
+    setSavingModule(true)
     try {
-      if (editingModule) {
-        const { error } = await adminWrite({ action: 'update', table: 'modulos', data: moduleData, id: editingModule.id })
-        if (error) throw new Error(error)
-        toast.success('Módulo actualizado')
-      } else {
-        const { error } = await adminWrite({ action: 'insert', table: 'modulos', data: moduleData })
-        if (error) throw new Error(error)
-        toast.success('Módulo creado')
+      const payload = {
+        action: editingModule ? 'update' : 'insert',
+        table: 'modulos',
+        data: {
+          curso_id: courseId,
+          titulo: moduleTitle.trim(),
+          orden_index: editingModule?.orden_index ?? modules.length + 1,
+        },
+        ...(editingModule ? { id: editingModule.id } : {}),
       }
+      const res = await fetch('/api/admin/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Error al guardar módulo')
+      toast.success(editingModule ? 'Módulo actualizado' : 'Módulo creado')
       setModuleDialogOpen(false)
-      setEditingModule(null)
-      loadCourseData()
-    } catch (error) {
-      console.error('[v0] Error saving module:', error)
-      toast.error('Error al guardar módulo')
+      await loadCourseData()
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setSavingModule(false)
     }
   }
 
   const handleDeleteModule = async (moduleId: string) => {
     if (!confirm('¿Eliminar este módulo y todas sus sesiones?')) return
     try {
-      const { error } = await adminWrite({ action: 'delete', table: 'modulos', id: moduleId })
-      if (error) throw new Error(error)
+      const res = await fetch('/api/admin/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', table: 'modulos', id: moduleId }),
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Error al eliminar')
       toast.success('Módulo eliminado')
-      loadCourseData()
-    } catch (error) {
-      console.error('[v0] Error deleting module:', error)
-      toast.error('Error al eliminar módulo')
+      await loadCourseData()
+    } catch (err: any) {
+      toast.error(err.message)
     }
   }
 
-  // CRUD Sesiones
-  const handleSubmitSesion = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    
-    const moduleId = editingSesion.moduleId
+  // --- Session CRUD ---
+  const openNewSesion = (moduleId: string) => {
+    setEditingSesion({ sesion: null, moduleId })
+    setSesionTitle('')
+    setSesionUrl('')
+    setSesionDialogOpen(true)
+  }
+
+  const openEditSesion = (sesion: Sesion, moduleId: string) => {
+    setEditingSesion({ sesion, moduleId })
+    setSesionTitle(sesion.titulo)
+    setSesionUrl(sesion.video_url)
+    setSesionDialogOpen(true)
+  }
+
+  const handleSaveSesion = async () => {
+    if (!sesionTitle.trim()) return toast.error('El título es obligatorio')
+    if (!sesionUrl.trim()) return toast.error('La URL del video es obligatoria')
+    const { sesion, moduleId } = editingSesion
     if (!moduleId) return
-
-    const module = modules.find(m => m.id === moduleId)
-    const sesionData = {
-      modulos_id: moduleId,
-      titulo: formData.get('titulo') as string,
-      video_url: formData.get('video_url') as string,
-      orden_index: editingSesion.sesion?.orden_index || (module?.sesiones.length || 0) + 1
-    }
-
+    setSavingSesion(true)
     try {
-      if (editingSesion.sesion) {
-        const { error } = await adminWrite({ action: 'update', table: 'sesiones', data: sesionData, id: editingSesion.sesion.id })
-        if (error) throw new Error(error)
-        toast.success('Sesión actualizada')
-      } else {
-        const { error } = await adminWrite({ action: 'insert', table: 'sesiones', data: sesionData })
-        if (error) throw new Error(error)
-        toast.success('Sesión creada')
+      const module = modules.find(m => m.id === moduleId)
+      const payload = {
+        action: sesion ? 'update' : 'insert',
+        table: 'sesiones',
+        data: {
+          modulos_id: moduleId,
+          titulo: sesionTitle.trim(),
+          video_url: sesionUrl.trim(),
+          orden_index: sesion?.orden_index ?? (module?.sesiones.length || 0) + 1,
+        },
+        ...(sesion ? { id: sesion.id } : {}),
       }
+      const res = await fetch('/api/admin/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Error al guardar sesión')
+      toast.success(sesion ? 'Sesión actualizada' : 'Sesión creada')
       setSesionDialogOpen(false)
-      setEditingSesion({ sesion: null, moduleId: null })
-      loadCourseData()
-    } catch (error) {
-      console.error('[v0] Error saving sesion:', error)
-      toast.error('Error al guardar sesión')
+      await loadCourseData()
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setSavingSesion(false)
     }
   }
 
-  const handleDeleteSesion = async (e: React.MouseEvent, sesionId: string) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleDeleteSesion = async (sesionId: string) => {
     if (!confirm('¿Eliminar esta sesión?')) return
     try {
-      const { error } = await adminWrite({ action: 'delete', table: 'sesiones', id: sesionId })
-      if (error) throw new Error(error)
+      const res = await fetch('/api/admin/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', table: 'sesiones', id: sesionId }),
+      })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Error al eliminar')
       toast.success('Sesión eliminada')
-      loadCourseData()
-    } catch (error) {
-      console.error('[v0] Error deleting sesion:', error)
-      toast.error('Error al eliminar sesión')
+      await loadCourseData()
+    } catch (err: any) {
+      toast.error(err.message)
     }
   }
 
   if (loading) {
     return (
       <div className="flex min-h-[500px] items-center justify-center p-8">
-        <div className="text-center">
-          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
-          <p className="text-muted-foreground">Cargando curso...</p>
-        </div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
       </div>
     )
   }
@@ -219,8 +256,7 @@ export default function CourseDetailPage() {
           <p className="text-lg font-medium text-muted-foreground">Curso no encontrado</p>
           <Link href="/dashboard/courses">
             <Button variant="outline" className="mt-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver a cursos
+              <ArrowLeft className="mr-2 h-4 w-4" />Volver a cursos
             </Button>
           </Link>
         </div>
@@ -230,42 +266,25 @@ export default function CourseDetailPage() {
 
   return (
     <div className="space-y-8 p-8">
-      {/* Back Button */}
-      <div>
-        <Link href="/dashboard/courses">
-          <Button variant="outline" size="sm" className="bg-transparent">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver
-          </Button>
-        </Link>
-      </div>
+      <Link href="/dashboard/courses">
+        <Button variant="outline" size="sm" className="bg-transparent">
+          <ArrowLeft className="mr-2 h-4 w-4" />Volver
+        </Button>
+      </Link>
 
-      {/* Course Header with Image */}
+      {/* Course Header */}
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Image */}
         {course.imagen_url && (
           <div className="lg:col-span-1">
             <div className="overflow-hidden rounded-xl border shadow-lg">
-              <img
-                src={course.imagen_url}
-                alt={course.titulo}
-                className="aspect-video w-full object-cover"
-              />
+              <img src={course.imagen_url} alt={course.titulo} className="aspect-video w-full object-cover" />
             </div>
           </div>
         )}
-
-        {/* Course Info */}
-        <div className={course.imagen_url ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="mb-3 flex items-center gap-2">
-            <Badge className="bg-primary/10 text-primary">{course.categoria}</Badge>
-          </div>
-          <h1 className="text-balance text-4xl font-bold tracking-tight">
-            {course.titulo}
-          </h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            {course.descripcion}
-          </p>
+        <div className={course.imagen_url ? 'lg:col-span-2' : 'lg:col-span-3'}>
+          <Badge className="mb-3 bg-primary/10 text-primary">{course.categoria}</Badge>
+          <h1 className="text-balance text-4xl font-bold tracking-tight">{course.titulo}</h1>
+          <p className="mt-3 text-lg text-muted-foreground">{course.descripcion}</p>
           <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <User className="h-4 w-4" />
@@ -276,12 +295,11 @@ export default function CourseDetailPage() {
               <span>{getTotalSesiones()} sesiones</span>
             </div>
           </div>
-          {!canEdit && getTotalSesiones() > 0 && (
+          {!isAdmin && getTotalSesiones() > 0 && (
             <div className="mt-6">
               <Link href={`/dashboard/courses/${courseId}/view`}>
                 <Button size="lg" className="gap-2">
-                  <PlayCircle className="h-5 w-5" />
-                  Ver Curso
+                  <PlayCircle className="h-5 w-5" />Ver Curso
                 </Button>
               </Link>
             </div>
@@ -289,65 +307,31 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Contenido del curso - Solo visible en modo edición para admins */}
-      {canEdit && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>Contenido del Curso</CardTitle>
-                <CardDescription>
-                  {modules.length} módulos • {getTotalSesiones()} sesiones
-                </CardDescription>
-              </div>
-              <Dialog open={moduleDialogOpen} onOpenChange={setModuleDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={() => setEditingModule(null)} size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nuevo Módulo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>{editingModule ? 'Editar Módulo' : 'Crear Nuevo Módulo'}</DialogTitle>
-                    <DialogDescription>
-                      Añade un nuevo módulo al curso
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmitModule} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="titulo">Título del Módulo</Label>
-                      <Input
-                        id="titulo"
-                        name="titulo"
-                        defaultValue={editingModule?.titulo}
-                        placeholder="Ej: Introducción al Trading"
-                        required
-                      />
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <Button type="button" variant="outline" onClick={() => setModuleDialogOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button type="submit">
-                        {editingModule ? 'Actualizar' : 'Crear'}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
+      {/* Course Content */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle>Contenido del Curso</CardTitle>
+              <CardDescription>{modules.length} módulos • {getTotalSesiones()} sesiones</CardDescription>
             </div>
-          </CardHeader>
+            {isAdmin && (
+              <Button onClick={openNewModule} size="sm">
+                <Plus className="mr-2 h-4 w-4" />Nuevo Módulo
+              </Button>
+            )}
+          </div>
+        </CardHeader>
         <CardContent>
           {modules.length === 0 ? (
             <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 text-center">
               <PlayCircle className="mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="mb-2 text-lg font-medium text-muted-foreground">
-                Este curso aún no tiene contenido
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Los módulos y sesiones aparecerán aquí cuando estén disponibles
-              </p>
+              <p className="mb-2 text-lg font-medium text-muted-foreground">Sin contenido aún</p>
+              {isAdmin && (
+                <Button onClick={openNewModule} variant="outline" size="sm" className="mt-2">
+                  <Plus className="mr-2 h-4 w-4" />Crear primer módulo
+                </Button>
+              )}
             </div>
           ) : (
             <Accordion type="multiple" className="w-full">
@@ -366,25 +350,14 @@ export default function CourseDetailPage() {
                           </p>
                         </div>
                       </div>
-                        {canEdit && (
-                        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingModule(modulo)
-                              setModuleDialogOpen(true)
-                            }}
-                            className="h-7 w-7 bg-transparent p-0"
-                          >
+                      {isAdmin && (
+                        <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                          <Button variant="outline" size="sm" className="h-7 w-7 bg-transparent p-0"
+                            onClick={() => openEditModule(modulo)}>
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteModule(modulo.id)}
-                            className="h-7 w-7 bg-transparent p-0"
-                          >
+                          <Button variant="outline" size="sm" className="h-7 w-7 bg-transparent p-0"
+                            onClick={() => handleDeleteModule(modulo.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
@@ -393,64 +366,35 @@ export default function CourseDetailPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-3 pl-11 pr-4">
-                      {canEdit && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingSesion({ sesion: null, moduleId: modulo.id })
-                            setSesionDialogOpen(true)
-                          }}
-                          className="w-full"
-                        >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Añadir Sesión
+                      {isAdmin && (
+                        <Button variant="outline" size="sm" className="w-full"
+                          onClick={() => openNewSesion(modulo.id)}>
+                          <Plus className="mr-2 h-4 w-4" />Añadir Sesión
                         </Button>
                       )}
                       {modulo.sesiones.length === 0 ? (
-                        <p className="py-4 text-sm text-muted-foreground">
-                          No hay sesiones disponibles en este módulo
-                        </p>
+                        <p className="py-4 text-sm text-muted-foreground">No hay sesiones aún</p>
                       ) : (
                         <div className="space-y-2">
                           {modulo.sesiones.map((sesion, sesionIndex) => (
-                            <div
-                              key={sesion.id}
-                              className="group flex items-center justify-between rounded-lg border p-3 transition-all hover:border-primary hover:bg-primary/5"
-                            >
-                              <a
-                                href={sesion.video_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex flex-1 items-center gap-3"
-                              >
+                            <div key={sesion.id}
+                              className="group flex items-center justify-between rounded-lg border p-3 transition-all hover:border-primary hover:bg-primary/5">
+                              <a href={sesion.video_url} target="_blank" rel="noopener noreferrer"
+                                className="flex flex-1 items-center gap-3">
                                 <PlayCircle className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-                                <div className="flex-1">
-                                  <p className="font-medium group-hover:text-primary">
-                                    {sesionIndex + 1}. {sesion.titulo}
-                                  </p>
-                                </div>
+                                <p className="flex-1 font-medium group-hover:text-primary">
+                                  {sesionIndex + 1}. {sesion.titulo}
+                                </p>
                                 <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                               </a>
-                              {canEdit && (
+                              {isAdmin && (
                                 <div className="ml-2 flex gap-1">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setEditingSesion({ sesion, moduleId: modulo.id })
-                                      setSesionDialogOpen(true)
-                                    }}
-                                    className="h-7 w-7 bg-transparent p-0"
-                                  >
+                                  <Button variant="outline" size="sm" className="h-7 w-7 bg-transparent p-0"
+                                    onClick={() => openEditSesion(sesion, modulo.id)}>
                                     <Pencil className="h-3.5 w-3.5" />
                                   </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={(e) => handleDeleteSesion(e, sesion.id)}
-                                    className="h-7 w-7 bg-transparent p-0"
-                                  >
+                                  <Button variant="outline" size="sm" className="h-7 w-7 bg-transparent p-0"
+                                    onClick={() => handleDeleteSesion(sesion.id)}>
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
                                 </div>
@@ -467,55 +411,69 @@ export default function CourseDetailPage() {
           )}
         </CardContent>
       </Card>
-      )}
 
-      {/* Dialog para Sesiones */}
-      {canEdit && (
-        <Dialog open={sesionDialogOpen} onOpenChange={setSesionDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editingSesion.sesion ? 'Editar Sesión' : 'Crear Nueva Sesión'}</DialogTitle>
-              <DialogDescription>
-                Completa la información de la sesión y añade el enlace del video
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmitSesion} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="titulo">Título de la Sesión</Label>
-                <Input
-                  id="titulo"
-                  name="titulo"
-                  defaultValue={editingSesion.sesion?.titulo}
-                  placeholder="Ej: Introducción a Bitcoin"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="video_url">URL del Video</Label>
-                <Input
-                  id="video_url"
-                  name="video_url"
-                  type="url"
-                  defaultValue={editingSesion.sesion?.video_url}
-                  placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  El video se abrirá en una nueva pestaña cuando los usuarios hagan clic
-                </p>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setSesionDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit">
-                  {editingSesion.sesion ? 'Actualizar' : 'Crear'}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Module Dialog — always mounted, controlled by state */}
+      <Dialog open={moduleDialogOpen} onOpenChange={setModuleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingModule ? 'Editar Módulo' : 'Nuevo Módulo'}</DialogTitle>
+            <DialogDescription>Añade un módulo al curso</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="mod-titulo">Título del Módulo</Label>
+              <Input
+                id="mod-titulo"
+                value={moduleTitle}
+                onChange={e => setModuleTitle(e.target.value)}
+                placeholder="Ej: Introducción al Trading"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setModuleDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleSaveModule} disabled={savingModule}>
+                {savingModule ? 'Guardando...' : editingModule ? 'Actualizar' : 'Crear'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Session Dialog — always mounted, controlled by state */}
+      <Dialog open={sesionDialogOpen} onOpenChange={setSesionDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingSesion.sesion ? 'Editar Sesión' : 'Nueva Sesión'}</DialogTitle>
+            <DialogDescription>Añade una sesión con su video</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ses-titulo">Título de la Sesión</Label>
+              <Input
+                id="ses-titulo"
+                value={sesionTitle}
+                onChange={e => setSesionTitle(e.target.value)}
+                placeholder="Ej: Introducción a Bitcoin"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ses-url">URL del Video</Label>
+              <Input
+                id="ses-url"
+                value={sesionUrl}
+                onChange={e => setSesionUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setSesionDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleSaveSesion} disabled={savingSesion}>
+                {savingSesion ? 'Guardando...' : editingSesion.sesion ? 'Actualizar' : 'Crear'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
