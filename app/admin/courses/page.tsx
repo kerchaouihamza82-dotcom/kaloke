@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus, Pencil, Trash2, FolderOpen, Video } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { adminWrite } from '@/lib/admin-write'
+import { createCourse, updateCourse, deleteCourse } from '@/app/actions/admin-courses'
 
 interface Course {
   id: string
@@ -78,31 +78,23 @@ export default function AdminCoursesPage() {
     }
 
     try {
+      let result
       if (editingCourse) {
-        const { error } = await adminWrite({
-          action: 'update',
-          table: 'cursos',
-          data: courseData,
-          id: editingCourse.id,
-        })
-        if (error) throw new Error(error)
+        result = await updateCourse(editingCourse.id, courseData)
+        if (result.error) throw new Error(result.error)
         toast.success('Curso actualizado exitosamente')
       } else {
-        const { error } = await adminWrite({
-          action: 'insert',
-          table: 'cursos',
-          data: courseData,
-        })
-        if (error) throw new Error(error)
+        result = await createCourse(courseData)
+        if (result.error) throw new Error(result.error)
         toast.success('Curso creado exitosamente')
       }
 
       setDialogOpen(false)
       setEditingCourse(null)
       loadCourses()
-    } catch (error) {
+    } catch (error: any) {
       console.error('[v0] Error saving course:', error)
-      toast.error('Error al guardar curso')
+      toast.error(error.message || 'Error al guardar curso')
     }
   }
 
@@ -110,13 +102,13 @@ export default function AdminCoursesPage() {
     if (!confirm('¿Estás seguro de eliminar este curso? Se eliminarán todos sus módulos y sesiones.')) return
 
     try {
-      const { error } = await adminWrite({ action: 'delete', table: 'cursos', id: courseId })
-      if (error) throw new Error(error)
+      const result = await deleteCourse(courseId)
+      if (result.error) throw new Error(result.error)
       toast.success('Curso eliminado')
       loadCourses()
-    } catch (error) {
+    } catch (error: any) {
       console.error('[v0] Error deleting course:', error)
-      toast.error('Error al eliminar curso')
+      toast.error(error.message || 'Error al eliminar curso')
     }
   }
 
