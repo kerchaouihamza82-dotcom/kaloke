@@ -1,12 +1,28 @@
 'use client'
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, ArrowLeft } from "lucide-react"
+import { Check, ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { handleSubscription } from "@/lib/handle-subscription"
+import { toast } from "sonner"
 
 export default function InscribetePage() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+
+  const onSubscribe = async (plan: 'mensual' | 'anual') => {
+    setLoadingPlan(plan)
+    try {
+      await handleSubscription(plan)
+    } catch (e: any) {
+      toast.error(e.message)
+    } finally {
+      setLoadingPlan(null)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -88,14 +104,20 @@ export default function InscribetePage() {
 
                 {/* CTA */}
                 <div className="mt-auto space-y-4 pt-8">
-                  <Link href="/checkout/plan-mensual">
-                    <Button className="w-full bg-red-600 py-6 text-lg font-medium hover:bg-red-700">
-                      Acceder ahora
-                    </Button>
-                  </Link>
+                  <Button
+                    className="w-full bg-red-600 py-6 text-lg font-medium hover:bg-red-700"
+                    onClick={() => onSubscribe('mensual')}
+                    disabled={loadingPlan === 'mensual'}
+                  >
+                    {loadingPlan === 'mensual' ? (
+                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Procesando...</>
+                    ) : (
+                      'Acceder ahora'
+                    )}
+                  </Button>
 
                   <p className="text-center text-sm font-light text-muted-foreground">
-                    7 días de garantía de devolución
+                    {'7 días de garantía de devolución'}
                   </p>
                 </div>
               </CardContent>
@@ -137,14 +159,20 @@ export default function InscribetePage() {
 
                 {/* CTA */}
                 <div className="mt-auto space-y-4 pt-8">
-                  <Link href="/checkout/plan-completo">
-                    <Button className="w-full border border-foreground bg-foreground py-6 text-lg font-medium text-background hover:bg-foreground/90">
-                      Acceder ahora
-                    </Button>
-                  </Link>
+                  <Button
+                    className="w-full border border-foreground bg-foreground py-6 text-lg font-medium text-background hover:bg-foreground/90"
+                    onClick={() => onSubscribe('anual')}
+                    disabled={loadingPlan === 'anual'}
+                  >
+                    {loadingPlan === 'anual' ? (
+                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Procesando...</>
+                    ) : (
+                      'Acceder ahora'
+                    )}
+                  </Button>
 
                   <p className="text-center text-sm font-light text-muted-foreground">
-                    Pago único, sin cargos recurrentes
+                    {'Pago único, sin cargos recurrentes'}
                   </p>
                 </div>
               </CardContent>

@@ -7,9 +7,11 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { ArrowLeft, PlayCircle, Check, ChevronRight, ChevronLeft } from 'lucide-react'
+import { ArrowLeft, PlayCircle, Check, ChevronRight, ChevronLeft, Lock } from 'lucide-react'
 import { VideoPlayer } from '@/components/video-player'
 import { Progress } from '@/components/ui/progress'
+import { handleSubscription } from '@/lib/handle-subscription'
+import { toast } from 'sonner'
 
 interface Curso {
   id: string
@@ -43,6 +45,8 @@ export default function CourseViewerPage() {
   const [currentModuleId, setCurrentModuleId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [completedSesiones, setCompletedSesiones] = useState<Set<string>>(new Set())
+  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null)
+  const [subscribing, setSubscribing] = useState(false)
 
   useEffect(() => {
     loadCourseData()
@@ -51,6 +55,29 @@ export default function CourseViewerPage() {
   const loadCourseData = async () => {
     try {
       const supabase = createClient()
+
+      // Check subscription status
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: suscripcion } = await supabase
+          .from('suscripciones')
+          .select('estado')
+          .eq('user_id', user.id)
+          .single()
+
+        setHasActiveSubscription(suscripcion?.estado === 'activa')
+
+        // Also check if user is admin (admins always have access)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.role === 'admin') {
+          setHasActiveSubscription(true)
+        }
+      }
       
       const { data: cursoData, error: cursoError } = await supabase
         .from('cursos')
@@ -220,6 +247,44 @@ export default function CourseViewerPage() {
 
         {/* Video Player */}
         <div className="flex-1 p-6">
+          {hasActiveSubscription === false ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-gray-800 bg-gray-950 px-8 py-20">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-800">
+                <Lock className="h-10 w-10 text-gray-400" />
+              </div>
+              <h2 className="mb-3 text-2xl font-bold">Contenido bloqueado</h2>
+              <p className="mb-8 max-w-md text-center leading-relaxed text-gray-400">
+                {'Necesitas una suscripción activa para acceder a las lecciones de este curso. Elige un plan y comienza a aprender hoy.'}
+              </p>
+              <div className="flex gap-4">
+                <Button
+                  className="bg-blue-600 px-8 py-6 text-base hover:bg-blue-700"
+                  disabled={subscribing}
+                  onClick={async () => {
+                    setSubscribing(true)
+                    try { await handleSubscription('mensual') }
+                    catch (e: any) { toast.error(e.message) }
+                    finally { setSubscribing(false) }
+                  }}
+                >
+                  {subscribing ? 'Procesando...' : 'Plan Mensual - $9.99/mes'}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-gray-700 px-8 py-6 text-base hover:bg-gray-800"
+                  disabled={subscribing}
+                  onClick={async () => {
+                    setSubscribing(true)
+                    try { await handleSubscription('anual') }
+                    catch (e: any) { toast.error(e.message) }
+                    finally { setSubscribing(false) }
+                  }}
+                >
+                  {'Plan Anual - $2,500'}
+                </Button>
+              </div>
+            </div>
+          ) : (
           <VideoPlayer videoUrl={currentSesion.video_url} title={currentSesion.titulo} />
           
           {/* Lesson Title and Controls */}
@@ -262,6 +327,7 @@ export default function CourseViewerPage() {
               <Progress value={getProgress()} className="h-2" />
             </div>
           </div>
+          )}
         </div>
       </div>
 

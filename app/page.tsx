@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from "react"
+import { handleSubscription } from "@/lib/handle-subscription"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -443,11 +445,15 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <div className="mt-auto pt-8">
-                  <Link href="/inscribete">
-                    <Button className="h-12 w-full bg-blue-600 font-medium transition-transform hover:scale-105">
-                      Acceder ahora
-                    </Button>
-                  </Link>
+                  <Button
+                    className="h-12 w-full bg-blue-600 font-medium transition-transform hover:scale-105"
+                    onClick={async () => {
+                      try { await handleSubscription('mensual') }
+                      catch (e: any) { toast.error(e.message) }
+                    }}
+                  >
+                    Acceder ahora
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -484,11 +490,15 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <div className="mt-auto pt-8">
-                  <Link href="/inscribete">
-                    <Button className="h-12 w-full bg-red-600 font-medium transition-transform hover:scale-105">
-                      Acceder ahora
-                    </Button>
-                  </Link>
+                  <Button
+                    className="h-12 w-full bg-red-600 font-medium transition-transform hover:scale-105"
+                    onClick={async () => {
+                      try { await handleSubscription('anual') }
+                      catch (e: any) { toast.error(e.message) }
+                    }}
+                  >
+                    Acceder ahora
+                  </Button>
                 </div>
               </CardContent>
             </Card>
