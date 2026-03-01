@@ -13,27 +13,31 @@ export async function handleSubscription(plan: 'mensual' | 'anual') {
   // 1. Verify user is authenticated
   const { data: { user }, error: userError } = await supabase.auth.getUser()
   if (userError) {
-    console.error('[subscription] Auth error:', userError.message)
-    throw new Error('Error de autenticación: ' + userError.message)
+    alert('Error de Supabase: ' + userError.message)
+    return
   }
   if (!user) {
     window.location.href = '/login'
     return
   }
 
-  // 2. Get valid price ID
   const priceId = PRICE_IDS[plan]
-  if (!priceId) throw new Error('Plan no válido: ' + plan)
+  const email = user.email
+  const userId = user.id
 
-  // 3. Get session token for Authorization header
+  // 2. Diagnostic log — verify no empty data before request
+  console.log('Datos enviados:', { priceId, email, userId })
+
+  if (!priceId || !email || !userId) {
+    alert('Error: datos incompletos — priceId=' + priceId + ' | email=' + email + ' | userId=' + userId)
+    return
+  }
+
+  // 3. Get session token
   const { data: { session } } = await supabase.auth.getSession()
   const token = session?.access_token
 
-  // 4. Build request body
-  const body = JSON.stringify({ email: user.email, userId: user.id, priceId })
-  console.log('[subscription] Sending to Edge Function:', { url: CHECKOUT_URL, email: user.email, userId: user.id, priceId })
-
-  // 5. Call Edge Function
+  // 4. Call Edge Function with correct headers
   let response: Response
   try {
     response = await fetch(CHECKOUT_URL, {
@@ -43,40 +47,38 @@ export async function handleSubscription(plan: 'mensual' | 'anual') {
         'Authorization': `Bearer ${token}`,
         'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       },
-      body,
+      body: JSON.stringify({ priceId, email, userId }),
     })
   } catch (networkErr: any) {
-    console.error('[subscription] Network error:', networkErr)
-    throw new Error('Error de red al conectar con el servidor de pagos: ' + networkErr.message)
+    alert('Error de Supabase: ' + networkErr.message)
+    return
   }
 
-  // 6. Read response body as text first (safe for any content type)
+  // 5. Read response as plain text first (safe regardless of content type)
   const rawText = await response.text()
-  console.log('[subscription] Response status:', response.status)
-  console.log('[subscription] Response body:', rawText)
+  console.log('Respuesta status:', response.status)
+  console.log('Respuesta body:', rawText)
 
-  // 7. Parse JSON
+  // 6. Parse JSON safely
   let data: any = {}
   try {
     data = JSON.parse(rawText)
   } catch {
-    console.error('[subscription] Response is not JSON:', rawText)
-    throw new Error('Respuesta inesperada del servidor: ' + rawText.slice(0, 200))
+    alert('Error de Supabase: Respuesta no es JSON — ' + rawText.slice(0, 300))
+    return
   }
 
-  // 8. Handle error responses
+  // 7. If error, show exact Supabase message
   if (!response.ok) {
-    const msg = data?.error || data?.message || `HTTP ${response.status}`
-    console.error('[subscription] Edge Function error:', msg, data)
-    throw new Error('Error al crear la sesión de pago: ' + msg)
+    alert('Error de Supabase: ' + (data.error || data.message || `HTTP ${response.status} — ${rawText.slice(0, 200)}`))
+    return
   }
 
-  // 9. Redirect to Stripe Checkout
+  // 8. Redirect to Stripe Checkout
   if (data?.url) {
-    console.log('[subscription] Redirecting to:', data.url)
     window.location.href = data.url
   } else {
-    console.error('[subscription] Missing URL in response:', data)
-    throw new Error('No se recibió la URL de pago. Respuesta: ' + JSON.stringify(data))
+    alert('Error de Supabase: No se recibió URL de pago — ' + JSON.stringify(data))
   }
 }
+
