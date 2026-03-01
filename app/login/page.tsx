@@ -44,12 +44,15 @@ function LoginForm() {
           setError(error.message)
         }
       } else {
-        // If user came from a plan selection, redirect to checkout
-        if (plan) {
-          router.push(`/checkout/${plan}`)
-        } else {
-          router.push('/dashboard')
-        }
+        // Check for a pending plan saved before login redirect
+        const pendingPlan = sessionStorage.getItem('pendingPlan')
+        sessionStorage.removeItem('pendingPlan')
+        const destination = pendingPlan
+          ? `/checkout/${pendingPlan}`
+          : plan
+          ? `/checkout/${plan}`
+          : '/dashboard'
+        router.push(destination)
         router.refresh()
       }
     } catch (err) {
@@ -142,7 +145,7 @@ function LoginForm() {
           </div>
           <p className="text-center text-sm text-muted-foreground">
             ¿No tienes una cuenta?{" "}
-            <Link href={plan ? `/register?plan=${plan}` : '/register'} className="font-medium text-primary transition-colors hover:underline">
+            <Link href={plan ? `/registro?plan=${plan}` : '/registro'} className="font-medium text-primary transition-colors hover:underline">
               {'Registrate'}
             </Link>
           </p>

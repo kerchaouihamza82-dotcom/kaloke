@@ -17,7 +17,9 @@ export async function handleSubscription(plan: 'mensual' | 'anual') {
     return
   }
   if (!user) {
-    window.location.href = '/login'
+    // Save intended plan so after registration we can resume checkout
+    sessionStorage.setItem('pendingPlan', plan)
+    window.location.href = '/registro'
     return
   }
 

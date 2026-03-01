@@ -22,6 +22,7 @@ import Link from "next/link"
 import { VideoCarousel } from "@/components/video-carousel"
 import { ImageCarousel } from "@/components/image-carousel"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { AuthNavButton } from "@/components/auth-nav-button"
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
@@ -45,7 +46,7 @@ export default function LandingPage() {
             <a href="#profesiones" className="text-sm font-medium transition-colors hover:text-blue-400">Profesiones</a>
             <a href="#reseñas" className="text-sm font-medium transition-colors hover:text-blue-400">Reseñas</a>
             <a href="#información" className="text-sm font-medium transition-colors hover:text-blue-400">Información</a>
-            <Link href="/login" className="text-sm font-medium transition-colors hover:text-blue-400">Acceso</Link>
+            <AuthNavButton />
             <ThemeToggle />
             <Link href="/inscribete">
               <Button className="h-10 bg-red-600 px-6 font-medium transition-transform hover:scale-105">
