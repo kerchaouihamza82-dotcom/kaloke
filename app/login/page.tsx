@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { handleSubscription } from "@/lib/handle-subscription"
 
 function LoginForm() {
   const router = useRouter()
@@ -45,15 +46,15 @@ function LoginForm() {
         }
       } else {
         // Check for a pending plan saved before login redirect
-        const pendingPlan = sessionStorage.getItem('pendingPlan')
         sessionStorage.removeItem('pendingPlan')
-        const destination = pendingPlan
-          ? `/checkout/${pendingPlan}`
-          : plan
-          ? `/checkout/${plan}`
-          : '/dashboard'
-        router.push(destination)
-        router.refresh()
+
+        if (plan === 'mensual' || plan === 'anual') {
+          // User came from a pricing button — launch checkout immediately
+          await handleSubscription(plan)
+        } else {
+          router.push('/dashboard')
+          router.refresh()
+        }
       }
     } catch (err) {
       setError('Ocurrio un error inesperado')

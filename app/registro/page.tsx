@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { handleSubscription } from "@/lib/handle-subscription"
 
 function RegistroForm() {
   const router = useRouter()
@@ -56,16 +57,17 @@ function RegistroForm() {
 
       // If email confirmation is disabled, log in directly
       if (data.session) {
-        // Check for a pending plan saved before login redirect
-        const pendingPlan = sessionStorage.getItem('pendingPlan')
+        // Clear any sessionStorage plan
         sessionStorage.removeItem('pendingPlan')
-        const destination = pendingPlan
-          ? `/checkout/${pendingPlan}`
-          : plan
-          ? `/checkout/${plan}`
-          : '/dashboard'
-        router.push(destination)
-        router.refresh()
+
+        if (plan === 'mensual' || plan === 'anual') {
+          // User came from a pricing button — launch checkout immediately
+          await handleSubscription(plan)
+        } else {
+          // No plan selected — go to pricing so they can choose
+          router.push('/inscribete')
+          router.refresh()
+        }
       } else {
         // Email confirmation required — show message
         setError('¡Registro exitoso! Revisa tu correo para confirmar tu cuenta y luego inicia sesión.')
@@ -83,7 +85,7 @@ function RegistroForm() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-foreground">Crear cuenta</CardTitle>
           <CardDescription>
-            {'Regístrate gratis y empieza a aprender hoy'}
+            {'Crea tu cuenta para empezar'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -161,7 +163,7 @@ function RegistroForm() {
             </div>
 
             <Button type="submit" className="h-11 w-full bg-red-600 hover:bg-red-700" disabled={loading}>
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creando cuenta...</> : 'Crear cuenta gratis'}
+              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{'Creando cuenta...'}</> : 'Crear cuenta'}
             </Button>
           </form>
         </CardContent>
