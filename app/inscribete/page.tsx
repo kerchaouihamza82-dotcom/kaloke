@@ -183,7 +183,7 @@ export default function InscribetePage() {
                   >
                     {loadingPlan === 'mensual'
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
-                      : user ? 'Elegir plan mensual' : 'Crear cuenta y suscribirme'}
+                      : 'Elegir este plan'}
                   </Button>
                   <p className="text-center text-xs text-muted-foreground">7 días de garantía de devolución</p>
                 </div>
@@ -217,7 +217,7 @@ export default function InscribetePage() {
                   >
                     {loadingPlan === 'anual'
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
-                      : user ? 'Elegir plan completo' : 'Crear cuenta y acceder'}
+                      : 'Elegir este plan'}
                   </Button>
                   <p className="text-center text-xs text-muted-foreground">Pago único, sin cargos recurrentes</p>
                 </div>

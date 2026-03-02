@@ -10,7 +10,13 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { handleSubscription } from "@/lib/handle-subscription"
+
+const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
+
+const PRICE_IDS: Record<string, string> = {
+  mensual: 'price_1SrR7URUc0SIWrwDLZbISOX8',
+  anual: 'price_1T5oneRUc0SIWrwD0xAJAaew',
+}
 
 function RegistroForm() {
   const router = useRouter()
@@ -57,15 +63,51 @@ function RegistroForm() {
 
       // If email confirmation is disabled, log in directly
       if (data.session) {
-        // Clear any sessionStorage plan
-        sessionStorage.removeItem('pendingPlan')
+        // Check for pending priceId in localStorage (set by /inscribete when not logged in)
+        const pendingPriceId = localStorage.getItem('pendingPriceId')
+        const pendingPlan = localStorage.getItem('pendingPlan') || plan
 
-        if (plan === 'mensual' || plan === 'anual') {
-          // User came from a pricing button — launch checkout immediately
-          await handleSubscription(plan)
-        } else {
-          // No plan selected — go to pricing so they can choose
+        if (pendingPriceId) {
+          localStorage.removeItem('pendingPriceId')
+          localStorage.removeItem('pendingPlan')
+
+          // Call Stripe checkout directly with fresh session data
+          try {
+            const res = await fetch(CHECKOUT_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data.session.access_token}`,
+                'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+              },
+              body: JSON.stringify({
+                priceId: pendingPriceId,
+                email: data.session.user.email,
+                userId: data.session.user.id,
+              }),
+            })
+
+            const text = await res.text()
+            let json: any = {}
+            try { json = JSON.parse(text) } catch { /* non-JSON */ }
+
+            if (json?.url) {
+              window.location.assign(json.url)
+              return
+            } else {
+              setError('No se recibió URL de pago: ' + text.slice(0, 100))
+              return
+            }
+          } catch (fetchErr: any) {
+            setError('Error al crear sesión de pago: ' + fetchErr.message)
+            return
+          }
+        } else if (pendingPlan === 'mensual' || pendingPlan === 'anual') {
+          // Plan came from URL param, no priceId saved — redirect to /inscribete to pick plan
           router.push('/inscribete')
+          return
+        } else {
+          router.push('/dashboard')
           router.refresh()
         }
       } else {
