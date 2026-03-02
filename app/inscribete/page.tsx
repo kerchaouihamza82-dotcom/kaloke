@@ -1,54 +1,27 @@
 'use client'
-// v2 - full rewrite, single return statement
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Check, ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { handleSubscription } from "@/lib/handle-subscription"
-import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner"
-import type { User } from "@supabase/supabase-js"
+
+const PRICE_IDS = {
+  mensual: 'price_1SrR7URUc0SIWrwDLZbISOX8',
+  anual: 'price_1T5oneRUc0SIWrwD0xAJAaew',
+}
 
 export default function InscribetePage() {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
-  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState<string | null>(null)
 
-  // Monitor auth state in real time — prevents "Auth session missing" race condition
-  useEffect(() => {
-    const supabase = createClient()
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const onSubscribe = async (plan: 'mensual' | 'anual') => {
-    if (!user) {
-      toast.info('Debes crear una cuenta o iniciar sesión primero')
-      setTimeout(() => {
-        sessionStorage.setItem('pendingPlan', plan)
-        window.location.href = `/login?plan=${plan}`
-      }, 1200)
-      return
-    }
-
-    setLoadingPlan(plan)
-    try {
-      await handleSubscription(plan)
-    } catch (e: any) {
-      toast.error(e.message)
-    } finally {
-      setLoadingPlan(null)
-    }
+  const elegirPlan = (plan: 'mensual' | 'anual') => {
+    setLoading(plan)
+    // Step 1: Save the priceId in localStorage
+    localStorage.setItem('pendingPriceId', PRICE_IDS[plan])
+    localStorage.setItem('pendingPlan', plan)
+    // Step 2: Redirect to registration
+    window.location.href = '/registro'
   }
 
   return (
@@ -65,23 +38,12 @@ export default function InscribetePage() {
             />
             <span className="text-xl font-light tracking-wide">DigiCash Academy</span>
           </Link>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <span className="text-sm font-light text-muted-foreground">{user.email}</span>
-            ) : (
-              <Link href="/login?plan=mensual">
-                <Button variant="outline" size="sm" className="font-light">
-                  Inicia sesión para suscribirte
-                </Button>
-              </Link>
-            )}
-            <Link href="/">
-              <Button variant="ghost" className="gap-2 font-light">
-                <ArrowLeft className="h-4 w-4" />
-                Volver
-              </Button>
-            </Link>
-          </div>
+          <Link href="/">
+            <Button variant="ghost" className="gap-2 font-light">
+              <ArrowLeft className="h-4 w-4" />
+              Volver
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -92,9 +54,7 @@ export default function InscribetePage() {
           <div className="mb-20 space-y-4 text-center">
             <h1 className="text-5xl font-light md:text-6xl">Elige tu plan</h1>
             <p className="text-lg font-light text-muted-foreground">
-              {user
-                ? 'Selecciona el plan que mejor se adapte a ti'
-                : 'Crea una cuenta para acceder a la academia'}
+              Selecciona el plan y crea tu cuenta para comenzar
             </p>
           </div>
 
@@ -140,12 +100,12 @@ export default function InscribetePage() {
                 <div className="mt-auto space-y-4 pt-8">
                   <Button
                     className="w-full bg-blue-600 py-6 text-lg font-medium hover:bg-blue-700"
-                    onClick={() => onSubscribe('mensual')}
-                    disabled={loadingPlan === 'mensual'}
+                    onClick={() => elegirPlan('mensual')}
+                    disabled={loading === 'mensual'}
                   >
-                    {loadingPlan === 'mensual' ? (
-                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" />{'Procesando...'}</>
-                    ) : user ? 'Acceder ahora' : 'Inicia sesión para suscribirte'}
+                    {loading === 'mensual'
+                      ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Redirigiendo...</>
+                      : 'Elegir este plan'}
                   </Button>
                   <p className="text-center text-sm font-light text-muted-foreground">
                     {'7 días de garantía de devolución'}
@@ -187,12 +147,12 @@ export default function InscribetePage() {
                 <div className="mt-auto space-y-4 pt-8">
                   <Button
                     className="w-full border border-foreground bg-foreground py-6 text-lg font-medium text-background hover:bg-foreground/90"
-                    onClick={() => onSubscribe('anual')}
-                    disabled={loadingPlan === 'anual'}
+                    onClick={() => elegirPlan('anual')}
+                    disabled={loading === 'anual'}
                   >
-                    {loadingPlan === 'anual' ? (
-                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" />{'Procesando...'}</>
-                    ) : user ? 'Acceder ahora' : 'Inicia sesión para suscribirte'}
+                    {loading === 'anual'
+                      ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Redirigiendo...</>
+                      : 'Elegir este plan'}
                   </Button>
                   <p className="text-center text-sm font-light text-muted-foreground">
                     {'Pago único, sin cargos recurrentes'}
@@ -203,7 +163,7 @@ export default function InscribetePage() {
           </div>
 
           {/* Trust Signals */}
-          <div className="mt-20 space-y-8 text-center">
+          <div className="mt-20 text-center">
             <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
               <div className="space-y-2">
                 <div className="text-4xl font-light text-blue-500">25+</div>
@@ -218,12 +178,6 @@ export default function InscribetePage() {
                 <p className="font-light text-muted-foreground">Satisfacción garantizada</p>
               </div>
             </div>
-            <p className="text-lg font-light text-muted-foreground">
-              {'¿Tienes preguntas? '}
-              <Link href="/#faq" className="text-blue-500 hover:underline">
-                Consulta nuestras FAQ
-              </Link>
-            </p>
           </div>
         </div>
       </main>
