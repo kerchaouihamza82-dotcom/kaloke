@@ -1,4 +1,5 @@
 'use client'
+// v2 - full rewrite, single return statement
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
