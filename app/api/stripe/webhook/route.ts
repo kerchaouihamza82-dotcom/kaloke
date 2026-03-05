@@ -7,8 +7,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 // Service-role client — bypasses RLS
+// Use server-only SUPABASE_URL first, fall back to NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_URL = (process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL)!
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
