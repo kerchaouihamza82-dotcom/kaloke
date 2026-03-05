@@ -10,31 +10,30 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const { productId, userId } = await request.json()
+    const body = await request.json()
+    // Support both productId (new) and priceId (legacy) fields
+    const { productId, priceId: legacyPriceId, userId } = body
 
-    if (!productId || !userId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    if (!userId) {
+      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
     }
 
-    // Find the product by ID
-    const product = PRODUCTS.find((p) => p.id === productId)
+    // Resolve the product — look up by productId first, then by stripePriceId for legacy calls
+    let product = productId
+      ? PRODUCTS.find((p) => p.id === productId)
+      : PRODUCTS.find((p) => p.stripePriceId === legacyPriceId)
+
     if (!product) {
-      return NextResponse.json(
-        { error: 'Invalid product' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid product or price ID' }, { status: 400 })
     }
 
-    // Get user email from Supabase auth
+    // Get user from Supabase
     const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 400 })
     }
 
-    // Check if user already has a Stripe customer ID
+    // Reuse or create Stripe customer
     const { data: profile } = await supabaseAdmin
       .from('user_profiles')
       .select('stripe_customer_id')
@@ -43,7 +42,6 @@ export async function POST(request: NextRequest) {
 
     let customerId = profile?.stripe_customer_id
 
-    // Create Stripe customer if needed
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
@@ -53,35 +51,39 @@ export async function POST(request: NextRequest) {
 
       await supabaseAdmin
         .from('user_profiles')
-        .upsert({ id: userId, stripe_customer_id: customerId })
+        .upsert({ id: userId, stripe_customer_id: customerId }, { onConflict: 'id' })
     }
 
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const origin =
+      request.headers.get('origin') ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'http://localhost:3000'
 
-    // Create embedded checkout session
+    // Use hosted redirect mode so the page gets back a `url` to redirect to
     const session = await stripe.checkout.sessions.create({
-      ui_mode: 'embedded',
       customer: customerId,
       line_items: [{ price: product.stripePriceId, quantity: 1 }],
       mode: product.type === 'subscription' ? 'subscription' : 'payment',
-      return_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/inscribete`,
       metadata: {
         userId,
         productId: product.id,
-        subscriptionType: product.type,
       },
-      ...(product.type === 'subscription' ? {
-        subscription_data: {
-          metadata: { userId, productId: product.id },
-        },
-      } : {
-        payment_intent_data: {
-          metadata: { userId, productId: product.id },
-        },
-      }),
+      ...(product.type === 'subscription'
+        ? {
+            subscription_data: {
+              metadata: { userId, productId: product.id },
+            },
+          }
+        : {
+            payment_intent_data: {
+              metadata: { userId, productId: product.id },
+            },
+          }),
     })
 
-    return NextResponse.json({ clientSecret: session.client_secret })
+    return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('[Stripe] Error creating checkout session:', error)
     return NextResponse.json(
