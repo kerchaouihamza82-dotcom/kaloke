@@ -72,6 +72,8 @@ function InscribetePage() {
         return
       }
 
+      console.log('[v0] userId:', session.user.id.substring(0, 8), '| productId:', PRODUCT_IDS[plan])
+
       const res = await fetch(CHECKOUT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
