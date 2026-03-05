@@ -21,6 +21,27 @@ const PLAN_LABELS: Record<string, string> = {
   anual: '$2,500 pago \u00fanico',
 }
 
+const MENSUAL_BENEFITS = [
+  "Acceso a los 5 campus especializados",
+  "Contenido actualizado diariamente a las 8 a.m.",
+  "Comunidad privada de m\u00e1s de 100 estudiantes",
+  "Recursos descargables y plantillas",
+  "Acceso a llamadas en vivo y mentor\u00edas",
+  "Soporte prioritario",
+  "Sin permanencia, cancela cuando quieras",
+]
+
+const ANUAL_BENEFITS = [
+  "Todo lo del plan mensual",
+  "Acceso de por vida a todos los campus",
+  "Todas las actualizaciones futuras incluidas",
+  "Sesiones de mentor\u00eda 1 a 1 mensuales",
+  "Acceso prioritario a nuevos campus",
+  "Certificados de finalizaci\u00f3n",
+  "Grupo VIP exclusivo",
+  "Ahorra m\u00e1s de $1,500 al a\u00f1o",
+]
+
 export default function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
@@ -89,27 +110,6 @@ export default function InscribetePage() {
       setLoadingPlan(null)
     }
   }
-
-  const MENSUAL_BENEFITS = [
-    "Acceso a los 5 campus especializados",
-    "Contenido actualizado diariamente a las 8 a.m.",
-      "Comunidad privada de m\u00e1s de 100 estudiantes",
-    "Recursos descargables y plantillas",
-      "Acceso a llamadas en vivo y mentor\u00edas",
-    "Soporte prioritario",
-    "Sin permanencia, cancela cuando quieras",
-  ]
-
-  const ANUAL_BENEFITS = [
-    "Todo lo del plan mensual",
-    "Acceso de por vida a todos los campus",
-    "Todas las actualizaciones futuras incluidas",
-      "Sesiones de mentor\u00eda 1 a 1 mensuales",
-    "Acceso prioritario a nuevos campus",
-      "Certificados de finalizaci\u00f3n",
-    "Grupo VIP exclusivo",
-      "Ahorra m\u00e1s de $1,500 al a\u00f1o",
-  ]
 
   return (
     <div className="min-h-screen bg-background text-foreground">
