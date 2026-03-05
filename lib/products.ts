@@ -23,9 +23,10 @@ export const PRODUCTS: Product[] = [
   {
     id: 'plan-completo',
     name: 'Plan Completo',
-    description: 'Acceso de por vida a DigiCash Academy — pago único',
-    priceInCents: 250000, // $2,500
-    type: 'one-time',
+    description: 'Acceso anual completo a DigiCash Academy',
+    priceInCents: 250000, // $2,500/año
+    type: 'subscription',
+    interval: 'year',
     stripePriceId: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
     stripeProductId: 'prod_U2C0T76GCy1vAu',
   },

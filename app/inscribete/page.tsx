@@ -27,13 +27,13 @@ const MENSUAL_BENEFITS: string[] = [
 
 const ANUAL_BENEFITS: string[] = [
   "Todo lo del plan mensual",
-  "Acceso de por vida a todos los campus",
-  "Todas las actualizaciones futuras incluidas",
-  "Sesiones de mentoria 1 a 1 mensuales",
+  "Acceso durante 12 meses completos",
+  "Todas las actualizaciones del año incluidas",
+  "Sesiones de mentoría 1 a 1 mensuales",
   "Acceso prioritario a nuevos campus",
-  "Certificados de finalizacion",
+  "Certificados de finalización",
   "Grupo VIP exclusivo",
-  "Ahorra mas de $1,500 al ano",
+  "Ahorra más de $1,500 al año frente al mensual",
 ]
 
 const CHECKOUT_URL = '/api/create-checkout-session'
@@ -184,9 +184,12 @@ function InscribetePage() {
             <Card className="flex flex-col border border-border">
               <CardContent className="flex flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo</h2>
-                  <div className="text-6xl font-light">$2,500</div>
-                  <p className="text-sm font-light text-muted-foreground">Pago \u00fanico, acceso de por vida</p>
+                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo Anual</h2>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-6xl font-light">$2,500</span>
+                    <span className="text-xl text-muted-foreground">/ año</span>
+                  </div>
+                  <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
@@ -209,7 +212,7 @@ function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">Pago \u00fanico, sin cargos recurrentes</p>
+                  <p className="text-center text-xs text-muted-foreground">Renovación anual, cancela antes de que venza</p>
                 </div>
               </CardContent>
             </Card>
