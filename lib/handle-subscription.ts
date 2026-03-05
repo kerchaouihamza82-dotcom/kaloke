@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 const PRICE_IDS: Record<string, string> = {
-  mensual: 'price_1SrR7URUc0SIWrwDLZbISOX8',
-  anual: 'price_1T5oneRUc0SIWrwD0xAJAaew',
+  mensual: 'price_1T7cBgGXPveWbaAfVlivnMcG',
+  anual: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
 }
 
 const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'

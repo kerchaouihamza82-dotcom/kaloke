@@ -12,8 +12,8 @@ import { toast } from "sonner"
 import type { User } from "@supabase/supabase-js"
 
 const PRICE_IDS: Record<string, string> = {
-  mensual: 'price_1SrR7URUc0SIWrwDLZbISOX8',
-  anual: 'price_1T5oneRUc0SIWrwD0xAJAaew',
+  mensual: 'price_1T7cBgGXPveWbaAfVlivnMcG',
+  anual: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
 }
 
 const PLAN_LABELS: Record<string, string> = {
