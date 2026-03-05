@@ -10,9 +10,9 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import type { User } from "@supabase/supabase-js"
 
-const PRICE_IDS: Record<string, string> = {
-  mensual: 'price_1T7cBgGXPveWbaAfVlivnMcG',
-  anual: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
+const PRODUCT_IDS: Record<string, string> = {
+  mensual: 'plan-mensual',
+  anual: 'plan-completo',
 }
 
 const MENSUAL_BENEFITS: string[] = [
@@ -36,7 +36,7 @@ const ANUAL_BENEFITS: string[] = [
   "Ahorra mas de $1,500 al ano",
 ]
 
-const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
+const CHECKOUT_URL = '/api/create-checkout-session'
 
 function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
@@ -55,7 +55,7 @@ function InscribetePage() {
 
   const onSelectPlan = async (plan: 'mensual' | 'anual') => {
     if (!user) {
-      localStorage.setItem('pendingPriceId', PRICE_IDS[plan])
+      localStorage.setItem('pendingProductId', PRODUCT_IDS[plan])
       localStorage.setItem('pendingPlan', plan)
       window.location.href = `/registro?plan=${plan}`
       return
@@ -66,28 +66,19 @@ function InscribetePage() {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
 
-      if (!session?.access_token || !session.user?.email || !session.user?.id) {
-        toast.error('Sesi\u00f3n expirada. Vuelve a iniciar sesi\u00f3n.')
+      if (!session?.user?.id) {
+        toast.error('Sesión expirada. Vuelve a iniciar sesión.')
         window.location.href = '/login'
         return
       }
 
-      const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-
-      const body = JSON.stringify({
-        priceId: PRICE_IDS[plan],
-        email: session.user.email,
-        userId: session.user.id,
-      })
-
       const res = await fetch(CHECKOUT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': anon,
-        },
-        body,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: PRODUCT_IDS[plan],
+          userId: session.user.id,
+        }),
       })
 
       const text = await res.text()

@@ -141,7 +141,35 @@ export async function POST(req: NextRequest) {
         break
       }
 
-      // ─── Payment failed → mark inactive ───────────────────────────────────
+      // ─── Invoice paid → keep access active on renewal ─────────────────────
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice
+        const subscriptionId = invoice.subscription as string | null
+        const userId = await resolveUserId(null, subscriptionId)
+
+        if (!userId) break
+
+        const sub = subscriptionId
+          ? await stripe.subscriptions.retrieve(subscriptionId)
+          : null
+
+        await supabase.from('suscripciones').update({
+          estado: 'activa',
+          fecha_fin: sub
+            ? new Date(sub.current_period_end * 1000).toISOString()
+            : undefined,
+          updated_at: new Date().toISOString(),
+        }).eq('user_id', userId)
+
+        await supabase.from('user_profiles').update({
+          has_access: true,
+          updated_at: new Date().toISOString(),
+        }).eq('user_id', userId)
+
+        break
+      }
+
+      // ─── Payment failed → revoke access ───────────────────────────────────
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
         const subscriptionId = invoice.subscription as string | null
@@ -150,7 +178,12 @@ export async function POST(req: NextRequest) {
         if (!userId) break
 
         await supabase.from('suscripciones').update({
-          estado: 'inactiva',
+          estado: 'pago_fallido',
+          updated_at: new Date().toISOString(),
+        }).eq('user_id', userId)
+
+        await supabase.from('user_profiles').update({
+          has_access: false,
           updated_at: new Date().toISOString(),
         }).eq('user_id', userId)
 

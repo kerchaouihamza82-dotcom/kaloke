@@ -17,7 +17,7 @@ export const PRODUCTS: Product[] = [
     priceInCents: 999, // $9.99
     type: 'subscription',
     interval: 'month',
-    stripePriceId: 'price_1T47coCYzThxiyRJjvJQQdsF',
+    stripePriceId: 'price_1T7cBgGXPveWbaAfVlivnMcG',
     stripeProductId: 'prod_U2C0aP4F36loA6',
   },
   {
@@ -27,7 +27,7 @@ export const PRODUCTS: Product[] = [
     priceInCents: 250000, // $2,500
     type: 'subscription',
     interval: 'year',
-    stripePriceId: 'price_1T47coCYzThxiyRJivPjnnkh',
+    stripePriceId: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
     stripeProductId: 'prod_U2C0T76GCy1vAu',
   },
 ]
