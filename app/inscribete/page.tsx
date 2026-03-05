@@ -89,9 +89,8 @@ function InscribetePage() {
       try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
       if (!res.ok || !data?.url) {
-        const msg = data?.error || `Error ${res.status}: ${text.substring(0, 100)}`
+        const msg = data?.error || `Error ${res.status}: ${text.substring(0, 200)}`
         toast.error(msg)
-        console.error('[v0] Checkout status:', res.status, '| error:', JSON.stringify(data))
         return
       }
 
