@@ -35,7 +35,7 @@ const ANUAL_BENEFITS: string[] = [
   "Ahorra más de $1,500 al año frente al mensual",
 ]
 
-const CHECKOUT_URL = '/api/create-checkout-session'
+const CHECKOUT_URL = '/api/checkout'
 
 function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
