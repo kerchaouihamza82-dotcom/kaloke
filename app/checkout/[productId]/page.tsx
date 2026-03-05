@@ -1,30 +1,19 @@
 'use client'
 
-import { use, useEffect, useState, useCallback } from 'react'
+import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { loadStripe } from '@stripe/stripe-js'
-import {
-  EmbeddedCheckoutProvider,
-  EmbeddedCheckout,
-} from '@stripe/react-stripe-js'
 import { createClient } from '@/lib/supabase/client'
 import { PRODUCTS } from '@/lib/products'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Loader2, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
-
-const STRIPE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 
-  'pk_live_51RTVmQBNyZln5VT1UxulM980MhDBKbMzKKxuGZG27Km7xPVAkjNfhL5TyWPpKAJTs784CtHkM1fCQEWw7aeNDPYm00PzbYTcpy'
-
-console.log('[v0] Stripe key being used:', STRIPE_KEY.substring(0, 20) + '...')
-const stripePromise = loadStripe(STRIPE_KEY)
+import { toast } from 'sonner'
 
 export default function CheckoutPage({ params }: { params: Promise<{ productId: string }> }) {
   const resolvedParams = use(params)
   const router = useRouter()
-  const [userId, setUserId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [authChecking, setAuthChecking] = useState(true)
 
   const product = PRODUCTS.find(p => p.id === resolvedParams.productId)
 
@@ -32,71 +21,50 @@ export default function CheckoutPage({ params }: { params: Promise<{ productId: 
     const checkAuth = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-
       if (!user) {
-        router.push(`/register?plan=${resolvedParams.productId}`)
+        router.push(`/registro?plan=${resolvedParams.productId}`)
         return
       }
-
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('has_access')
-        .eq('id', user.id)
-        .single()
-
-      if (profile?.has_access) {
-        router.push('/dashboard')
-        return
-      }
-
-      setUserId(user.id)
-      setLoading(false)
+      setAuthChecking(false)
     }
-
     checkAuth()
   }, [resolvedParams.productId, router])
 
-  const fetchClientSecret = useCallback(async () => {
-    if (!userId || !product) throw new Error('Missing data')
-
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productId: resolvedParams.productId,
-        userId,
-      }),
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      setError(data.error || 'Error al crear la sesion de pago')
-      throw new Error(data.error)
+  const handleCheckout = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: resolvedParams.productId }),
+        credentials: 'include',
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.url) {
+        toast.error(data?.error || 'No se pudo iniciar el pago')
+        return
+      }
+      window.location.assign(data.url)
+    } catch (err: any) {
+      toast.error(err?.message || 'Error al iniciar el pago')
+    } finally {
+      setLoading(false)
     }
-
-    return data.clientSecret
-  }, [userId, product, resolvedParams.productId])
+  }
 
   if (!product) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background">
-        <h1 className="text-2xl font-bold text-foreground">{'Plan no encontrado'}</h1>
-        <p className="text-muted-foreground">{'El plan seleccionado no existe.'}</p>
-        <Link href="/inscribete">
-          <Button>{'Ver planes disponibles'}</Button>
-        </Link>
+        <h1 className="text-2xl font-bold">Plan no encontrado</h1>
+        <Link href="/inscribete"><Button>Ver planes disponibles</Button></Link>
       </div>
     )
   }
 
-  if (loading) {
+  if (authChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">{'Preparando checkout...'}</p>
-        </div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -112,49 +80,39 @@ export default function CheckoutPage({ params }: { params: Promise<{ productId: 
               className="h-10 object-contain"
               style={{ width: 'auto' }}
             />
-            <span className="text-xl font-light tracking-wide text-foreground">{'DigiCash Academy'}</span>
+            <span className="text-xl font-light tracking-wide">DigiCash Academy</span>
           </Link>
           <Link href="/inscribete">
             <Button variant="ghost" className="gap-2 font-light">
               <ArrowLeft className="h-4 w-4" />
-              {'Volver'}
+              Volver
             </Button>
           </Link>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-12">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-light text-foreground">{product.name}</h1>
-            <p className="mt-2 text-muted-foreground">
-              {product.type === 'subscription'
-                ? `$${(product.priceInCents / 100).toFixed(2)}/mes`
-                : `$${(product.priceInCents / 100).toLocaleString('en-US')} - Pago unico`
-              }
-            </p>
-          </div>
+      <main className="container mx-auto flex min-h-[calc(100vh-80px)] items-center justify-center px-6 py-12">
+        <div className="mx-auto w-full max-w-md text-center">
+          <h1 className="mb-2 text-3xl font-light">{product.name}</h1>
+          <p className="mb-8 text-muted-foreground">
+            ${(product.priceInCents / 100).toLocaleString('en-US')}
+            {product.interval === 'month' ? '/mes' : '/año'}
+          </p>
 
-          {error && (
-            <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center text-sm text-destructive">
-              {error}
-            </div>
-          )}
-
-          <div className="rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
-            {userId && (
-              <EmbeddedCheckoutProvider
-                stripe={stripePromise}
-                options={{ fetchClientSecret }}
-              >
-                <EmbeddedCheckout />
-              </EmbeddedCheckoutProvider>
-            )}
-          </div>
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={handleCheckout}
+            disabled={loading}
+          >
+            {loading ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
+            ) : 'Continuar al pago'}
+          </Button>
 
           <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <ShieldCheck className="h-4 w-4" />
-            <span>{'Pago seguro procesado por Stripe'}</span>
+            <span>Pago seguro procesado por Stripe</span>
           </div>
         </div>
       </main>
