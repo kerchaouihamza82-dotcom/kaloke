@@ -16,10 +16,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { productId, userId } = body
 
-    // Debug: shows whether we're in test or live mode
-    const keyPrefix = (process.env.STRIPE_SECRET_KEY ?? '').substring(0, 12)
-    console.log('[v0] Stripe key prefix:', keyPrefix, '| productId:', productId, '| userId:', userId?.substring(0, 8))
-
     if (!userId) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
     }
