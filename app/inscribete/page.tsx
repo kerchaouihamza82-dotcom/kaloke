@@ -88,7 +88,7 @@ function InscribetePage() {
       if (!res.ok || !data?.url) {
         const msg = data?.error || 'No se pudo iniciar el pago, intenta nuevamente'
         toast.error(msg)
-        console.error('[inscribete] Checkout error:', msg, 'status:', res.status)
+        console.error('[v0] Checkout status:', res.status, '| error:', JSON.stringify(data))
         return
       }
 
