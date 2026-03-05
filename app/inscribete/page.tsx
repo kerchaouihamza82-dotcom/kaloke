@@ -1,5 +1,4 @@
 'use client'
-// reset-v5
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -16,12 +15,7 @@ const PRICE_IDS: Record<string, string> = {
   anual: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
 }
 
-const PLAN_LABELS: Record<string, string> = {
-  mensual: '$9.99 / mes',
-  anual: '$2,500 pago \u00fanico',
-}
-
-const MENSUAL_BENEFITS = [
+const MENSUAL_BENEFITS: string[] = [
   "Acceso a los 5 campus especializados",
   "Contenido actualizado diariamente a las 8 a.m.",
   "Comunidad privada de m\u00e1s de 100 estudiantes",
@@ -31,7 +25,7 @@ const MENSUAL_BENEFITS = [
   "Sin permanencia, cancela cuando quieras",
 ]
 
-const ANUAL_BENEFITS = [
+const ANUAL_BENEFITS: string[] = [
   "Todo lo del plan mensual",
   "Acceso de por vida a todos los campus",
   "Todas las actualizaciones futuras incluidas",
@@ -41,6 +35,8 @@ const ANUAL_BENEFITS = [
   "Grupo VIP exclusivo",
   "Ahorra m\u00e1s de $1,500 al a\u00f1o",
 ]
+
+const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
 
 export default function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
@@ -59,52 +55,50 @@ export default function InscribetePage() {
 
   const onSelectPlan = async (plan: 'mensual' | 'anual') => {
     if (!user) {
-      // Save priceId and plan to localStorage before redirecting
       localStorage.setItem('pendingPriceId', PRICE_IDS[plan])
       localStorage.setItem('pendingPlan', plan)
       window.location.href = `/registro?plan=${plan}`
       return
     }
 
-    // Already logged in — call checkout directly
     setLoadingPlan(plan)
     try {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        toast.error('Sesión expirada. Vuelve a iniciar sesión.')
+
+      if (!session?.access_token || !session.user?.email || !session.user?.id) {
+        toast.error('Sesi\u00f3n expirada. Vuelve a iniciar sesi\u00f3n.')
+        window.location.href = '/login'
         return
       }
 
-      const res = await fetch('https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout', {
+      const body = JSON.stringify({
+        priceId: PRICE_IDS[plan],
+        email: session.user.email,
+        userId: session.user.id,
+      })
+
+      const res = await fetch(CHECKOUT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
         },
-        body: JSON.stringify({
-          priceId: PRICE_IDS[plan],
-          email: session.user.email,
-          userId: session.user.id,
-        }),
+        body,
       })
 
       const text = await res.text()
       let data: any = {}
-      try { data = JSON.parse(text) } catch { /* non-JSON response */ }
+      try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
-      if (!res.ok) {
+      if (!res.ok || !data?.url) {
         toast.error('No se pudo iniciar el pago, intenta nuevamente')
         return
       }
 
-      if (data?.url) {
-        window.location.assign(data.url)
-      } else {
-        toast.error('No se pudo iniciar el pago, intenta nuevamente')
-      }
-    } catch (err: any) {
+      window.location.assign(data.url)
+    } catch {
       toast.error('No se pudo iniciar el pago, intenta nuevamente')
     } finally {
       setLoadingPlan(null)
@@ -124,7 +118,7 @@ export default function InscribetePage() {
             ) : (
               <Link href="/login">
                 <Button variant="outline" size="sm" className="font-light">
-                  Iniciar sesión
+                  Iniciar sesi\u00f3n
                 </Button>
               </Link>
             )}
@@ -153,7 +147,7 @@ export default function InscribetePage() {
             {/* Plan Mensual */}
             <Card className="relative flex flex-col border-2 border-blue-500/40">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium tracking-widest text-white uppercase">
+                <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
                   Recomendado
                 </Badge>
               </div>
@@ -186,7 +180,7 @@ export default function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">7 días de garantía de devolución</p>
+                  <p className="text-center text-xs text-muted-foreground">7 d\u00edas de garant\u00eda de devoluci\u00f3n</p>
                 </div>
               </CardContent>
             </Card>
@@ -197,7 +191,7 @@ export default function InscribetePage() {
                 <div className="space-y-2 text-center">
                   <h2 className="text-xl font-light text-muted-foreground">Plan Completo</h2>
                   <div className="text-6xl font-light">$2,500</div>
-                  <p className="text-sm font-light text-muted-foreground">Pago único, acceso de por vida</p>
+                  <p className="text-sm font-light text-muted-foreground">Pago \u00fanico, acceso de por vida</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
@@ -220,7 +214,7 @@ export default function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">Pago único, sin cargos recurrentes</p>
+                  <p className="text-center text-xs text-muted-foreground">Pago \u00fanico, sin cargos recurrentes</p>
                 </div>
               </CardContent>
             </Card>
@@ -231,7 +225,7 @@ export default function InscribetePage() {
       <footer className="border-t border-border py-10">
         <div className="container mx-auto px-6 text-center">
           <p className="text-sm font-light text-muted-foreground">
-            © 2024 DigiCash Academy. Todos los derechos reservados.
+            &copy; 2024 DigiCash Academy. Todos los derechos reservados.
           </p>
         </div>
       </footer>
