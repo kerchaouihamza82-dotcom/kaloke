@@ -82,19 +82,21 @@ function InscribetePage() {
       })
 
       const text = await res.text()
+      console.error('[v0] RAW response:', res.status, text.substring(0, 500))
       let data: any = {}
       try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
       if (!res.ok || !data?.url) {
-        const msg = data?.error || 'No se pudo iniciar el pago, intenta nuevamente'
+        const msg = data?.error || `Error ${res.status}: ${text.substring(0, 100)}`
         toast.error(msg)
         console.error('[v0] Checkout status:', res.status, '| error:', JSON.stringify(data))
         return
       }
 
       window.location.assign(data.url)
-    } catch {
-      toast.error('No se pudo iniciar el pago, intenta nuevamente')
+    } catch (err: any) {
+      toast.error(err?.message || 'No se pudo iniciar el pago, intenta nuevamente')
+      console.error('[v0] fetch exception:', err)
     } finally {
       setLoadingPlan(null)
     }
