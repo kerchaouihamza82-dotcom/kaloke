@@ -17,8 +17,8 @@ export const PRODUCTS: Product[] = [
     priceInCents: 999, // $9.99
     type: 'subscription',
     interval: 'month',
-    stripePriceId: 'price_1T7kkbCYzThxiyRJmdzfnfeC',
-    stripeProductId: 'prod_U5wM2V6Ng2uZTS',
+    stripePriceId: 'price_1T7cBgGXPveWbaAfVlivnMcG',
+    stripeProductId: 'prod_U2C0aP4F36loA6',
   },
   {
     id: 'plan-completo',
@@ -27,7 +27,7 @@ export const PRODUCTS: Product[] = [
     priceInCents: 250000, // $2,500/año
     type: 'subscription',
     interval: 'year',
-    stripePriceId: 'price_1T7kkbCYzThxiyRJrBEh7Ddh',
-    stripeProductId: 'prod_U5wMCNSEw4HHS6',
+    stripePriceId: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
+    stripeProductId: 'prod_U2C0T76GCy1vAu',
   },
 ]
