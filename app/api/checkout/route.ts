@@ -56,7 +56,11 @@ export async function POST(request: NextRequest) {
           })).id
 
       await admin.from('user_profiles').upsert(
-        { user_id: user.id, stripe_customer_id: customerId },
+        { 
+          user_id: user.id, 
+          stripe_customer_id: customerId,
+          updated_at: new Date().toISOString(),
+        },
         { onConflict: 'user_id' }
       )
     }
