@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Check, ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner"import type { User } from "@supabase/supabase-js"
+import { toast } from "sonner"
+import type { User } from "@supabase/supabase-js"
 
 const PRODUCT_IDS: Record<string, string> = {
   mensual: 'plan-mensual',
