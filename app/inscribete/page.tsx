@@ -73,7 +73,6 @@ export default function InscribetePage() {
       }
 
       const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-      console.log('[v0] onSelectPlan:', { plan, priceId: PRICE_IDS[plan], email: session.user.email, userId: session.user.id, hasToken: !!session.access_token, hasAnon: !!anon })
 
       const body = JSON.stringify({
         priceId: PRICE_IDS[plan],
@@ -92,7 +91,6 @@ export default function InscribetePage() {
       })
 
       const text = await res.text()
-      console.log('[v0] checkout response:', res.status, text)
       let data: any = {}
       try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
