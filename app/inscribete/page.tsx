@@ -38,7 +38,7 @@ const ANUAL_BENEFITS: string[] = [
 
 const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
 
-export default function InscribetePage() {
+function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [user, setUser] = useState<User | null | undefined>(undefined)
 
@@ -234,3 +234,5 @@ export default function InscribetePage() {
     </div>
   )
 }
+
+export default InscribetePage
