@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { handleSubscription } from "@/lib/handle-subscription"
+
+const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
 
 function LoginForm() {
   const router = useRouter()
@@ -45,16 +46,45 @@ function LoginForm() {
           setError(error.message)
         }
       } else {
-        // Check for a pending plan saved before login redirect
         sessionStorage.removeItem('pendingPlan')
 
-        if (plan === 'mensual' || plan === 'anual') {
-          // User came from a pricing button — launch checkout immediately
-          await handleSubscription(plan)
-        } else {
-          router.push('/dashboard')
-          router.refresh()
+        // Check localStorage for a pending priceId (set from /inscribete)
+        const pendingPriceId = localStorage.getItem('pendingPriceId')
+        if (pendingPriceId) {
+          localStorage.removeItem('pendingPriceId')
+          localStorage.removeItem('pendingPlan')
+
+          const supabase = createClient()
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            const res = await fetch(CHECKOUT_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+                'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+              },
+              body: JSON.stringify({
+                priceId: pendingPriceId,
+                email: session.user.email,
+                userId: session.user.id,
+              }),
+            })
+            const text = await res.text()
+            let json: any = {}
+            try { json = JSON.parse(text) } catch { /* non-JSON */ }
+            if (json?.url) {
+              window.location.assign(json.url)
+              return
+            } else {
+              setError('No se recibi\u00f3 URL de pago: ' + text.slice(0, 100))
+              return
+            }
+          }
         }
+
+        router.push('/dashboard')
+        router.refresh()
       }
     } catch (err) {
       setError('Ocurrio un error inesperado')

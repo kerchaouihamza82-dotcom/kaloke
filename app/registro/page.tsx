@@ -47,12 +47,19 @@ function RegistroForm() {
     setLoading(true)
     try {
       const supabase = createClient()
+
+      // Build redirect URL — after email confirmation, land on /inscribete if plan pending
+      const pendingPlan = localStorage.getItem('pendingPlan')
+      const emailRedirectTo = pendingPlan
+        ? `${window.location.origin}/inscribete?plan=${pendingPlan}`
+        : `${window.location.origin}/dashboard`
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { full_name: nombre },
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo,
         },
       })
 
@@ -111,8 +118,8 @@ function RegistroForm() {
           router.refresh()
         }
       } else {
-        // Email confirmation required — show message
-        setError('¡Registro exitoso! Revisa tu correo para confirmar tu cuenta y luego inicia sesión.')
+        // Email confirmation required — show exact message from config
+        setError('Registro exitoso, revisa tu correo para confirmar tu cuenta y luego inicia sesi\u00f3n.')
       }
     } catch (err: any) {
       setError('Error inesperado: ' + err.message)
