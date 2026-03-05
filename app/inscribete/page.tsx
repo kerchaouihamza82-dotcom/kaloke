@@ -7,8 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Check, ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner"
-import type { User } from "@supabase/supabase-js"
+import { toast } from "sonner"import type { User } from "@supabase/supabase-js"
 
 const PRODUCT_IDS: Record<string, string> = {
   mensual: 'plan-mensual',
@@ -63,41 +62,25 @@ function InscribetePage() {
 
     setLoadingPlan(plan)
     try {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session?.user?.id) {
-        toast.error('Sesión expirada. Vuelve a iniciar sesión.')
-        window.location.href = '/login'
-        return
-      }
-
-      console.log('[v0] userId:', session.user.id.substring(0, 8), '| productId:', PRODUCT_IDS[plan])
-
       const res = await fetch(CHECKOUT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: PRODUCT_IDS[plan],
-          userId: session.user.id,
-        }),
+        body: JSON.stringify({ productId: PRODUCT_IDS[plan] }),
+        credentials: 'include', // envía las cookies de sesión al servidor
       })
 
       const text = await res.text()
-      console.error('[v0] RAW response:', res.status, text.substring(0, 500))
       let data: any = {}
       try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
       if (!res.ok || !data?.url) {
-        const msg = data?.error || `Error ${res.status}: ${text.substring(0, 200)}`
-        toast.error(msg)
+        toast.error(data?.error || `Error ${res.status}: no se pudo iniciar el pago`)
         return
       }
 
       window.location.assign(data.url)
     } catch (err: any) {
       toast.error(err?.message || 'No se pudo iniciar el pago, intenta nuevamente')
-      console.error('[v0] fetch exception:', err)
     } finally {
       setLoadingPlan(null)
     }
