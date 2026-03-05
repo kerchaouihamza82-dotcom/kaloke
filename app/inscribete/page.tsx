@@ -18,9 +18,9 @@ const PRICE_IDS: Record<string, string> = {
 const MENSUAL_BENEFITS: string[] = [
   "Acceso a los 5 campus especializados",
   "Contenido actualizado diariamente a las 8 a.m.",
-  "Comunidad privada de m\u00e1s de 100 estudiantes",
+  "Comunidad privada de mas de 100 estudiantes",
   "Recursos descargables y plantillas",
-  "Acceso a llamadas en vivo y mentor\u00edas",
+  "Acceso a llamadas en vivo y mentorias",
   "Soporte prioritario",
   "Sin permanencia, cancela cuando quieras",
 ]
@@ -29,11 +29,11 @@ const ANUAL_BENEFITS: string[] = [
   "Todo lo del plan mensual",
   "Acceso de por vida a todos los campus",
   "Todas las actualizaciones futuras incluidas",
-  "Sesiones de mentor\u00eda 1 a 1 mensuales",
+  "Sesiones de mentoria 1 a 1 mensuales",
   "Acceso prioritario a nuevos campus",
-  "Certificados de finalizaci\u00f3n",
+  "Certificados de finalizacion",
   "Grupo VIP exclusivo",
-  "Ahorra m\u00e1s de $1,500 al a\u00f1o",
+  "Ahorra mas de $1,500 al ano",
 ]
 
 const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
@@ -72,6 +72,9 @@ export default function InscribetePage() {
         return
       }
 
+      const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+      console.log('[v0] onSelectPlan:', { plan, priceId: PRICE_IDS[plan], email: session.user.email, userId: session.user.id, hasToken: !!session.access_token, hasAnon: !!anon })
+
       const body = JSON.stringify({
         priceId: PRICE_IDS[plan],
         email: session.user.email,
@@ -83,12 +86,13 @@ export default function InscribetePage() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+          'apikey': anon,
         },
         body,
       })
 
       const text = await res.text()
+      console.log('[v0] checkout response:', res.status, text)
       let data: any = {}
       try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
