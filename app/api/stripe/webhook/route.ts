@@ -12,10 +12,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Helper: resolve userId from metadata OR by looking up stripe_subscription_id in DB
+// Helper: resolve userId from metadata OR by looking up stripe_subscription_id / stripe_customer_id in DB
 async function resolveUserId(
   metadata: Record<string, string> | null,
-  stripeSubscriptionId?: string | null
+  stripeSubscriptionId?: string | null,
+  stripeCustomerId?: string | null
 ): Promise<string | null> {
   if (metadata?.userId) return metadata.userId
 
@@ -24,7 +25,17 @@ async function resolveUserId(
       .from('suscripciones')
       .select('user_id')
       .eq('stripe_subscription_id', stripeSubscriptionId)
-      .single()
+      .maybeSingle()
+    if (data?.user_id) return data.user_id
+  }
+
+  // Fallback: look up by stripe_customer_id in user_profiles
+  if (stripeCustomerId) {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('user_id')
+      .eq('stripe_customer_id', stripeCustomerId)
+      .maybeSingle()
     if (data?.user_id) return data.user_id
   }
 
@@ -145,7 +156,8 @@ export async function POST(req: NextRequest) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice
         const subscriptionId = invoice.subscription as string | null
-        const userId = await resolveUserId(null, subscriptionId)
+        const customerId = invoice.customer as string | null
+        const userId = await resolveUserId(null, subscriptionId, customerId)
 
         if (!userId) break
 
@@ -173,7 +185,8 @@ export async function POST(req: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
         const subscriptionId = invoice.subscription as string | null
-        const userId = await resolveUserId(null, subscriptionId)
+        const customerId = invoice.customer as string | null
+        const userId = await resolveUserId(null, subscriptionId, customerId)
 
         if (!userId) break
 
