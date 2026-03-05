@@ -34,24 +34,48 @@ export async function POST(request: NextRequest) {
     }
 
     // Reuse or create Stripe customer
-    const { data: profile } = await supabaseAdmin
-      .from('user_profiles')
-      .select('stripe_customer_id')
-      .eq('id', userId)
-      .single()
+    // user_profiles may not exist yet — handle gracefully
+    let customerId: string | null = null
+    try {
+      const { data: profile, error: profileErr } = await supabaseAdmin
+        .from('user_profiles')
+        .select('stripe_customer_id')
+        .eq('user_id', userId)
+        .maybeSingle()
 
-    let customerId = profile?.stripe_customer_id
+      if (profileErr) {
+        console.log('[v0] user_profiles lookup error (table may not exist yet):', profileErr.message)
+      } else {
+        customerId = profile?.stripe_customer_id ?? null
+        console.log('[v0] user_profiles found, customerId:', customerId)
+      }
+    } catch (e: any) {
+      console.log('[v0] user_profiles exception:', e?.message)
+    }
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { supabase_uid: userId },
-      })
-      customerId = customer.id
+      // Check if a Stripe customer already exists for this email to avoid duplicates
+      const existing = await stripe.customers.list({ email: user.email!, limit: 1 })
+      if (existing.data.length > 0) {
+        customerId = existing.data[0].id
+        console.log('[v0] Reusing existing Stripe customer:', customerId)
+      } else {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: { supabase_uid: userId },
+        })
+        customerId = customer.id
+        console.log('[v0] Created new Stripe customer:', customerId)
+      }
 
-      await supabaseAdmin
-        .from('user_profiles')
-        .upsert({ id: userId, stripe_customer_id: customerId }, { onConflict: 'id' })
+      // Try to persist the customer id, but don't fail if the table is missing
+      try {
+        await supabaseAdmin
+          .from('user_profiles')
+          .upsert({ user_id: userId, stripe_customer_id: customerId }, { onConflict: 'user_id' })
+      } catch (e: any) {
+        console.log('[v0] Could not save stripe_customer_id to user_profiles:', e?.message)
+      }
     }
 
     const origin =
