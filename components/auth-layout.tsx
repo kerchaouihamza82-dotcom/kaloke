@@ -10,7 +10,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             <img 
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sc-Photoroom-dyXvi00u3VQhtKjUqhzpGXU13MJGbc.png" 
               alt="DigiCash Academy" 
-              className="h-24 w-24 object-contain"
+              className="h-24 object-contain"
+              style={{ width: 'auto' }}
             />
             <span className="text-2xl font-bold tracking-tight text-foreground">
               DigiCash Academy

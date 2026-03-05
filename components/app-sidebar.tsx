@@ -53,7 +53,8 @@ export function AppSidebar() {
             <img 
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sc-Photoroom-dyXvi00u3VQhtKjUqhzpGXU13MJGbc.png" 
               alt="DigiCash Academy" 
-              className="h-10 w-10 object-contain"
+              className="h-10 object-contain"
+              style={{ width: 'auto' }}
             />
             <span className="text-lg font-semibold text-foreground">DigiCash Academy</span>
           </Link>
@@ -102,18 +103,7 @@ export function AppSidebar() {
           )}
         </nav>
 
-        {/* Footer */}
-        <div className="border-t border-border p-4">
-          <div className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <span className="text-sm font-medium">U</span>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">Usuario</p>
-              <p className="truncate text-xs text-muted-foreground">usuario@email.com</p>
-            </div>
-          </div>
-        </div>
+
       </div>
     </aside>
   )

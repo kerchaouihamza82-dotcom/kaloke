@@ -16,25 +16,21 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
-interface Lesson {
+interface Sesion {
   id: string
-  title: string
-  description: string
+  titulo: string
   video_url: string
-  video_type: 'youtube' | 'vimeo' | 'other'
-  duration_minutes: number
-  order_index: number
-  content: string
+  orden_index: number
 }
 
 interface Module {
   id: string
-  title: string
+  titulo: string
 }
 
 interface Course {
   id: string
-  title: string
+  titulo: string
 }
 
 export default function ModuleLessonsPage() {
@@ -44,10 +40,10 @@ export default function ModuleLessonsPage() {
   
   const [course, setCourse] = useState<Course | null>(null)
   const [module, setModule] = useState<Module | null>(null)
-  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [sesiones, setSesiones] = useState<Sesion[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
+  const [editingSesion, setEditingSesion] = useState<Sesion | null>(null)
 
   useEffect(() => {
     loadData()
@@ -59,7 +55,7 @@ export default function ModuleLessonsPage() {
       
       // Load course info
       const { data: courseData } = await supabase
-        .from('courses')
+        .from('cursos')
         .select('*')
         .eq('id', courseId)
         .single()
@@ -67,21 +63,21 @@ export default function ModuleLessonsPage() {
 
       // Load module info
       const { data: moduleData } = await supabase
-        .from('modules')
+        .from('modulos')
         .select('*')
         .eq('id', moduleId)
         .single()
       setModule(moduleData)
 
-      // Load lessons
-      const { data: lessonsData, error } = await supabase
-        .from('lessons')
+      // Load sesiones
+      const { data: sesionesData, error } = await supabase
+        .from('sesiones')
         .select('*')
-        .eq('module_id', moduleId)
-        .order('order_index', { ascending: true })
+        .eq('modulos_id', moduleId)
+        .order('orden_index', { ascending: true })
 
       if (error) throw error
-      setLessons(lessonsData || [])
+      setSesiones(sesionesData || [])
     } catch (error) {
       console.error('[v0] Error loading data:', error)
       toast.error('Error al cargar datos')
@@ -94,73 +90,58 @@ export default function ModuleLessonsPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     
-    const lessonData = {
-      module_id: moduleId,
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
+    const sesionData = {
+      modulos_id: moduleId,
+      titulo: formData.get('titulo') as string,
       video_url: formData.get('video_url') as string,
-      video_type: formData.get('video_type') as string,
-      duration_minutes: parseInt(formData.get('duration_minutes') as string) || 0,
-      content: formData.get('content') as string,
-      order_index: editingLesson?.order_index || lessons.length + 1
+      orden_index: editingSesion?.orden_index || sesiones.length + 1
     }
 
     try {
       const supabase = createClient()
 
-      if (editingLesson) {
+      if (editingSesion) {
         const { error } = await supabase
-          .from('lessons')
-          .update(lessonData)
-          .eq('id', editingLesson.id)
+          .from('sesiones')
+          .update(sesionData)
+          .eq('id', editingSesion.id)
 
         if (error) throw error
-        toast.success('Lección actualizada')
+        toast.success('Sesión actualizada')
       } else {
         const { error } = await supabase
-          .from('lessons')
-          .insert([lessonData])
+          .from('sesiones')
+          .insert([sesionData])
 
         if (error) throw error
-        toast.success('Lección creada')
+        toast.success('Sesión creada')
       }
 
       setDialogOpen(false)
-      setEditingLesson(null)
+      setEditingSesion(null)
       loadData()
     } catch (error) {
-      console.error('[v0] Error saving lesson:', error)
-      toast.error('Error al guardar lección')
+      console.error('[v0] Error saving sesion:', error)
+      toast.error('Error al guardar sesión')
     }
   }
 
-  const handleDelete = async (lessonId: string) => {
-    if (!confirm('¿Eliminar esta lección?')) return
+  const handleDelete = async (sesionId: string) => {
+    if (!confirm('¿Eliminar esta sesión?')) return
 
     try {
       const supabase = createClient()
       const { error } = await supabase
-        .from('lessons')
+        .from('sesiones')
         .delete()
-        .eq('id', lessonId)
+        .eq('id', sesionId)
 
       if (error) throw error
-      toast.success('Lección eliminada')
+      toast.success('Sesión eliminada')
       loadData()
     } catch (error) {
-      console.error('[v0] Error deleting lesson:', error)
-      toast.error('Error al eliminar lección')
-    }
-  }
-
-  const getVideoIcon = (type: string) => {
-    switch (type) {
-      case 'youtube':
-        return '📺'
-      case 'vimeo':
-        return '🎬'
-      default:
-        return '🎥'
+      console.error('[v0] Error deleting sesion:', error)
+      toast.error('Error al eliminar sesión')
     }
   }
 
@@ -175,103 +156,57 @@ export default function ModuleLessonsPage() {
         </Link>
         <div className="flex-1">
           <h1 className="text-balance text-3xl font-bold tracking-tight">
-            {module?.title}
+            {module?.titulo}
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Gestiona las lecciones del módulo
+            Gestiona las sesiones del módulo
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingLesson(null)}>
+            <Button onClick={() => setEditingSesion(null)}>
               <Plus className="mr-2 h-4 w-4" />
-              Nueva Lección
+              Nueva Sesión
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{editingLesson ? 'Editar Lección' : 'Crear Nueva Lección'}</DialogTitle>
+              <DialogTitle>{editingSesion ? 'Editar Sesión' : 'Crear Nueva Sesión'}</DialogTitle>
               <DialogDescription>
-                Completa la información de la lección y añade el enlace del video
+                Completa la información de la sesión y añade el enlace del video
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título de la Lección</Label>
+                <Label htmlFor="titulo">Título de la Sesión</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  defaultValue={editingLesson?.title}
+                  id="titulo"
+                  name="titulo"
+                  defaultValue={editingSesion?.titulo}
                   placeholder="Ej: Introducción a Bitcoin"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  rows={2}
-                  defaultValue={editingLesson?.description}
-                  placeholder="Breve descripción de la lección"
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2 space-y-2">
-                  <Label htmlFor="video_url">URL del Video</Label>
-                  <Input
-                    id="video_url"
-                    name="video_url"
-                    type="url"
-                    defaultValue={editingLesson?.video_url}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Soporta: YouTube, Vimeo y otros enlaces de video
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="video_type">Tipo de Video</Label>
-                  <Select name="video_type" defaultValue={editingLesson?.video_type || 'youtube'} required>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="youtube">📺 YouTube</SelectItem>
-                      <SelectItem value="vimeo">🎬 Vimeo</SelectItem>
-                      <SelectItem value="other">🎥 Otro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="duration_minutes">Duración (minutos)</Label>
+                <Label htmlFor="video_url">URL del Video</Label>
                 <Input
-                  id="duration_minutes"
-                  name="duration_minutes"
-                  type="number"
-                  min="1"
-                  defaultValue={editingLesson?.duration_minutes}
-                  placeholder="15"
+                  id="video_url"
+                  name="video_url"
+                  type="url"
+                  defaultValue={editingSesion?.video_url}
+                  placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
+                  required
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="content">Contenido / Notas</Label>
-                <Textarea
-                  id="content"
-                  name="content"
-                  rows={5}
-                  defaultValue={editingLesson?.content}
-                  placeholder="Añade notas, recursos o contenido adicional para la lección..."
-                />
+                <p className="text-xs text-muted-foreground">
+                  El video se abrirá en una nueva pestaña cuando los usuarios hagan clic
+                </p>
               </div>
               <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancelar
                 </Button>
                 <Button type="submit">
-                  {editingLesson ? 'Actualizar' : 'Crear'}
+                  {editingSesion ? 'Actualizar' : 'Crear'}
                 </Button>
               </div>
             </form>
@@ -283,51 +218,44 @@ export default function ModuleLessonsPage() {
         <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
             <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
-            <p className="text-muted-foreground">Cargando lecciones...</p>
+            <p className="text-muted-foreground">Cargando sesiones...</p>
           </div>
         </div>
-      ) : lessons.length === 0 ? (
+      ) : sesiones.length === 0 ? (
         <Card>
           <CardContent className="flex min-h-[300px] flex-col items-center justify-center p-8">
             <Video className="mb-4 h-12 w-12 text-muted-foreground" />
             <p className="mb-2 text-lg font-medium text-muted-foreground">
-              No hay lecciones creadas
+              No hay sesiones creadas
             </p>
             <p className="mb-4 text-sm text-muted-foreground">
               Añade videos de YouTube o Vimeo para crear contenido
             </p>
             <Button onClick={() => setDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Crear Primera Lección
+              Crear Primera Sesión
             </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
-          {lessons.map((lesson, index) => (
-            <Card key={lesson.id}>
+          {sesiones.map((sesion, index) => (
+            <Card key={sesion.id}>
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <span className="text-lg">{getVideoIcon(lesson.video_type)}</span>
+                    <Video className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold">
-                          Lección {index + 1}: {lesson.title}
+                          Sesión {index + 1}: {sesion.titulo}
                         </h3>
-                        {lesson.description && (
-                          <p className="mt-1 text-sm text-muted-foreground">{lesson.description}</p>
-                        )}
                         <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                          {lesson.duration_minutes > 0 && (
-                            <span>⏱️ {lesson.duration_minutes} min</span>
-                          )}
-                          <span className="capitalize">{lesson.video_type}</span>
-                          {lesson.video_url && (
+                          {sesion.video_url && (
                             <a
-                              href={lesson.video_url}
+                              href={sesion.video_url}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1 text-primary hover:underline"
@@ -342,7 +270,7 @@ export default function ModuleLessonsPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            setEditingLesson(lesson)
+                            setEditingSesion(sesion)
                             setDialogOpen(true)
                           }}
                           className="bg-transparent"
@@ -352,7 +280,7 @@ export default function ModuleLessonsPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(lesson.id)}
+                          onClick={() => handleDelete(sesion.id)}
                           className="bg-transparent"
                         >
                           <Trash2 className="h-4 w-4" />

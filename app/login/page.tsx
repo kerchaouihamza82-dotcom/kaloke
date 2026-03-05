@@ -1,20 +1,24 @@
 'use client'
 
-import React from "react"
+import React, { Suspense } from "react"
 
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AuthLayout } from "@/components/auth-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 
-export default function LoginPage() {
+const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const plan = searchParams.get('plan')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -27,15 +31,6 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // BYPASS TEMPORAL PARA TESTING - Eliminar en producción
-      if (email === 'admin@digicash.academy' && password === 'gmjhdigicash$') {
-        // Simular sesión temporal para testing
-        localStorage.setItem('temp_admin_session', 'true')
-        router.push('/dashboard')
-        router.refresh()
-        return
-      }
-
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -43,20 +38,56 @@ export default function LoginPage() {
       })
 
       if (error) {
-        // Mejorar mensajes de error
         if (error.message.includes('Invalid login credentials')) {
-          setError('Usuario no encontrado o contraseña incorrecta. ¿Ya te registraste?')
+          setError('Usuario no encontrado o contrasena incorrecta.')
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Por favor confirma tu correo electrónico antes de iniciar sesión.')
+          setError('Por favor confirma tu correo electronico antes de iniciar sesion.')
         } else {
           setError(error.message)
         }
       } else {
+        sessionStorage.removeItem('pendingPlan')
+
+        // Check localStorage for a pending priceId (set from /inscribete)
+        const pendingPriceId = localStorage.getItem('pendingPriceId')
+        if (pendingPriceId) {
+          localStorage.removeItem('pendingPriceId')
+          localStorage.removeItem('pendingPlan')
+
+          const supabase = createClient()
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            const res = await fetch(CHECKOUT_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+                'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+              },
+              body: JSON.stringify({
+                priceId: pendingPriceId,
+                email: session.user.email,
+                userId: session.user.id,
+              }),
+            })
+            const text = await res.text()
+            let json: any = {}
+            try { json = JSON.parse(text) } catch { /* non-JSON */ }
+            if (json?.url) {
+              window.location.assign(json.url)
+              return
+            } else {
+              setError('No se recibi\u00f3 URL de pago: ' + text.slice(0, 100))
+              return
+            }
+          }
+        }
+
         router.push('/dashboard')
         router.refresh()
       }
     } catch (err) {
-      setError('Ocurrió un error inesperado')
+      setError('Ocurrio un error inesperado')
     } finally {
       setLoading(false)
     }
@@ -145,12 +176,20 @@ export default function LoginPage() {
           </div>
           <p className="text-center text-sm text-muted-foreground">
             ¿No tienes una cuenta?{" "}
-            <Link href="/register" className="font-medium text-primary transition-colors hover:underline">
-              Regístrate
+            <Link href={plan ? `/registro?plan=${plan}` : '/registro'} className="font-medium text-primary transition-colors hover:underline">
+              {'Registrate'}
             </Link>
           </p>
         </CardFooter>
-      </Card>
+        </Card>
     </AuthLayout>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<AuthLayout><div className="h-96 animate-pulse rounded-lg bg-secondary" /></AuthLayout>}>
+      <LoginForm />
+    </Suspense>
   )
 }

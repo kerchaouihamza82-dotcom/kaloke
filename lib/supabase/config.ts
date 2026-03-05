@@ -1,2 +1,2 @@
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qvriogqmhgykbpgxofwh.supabase.co'
-export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2cmlvZ3FtaGd5a2JwZ3hvZndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjMwOTMsImV4cCI6MjA4NTg5OTA5M30.GGIICw8uJf5SbdaA_a7cR51vrxuIQhxGLLltyvsD6io'
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

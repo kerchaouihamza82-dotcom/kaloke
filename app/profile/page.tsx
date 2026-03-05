@@ -9,21 +9,247 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
-import { Camera, Mail, User, Lock, Bell, CreditCard, Award, ArrowLeft } from "lucide-react"
+import { Camera, User as UserIcon, Lock, Bell, Award, ArrowLeft, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { useState, useEffect } from "react"
+import { toast } from "sonner"
+import { upload } from '@vercel/blob/client'
+import { NotificationsList } from "@/components/notifications-list"
+
+interface UserProfile {
+  id: string
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  phone: string | null
+  bio: string | null
+}
 
 export default function ProfilePage() {
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [updating, setUpdating] = useState(false)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [user, setUser] = useState<UserProfile | null>(null)
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    bio: '',
+    avatar_url: ''
+  })
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+
+  useEffect(() => {
+    loadUserProfile()
+  }, [])
+
+  const loadUserProfile = async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError || !authUser) {
+        console.error('[v0] Error getting user:', authError)
+        router.push('/login')
+        return
+      }
+
+      // Load profile from user_profiles table
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+
+      const userProfile: UserProfile = {
+        id: authUser.id,
+        email: authUser.email || '',
+        full_name: profile?.full_name || null,
+        avatar_url: profile?.avatar_url || null,
+        phone: authUser.user_metadata?.phone || null,
+        bio: profile?.bio || null
+      }
+
+      setUser(userProfile)
+      setFormData({
+        full_name: userProfile.full_name || '',
+        email: userProfile.email,
+        phone: userProfile.phone || '',
+        bio: userProfile.bio || '',
+        avatar_url: userProfile.avatar_url || ''
+      })
+    } catch (error) {
+      console.error('[v0] Error loading profile:', error)
+      toast.error('Error al cargar el perfil')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor selecciona una imagen válida')
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('La imagen debe ser menor a 2MB')
+      return
+    }
+
+    setUploadingAvatar(true)
+    console.log('[v0] Starting upload for:', file.name)
+
+    try {
+      const newBlob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
+      })
+      console.log('[v0] Upload successful, URL:', newBlob.url)
+
+      const supabase = createClient()
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      
+      if (!currentUser) throw new Error('No user found')
+      console.log('[v0] User ID:', currentUser.id)
+
+      // Update user_profiles table with new avatar
+      console.log('[v0] Updating user_profiles with avatar:', newBlob.url)
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: currentUser.id,
+          avatar_url: newBlob.url
+        })
+
+      if (error) {
+        console.error('[v0] Supabase error:', error)
+        throw error
+      }
+      console.log('[v0] Profile updated successfully')
+
+      setUser(prev => prev ? { ...prev, avatar_url: newBlob.url } : null)
+      setFormData(prev => ({ ...prev, avatar_url: newBlob.url }))
+      toast.success('Foto de perfil actualizada')
+    } catch (error) {
+      console.error('[v0] Error uploading avatar:', error)
+      toast.error('Error al subir la imagen: ' + (error as Error).message)
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setUpdating(true)
+
+    try {
+      const supabase = createClient()
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('No user found')
+
+      // Update email in auth if changed
+      if (formData.email !== user.email) {
+        const { error } = await supabase.auth.updateUser({
+          email: formData.email
+        })
+        if (error) throw error
+      }
+
+      // Update user_profiles table
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: user.id,
+          full_name: formData.full_name,
+          bio: formData.bio,
+          avatar_url: formData.avatar_url
+        })
+
+      if (profileError) throw profileError
+
+      toast.success('Perfil actualizado exitosamente')
+      loadUserProfile()
+    } catch (error: any) {
+      console.error('[v0] Error updating profile:', error)
+      toast.error(error.message || 'Error al actualizar el perfil')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Las contraseñas no coinciden')
+      return
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.error('La contraseña debe tener al menos 6 caracteres')
+      return
+    }
+
+    setUpdating(true)
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      })
+
+      if (error) throw error
+
+      toast.success('Contraseña actualizada exitosamente')
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+    } catch (error: any) {
+      console.error('[v0] Error updating password:', error)
+      toast.error(error.message || 'Error al actualizar la contraseña')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  const getInitials = (name: string | null) => {
+    if (!name) return 'U'
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="space-y-8 p-8">
-      {/* Botón Volver */}
       <Button variant="ghost" size="sm" onClick={() => router.back()}>
         <ArrowLeft className="mr-2 h-4 w-4" />
         Volver
       </Button>
 
-      {/* Header */}
       <div>
         <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground">
           Mi Perfil
@@ -33,114 +259,129 @@ export default function ProfilePage() {
         </p>
       </div>
 
-      {/* Profile Header Card */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
             <div className="relative">
               <Avatar className="h-24 w-24">
-                <AvatarImage src="/placeholder-avatar.jpg" alt="Usuario" />
+                <AvatarImage src={user.avatar_url || undefined} alt={user.full_name || 'Usuario'} />
                 <AvatarFallback className="bg-primary text-2xl text-primary-foreground">
-                  JD
+                  {getInitials(user.full_name)}
                 </AvatarFallback>
               </Avatar>
               <Button
                 size="icon"
                 className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
                 variant="secondary"
+                disabled={uploadingAvatar}
+                onClick={() => document.getElementById('avatar-upload')?.click()}
+                type="button"
               >
-                <Camera className="h-4 w-4" />
+                {uploadingAvatar ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
               </Button>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+                disabled={uploadingAvatar}
+              />
             </div>
             <div className="flex-1 space-y-2 text-center md:text-left">
-              <h2 className="text-2xl font-bold text-foreground">Juan Pérez</h2>
-              <p className="text-muted-foreground">juan.perez@email.com</p>
+              <h2 className="text-2xl font-bold text-foreground">{user.full_name || 'Sin nombre'}</h2>
+              <p className="text-muted-foreground">{user.email}</p>
               <div className="flex flex-wrap justify-center gap-2 md:justify-start">
-                <Badge variant="secondary">Miembro Premium</Badge>
-                <Badge variant="outline">Estudiante Activo</Badge>
-              </div>
-            </div>
-            <div className="flex gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-foreground">5</p>
-                <p className="text-xs text-muted-foreground">Cursos</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">3</p>
-                <p className="text-xs text-muted-foreground">Certificados</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">12.5h</p>
-                <p className="text-xs text-muted-foreground">Este mes</p>
+                <Badge variant="secondary">Estudiante</Badge>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabs Section */}
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-3">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="security">Seguridad</TabsTrigger>
           <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
-          <TabsTrigger value="billing">Facturación</TabsTrigger>
-          <TabsTrigger value="certificates">Certificados</TabsTrigger>
         </TabsList>
 
-        {/* General Tab */}
         <TabsContent value="general" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <UserIcon className="h-5 w-5" />
                 Información Personal
               </CardTitle>
               <CardDescription>
                 Actualiza tu información de perfil y detalles personales
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+            <CardContent>
+              <form onSubmit={handleUpdateProfile} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Nombre</Label>
-                  <Input id="firstName" placeholder="Juan" defaultValue="Juan" />
+                  <Label htmlFor="full_name">Nombre Completo</Label>
+                  <Input
+                    id="full_name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    placeholder="Tu nombre completo"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Apellido</Label>
-                  <Input id="lastName" placeholder="Pérez" defaultValue="Pérez" />
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="tu@email.com"
+                  />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="juan.perez@email.com"
-                  defaultValue="juan.perez@email.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" type="tel" placeholder="+34 123 456 789" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bio">Biografía</Label>
-                <textarea
-                  id="bio"
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="Cuéntanos sobre ti..."
-                />
-              </div>
-              <div className="flex justify-end gap-4">
-                <Button variant="outline">Cancelar</Button>
-                <Button>Guardar Cambios</Button>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Teléfono</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+34 123 456 789"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Biografía</Label>
+                  <textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="Cuéntanos sobre ti..."
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
+                  <Button type="button" variant="outline" onClick={() => loadUserProfile()}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={updating}>
+                    {updating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      'Guardar Cambios'
+                    )}
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Security Tab */}
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
@@ -152,59 +393,71 @@ export default function ProfilePage() {
                 Mantén tu cuenta segura actualizando tu contraseña regularmente
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Contraseña Actual</Label>
-                <Input id="currentPassword" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">Nueva Contraseña</Label>
-                <Input id="newPassword" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Nueva Contraseña</Label>
-                <Input id="confirmPassword" type="password" />
-              </div>
-              <div className="flex justify-end gap-4">
-                <Button variant="outline">Cancelar</Button>
-                <Button>Actualizar Contraseña</Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Autenticación de Dos Factores</CardTitle>
-              <CardDescription>
-                Agrega una capa extra de seguridad a tu cuenta
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Habilitar 2FA</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Requiere un código adicional al iniciar sesión
-                  </p>
+            <CardContent>
+              <form onSubmit={handleUpdatePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nueva Contraseña</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    placeholder="Mínimo 6 caracteres"
+                  />
                 </div>
-                <Switch />
-              </div>
-              <Separator />
-              <Button variant="outline" className="w-full bg-transparent">
-                Configurar Autenticación
-              </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmar Nueva Contraseña</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    placeholder="Repite la contraseña"
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={updating}>
+                    {updating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Actualizando...
+                      </>
+                    ) : (
+                      'Actualizar Contraseña'
+                    )}
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Notifications Tab */}
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Preferencias de Notificación
+                Notificaciones Recientes
               </CardTitle>
+              <CardDescription>
+                Gestiona y revisa tus notificaciones más recientes
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <NotificationsList />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Preferencias de Notificación</CardTitle>
               <CardDescription>
                 Controla cómo y cuándo recibes notificaciones
               </CardDescription>
@@ -233,16 +486,6 @@ export default function ProfilePage() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Mensajes de la Comunidad</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Recibe notificaciones de mensajes y menciones
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
                     <Label>Recordatorios de Llamadas</Label>
                     <p className="text-sm text-muted-foreground">
                       Recordatorios antes de sesiones en vivo programadas
@@ -250,158 +493,8 @@ export default function ProfilePage() {
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Newsletter Semanal</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Resumen semanal de contenido y novedades
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Billing Tab */}
-        <TabsContent value="billing" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Plan Actual
-              </CardTitle>
-              <CardDescription>
-                Administra tu suscripción y métodos de pago
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="rounded-lg border border-border bg-muted/50 p-6">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-foreground">Plan Premium</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Acceso completo a todos los cursos y contenido exclusivo
-                    </p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-foreground">$49</span>
-                      <span className="text-muted-foreground">/mes</span>
-                    </div>
-                  </div>
-                  <Badge>Activo</Badge>
-                </div>
-                <Separator className="my-4" />
-                <div className="space-y-2 text-sm">
-                  <p className="text-muted-foreground">
-                    Próxima facturación: <span className="font-medium text-foreground">15 de Marzo, 2024</span>
-                  </p>
-                  <p className="text-muted-foreground">
-                    Método de pago: <span className="font-medium text-foreground">•••• •••• •••• 4242</span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Button variant="outline" className="flex-1 bg-transparent">
-                  Cambiar Plan
-                </Button>
-                <Button variant="outline" className="flex-1 bg-transparent">
-                  Actualizar Pago
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Historial de Facturas</CardTitle>
-              <CardDescription>
-                Descarga tus facturas y recibos anteriores
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  { date: "15 Feb 2024", amount: "$49.00", status: "Pagado" },
-                  { date: "15 Ene 2024", amount: "$49.00", status: "Pagado" },
-                  { date: "15 Dic 2023", amount: "$49.00", status: "Pagado" },
-                ].map((invoice, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between rounded-lg border border-border p-4"
-                  >
-                    <div>
-                      <p className="font-medium text-foreground">{invoice.date}</p>
-                      <p className="text-sm text-muted-foreground">{invoice.amount}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Badge variant="secondary">{invoice.status}</Badge>
-                      <Button variant="ghost" size="sm">
-                        Descargar
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Certificates Tab */}
-        <TabsContent value="certificates" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
-                Mis Certificados
-              </CardTitle>
-              <CardDescription>
-                Certificados obtenidos por completar cursos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                {[
-                  {
-                    title: "Fundamentos de Bitcoin",
-                    date: "Completado el 15 Enero 2024",
-                    id: "CERT-001234",
-                  },
-                  {
-                    title: "Trading Avanzado",
-                    date: "Completado el 28 Diciembre 2023",
-                    id: "CERT-001189",
-                  },
-                  {
-                    title: "Introducción a DeFi",
-                    date: "Completado el 10 Noviembre 2023",
-                    id: "CERT-001098",
-                  },
-                ].map((cert, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4"
-                  >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <Award className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="font-semibold text-foreground">{cert.title}</h3>
-                      <p className="text-sm text-muted-foreground">{cert.date}</p>
-                      <p className="text-xs text-muted-foreground">ID: {cert.id}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-                        Ver
-                      </Button>
-                      <Button size="sm" className="flex-1">
-                        Descargar
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <Button className="w-full">Guardar Preferencias</Button>
             </CardContent>
           </Card>
         </TabsContent>

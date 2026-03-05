@@ -1,10 +1,9 @@
 'use client'
 
-import React from "react"
-
+import React, { Suspense } from "react"
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AuthLayout } from "@/components/auth-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,8 +12,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { createClient } from "@/lib/supabase/client"
 import { Eye, EyeOff } from "lucide-react"
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const plan = searchParams.get('plan')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,27 +32,29 @@ export default function RegisterPage() {
     setLoading(true)
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden')
+      setError('Las contrasenas no coinciden')
       setLoading(false)
       return
     }
 
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
+      setError('La contrasena debe tener al menos 6 caracteres')
       setLoading(false)
       return
     }
 
     try {
       const supabase = createClient()
+      const redirectUrl = plan
+        ? `${window.location.origin}/checkout/${plan}`
+        : `${window.location.origin}/dashboard`
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: {
-            full_name: name,
-          },
+          emailRedirectTo: redirectUrl,
+          data: { full_name: name },
         },
       })
 
@@ -60,8 +63,8 @@ export default function RegisterPage() {
       } else {
         setSuccess(true)
       }
-    } catch (err) {
-      setError('Ocurrió un error inesperado')
+    } catch {
+      setError('Ocurrio un error inesperado')
     } finally {
       setLoading(false)
     }
@@ -72,21 +75,20 @@ export default function RegisterPage() {
       <AuthLayout>
         <Card className="border-border">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-foreground">Confirma tu correo</CardTitle>
-            <CardDescription>
-              Te hemos enviado un correo de confirmación
-            </CardDescription>
+            <CardTitle className="text-2xl font-bold text-foreground">{'Confirma tu correo'}</CardTitle>
+            <CardDescription>{'Te hemos enviado un correo de confirmacion'}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para activar tu cuenta.
+              {'Revisa tu bandeja de entrada y haz clic en el enlace de confirmacion para activar tu cuenta.'}
+              {plan && ' Despues de confirmar, seras redirigido al checkout para completar tu compra.'}
             </p>
             <Button
               variant="outline"
               className="w-full bg-transparent"
-              onClick={() => router.push('/login')}
+              onClick={() => router.push(plan ? `/login?plan=${plan}` : '/login')}
             >
-              Ir a Iniciar Sesión
+              {'Ir a Iniciar Sesion'}
             </Button>
           </CardContent>
         </Card>
@@ -98,10 +100,8 @@ export default function RegisterPage() {
     <AuthLayout>
       <Card className="border-border">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-foreground">Crear Cuenta</CardTitle>
-          <CardDescription>
-            Completa los datos para comenzar tu aprendizaje
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold text-foreground">{'Crear Cuenta'}</CardTitle>
+          <CardDescription>{'Completa los datos para comenzar tu aprendizaje'}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">
@@ -111,13 +111,11 @@ export default function RegisterPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">
-                Nombre Completo
-              </Label>
+              <Label htmlFor="name" className="text-foreground">{'Nombre Completo'}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Juan Pérez"
+                placeholder="Juan Perez"
                 className="bg-secondary text-foreground"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -125,9 +123,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                Correo Electrónico
-              </Label>
+              <Label htmlFor="email" className="text-foreground">{'Correo Electronico'}</Label>
               <Input
                 id="email"
                 type="email"
@@ -139,9 +135,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
-                Contraseña
-              </Label>
+              <Label htmlFor="password" className="text-foreground">{'Contrasena'}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -159,18 +153,12 @@ export default function RegisterPage() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password" className="text-foreground">
-                Confirmar Contraseña
-              </Label>
+              <Label htmlFor="confirm-password" className="text-foreground">{'Confirmar Contrasena'}</Label>
               <div className="relative">
                 <Input
                   id="confirm-password"
@@ -188,11 +176,7 @@ export default function RegisterPage() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                 </Button>
               </div>
             </div>
@@ -200,18 +184,14 @@ export default function RegisterPage() {
               <input
                 type="checkbox"
                 id="terms"
-                className="mt-1 h-4 w-4 rounded border-border bg-secondary text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                className="mt-1 h-4 w-4 rounded border-border bg-secondary text-primary"
                 required
               />
               <label htmlFor="terms" className="text-sm text-muted-foreground">
-                Acepto los{" "}
-                <Link href="/terms" className="text-primary hover:underline">
-                  términos y condiciones
-                </Link>{" "}
-                y la{" "}
-                <Link href="/privacy" className="text-primary hover:underline">
-                  política de privacidad
-                </Link>
+                {'Acepto los '}
+                <Link href="/terms" className="text-primary hover:underline">{'terminos y condiciones'}</Link>
+                {' y la '}
+                <Link href="/privacy" className="text-primary hover:underline">{'politica de privacidad'}</Link>
               </label>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
@@ -229,13 +209,21 @@ export default function RegisterPage() {
             </div>
           </div>
           <p className="text-center text-sm text-muted-foreground">
-            ¿Ya tienes una cuenta?{" "}
-            <Link href="/login" className="font-medium text-primary transition-colors hover:underline">
-              Inicia sesión
+            {'Ya tienes una cuenta? '}
+            <Link href={plan ? `/login?plan=${plan}` : '/login'} className="font-medium text-primary transition-colors hover:underline">
+              {'Inicia sesion'}
             </Link>
           </p>
         </CardFooter>
       </Card>
     </AuthLayout>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<AuthLayout><div className="h-96 animate-pulse rounded-lg bg-secondary" /></AuthLayout>}>
+      <RegisterForm />
+    </Suspense>
   )
 }

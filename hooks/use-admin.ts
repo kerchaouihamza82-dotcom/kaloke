@@ -15,29 +15,31 @@ export function useAdmin() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      
+
       if (!user) {
         setIsAdmin(false)
         setLoading(false)
         return
       }
 
-      // Check if user is admin from database
-      const { data: profile, error } = await supabase
+      // Check role in profiles table (source of truth)
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
 
-      if (error) {
-        console.error('[v0] Error fetching profile:', error)
-        // Fallback to email check
-        const adminEmails = ['admin@digicash.academy', 'hamzakerchaoui11@gmail.com']
-        setIsAdmin(adminEmails.includes(user.email || ''))
-      } else {
-        setIsAdmin(profile?.role === 'admin')
+      if (profile?.role === 'admin') {
+        setIsAdmin(true)
+        setLoading(false)
+        return
       }
-      
+
+      // Fallback: check user_metadata
+      const metaAdmin = user.user_metadata?.is_admin === true ||
+                        user.user_metadata?.role === 'admin'
+      setIsAdmin(metaAdmin)
+
     } catch (error) {
       console.error('[v0] Error checking admin status:', error)
       setIsAdmin(false)
