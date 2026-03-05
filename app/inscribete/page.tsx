@@ -95,17 +95,17 @@ export default function InscribetePage() {
       try { data = JSON.parse(text) } catch { /* non-JSON response */ }
 
       if (!res.ok) {
-        toast.error('Error: ' + (data.error || data.message || `HTTP ${res.status}`))
+        toast.error('No se pudo iniciar el pago, intenta nuevamente')
         return
       }
 
       if (data?.url) {
         window.location.assign(data.url)
       } else {
-        toast.error('No se recibió URL de pago: ' + text.slice(0, 100))
+        toast.error('No se pudo iniciar el pago, intenta nuevamente')
       }
     } catch (err: any) {
-      toast.error('Error de red: ' + err.message)
+      toast.error('No se pudo iniciar el pago, intenta nuevamente')
     } finally {
       setLoadingPlan(null)
     }
