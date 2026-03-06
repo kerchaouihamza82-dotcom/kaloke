@@ -1,33 +1,31 @@
 export interface Product {
   id: string
   name: string
-  description: string
   priceInCents: number
-  type: 'subscription' | 'one-time'
-  interval?: 'month' | 'year'
+  mode: 'subscription'
+  interval: 'month' | 'year'
   stripePriceId: string
-  stripeProductId: string
 }
 
 export const PRODUCTS: Product[] = [
   {
     id: 'plan-mensual',
     name: 'Plan Mensual',
-    description: 'Acceso mensual a todos los campus de DigiCash Academy',
-    priceInCents: 999, // $9.99
-    type: 'subscription',
+    priceInCents: 999,
+    mode: 'subscription',
     interval: 'month',
-    stripePriceId: 'price_1T47coCYzThxiyRJjvJQQdsF',
-    stripeProductId: 'prod_U2C0aP4F36loA6',
+    stripePriceId: 'price_1T7cBgGXPveWbaAfVlivnMcG',
   },
   {
     id: 'plan-completo',
-    name: 'Plan Completo',
-    description: 'Acceso anual a DigiCash Academy',
-    priceInCents: 250000, // $2,500
-    type: 'subscription',
+    name: 'Plan Completo Anual',
+    priceInCents: 250000,
+    mode: 'subscription',
     interval: 'year',
-    stripePriceId: 'price_1T47coCYzThxiyRJivPjnnkh',
-    stripeProductId: 'prod_U2C0T76GCy1vAu',
+    stripePriceId: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
   },
 ]
+
+export function getProductById(id: string): Product | undefined {
+  return PRODUCTS.find((p) => p.id === id)
+}

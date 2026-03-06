@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from "react"
-import { handleSubscription } from "@/lib/handle-subscription"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"

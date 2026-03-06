@@ -10,9 +10,9 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import type { User } from "@supabase/supabase-js"
 
-const PRICE_IDS: Record<string, string> = {
-  mensual: 'price_1T7cBgGXPveWbaAfVlivnMcG',
-  anual: 'price_1T7cE1GXPveWbaAfZHbjhuxj',
+const PRODUCT_IDS: Record<string, string> = {
+  mensual: 'plan-mensual',
+  anual: 'plan-completo',
 }
 
 const MENSUAL_BENEFITS: string[] = [
@@ -27,16 +27,16 @@ const MENSUAL_BENEFITS: string[] = [
 
 const ANUAL_BENEFITS: string[] = [
   "Todo lo del plan mensual",
-  "Acceso de por vida a todos los campus",
-  "Todas las actualizaciones futuras incluidas",
-  "Sesiones de mentoria 1 a 1 mensuales",
+  "Acceso durante 12 meses completos",
+  "Todas las actualizaciones del año incluidas",
+  "Sesiones de mentoría 1 a 1 mensuales",
   "Acceso prioritario a nuevos campus",
-  "Certificados de finalizacion",
+  "Certificados de finalización",
   "Grupo VIP exclusivo",
-  "Ahorra mas de $1,500 al ano",
+  "Ahorra más de $1,500 al año frente al mensual",
 ]
 
-const CHECKOUT_URL = 'https://uwjjtmnesnjjqxkiacjt.supabase.co/functions/v1/create-checkout'
+const CHECKOUT_URL = '/api/checkout'
 
 function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
@@ -55,7 +55,7 @@ function InscribetePage() {
 
   const onSelectPlan = async (plan: 'mensual' | 'anual') => {
     if (!user) {
-      localStorage.setItem('pendingPriceId', PRICE_IDS[plan])
+      localStorage.setItem('pendingProductId', PRODUCT_IDS[plan])
       localStorage.setItem('pendingPlan', plan)
       window.location.href = `/registro?plan=${plan}`
       return
@@ -63,31 +63,11 @@ function InscribetePage() {
 
     setLoadingPlan(plan)
     try {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session?.access_token || !session.user?.email || !session.user?.id) {
-        toast.error('Sesi\u00f3n expirada. Vuelve a iniciar sesi\u00f3n.')
-        window.location.href = '/login'
-        return
-      }
-
-      const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-
-      const body = JSON.stringify({
-        priceId: PRICE_IDS[plan],
-        email: session.user.email,
-        userId: session.user.id,
-      })
-
       const res = await fetch(CHECKOUT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': anon,
-        },
-        body,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: PRODUCT_IDS[plan] }),
+        credentials: 'include', // envía las cookies de sesión al servidor
       })
 
       const text = await res.text()
@@ -95,13 +75,13 @@ function InscribetePage() {
       try { data = JSON.parse(text) } catch { /* non-JSON */ }
 
       if (!res.ok || !data?.url) {
-        toast.error('No se pudo iniciar el pago, intenta nuevamente')
+        toast.error(data?.error || `Error ${res.status}: no se pudo iniciar el pago`)
         return
       }
 
       window.location.assign(data.url)
-    } catch {
-      toast.error('No se pudo iniciar el pago, intenta nuevamente')
+    } catch (err: any) {
+      toast.error(err?.message || 'No se pudo iniciar el pago, intenta nuevamente')
     } finally {
       setLoadingPlan(null)
     }
@@ -191,9 +171,12 @@ function InscribetePage() {
             <Card className="flex flex-col border border-border">
               <CardContent className="flex flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo</h2>
-                  <div className="text-6xl font-light">$2,500</div>
-                  <p className="text-sm font-light text-muted-foreground">Pago \u00fanico, acceso de por vida</p>
+                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo Anual</h2>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-6xl font-light">$2,500</span>
+                    <span className="text-xl text-muted-foreground">/ año</span>
+                  </div>
+                  <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
@@ -216,7 +199,7 @@ function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">Pago \u00fanico, sin cargos recurrentes</p>
+                  <p className="text-center text-xs text-muted-foreground">Renovación anual, cancela antes de que venza</p>
                 </div>
               </CardContent>
             </Card>

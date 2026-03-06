@@ -60,12 +60,12 @@ export async function middleware(request: NextRequest) {
         return supabaseResponse
       }
 
-      // Check paid access in user_profiles
+      // Check paid access in user_profiles (column is user_id, not id)
       const { data: userProfile } = await supabaseAdmin
         .from('user_profiles')
         .select('has_access')
-        .eq('id', user.id)
-        .single()
+        .eq('user_id', user.id)
+        .maybeSingle()
 
       if (!userProfile?.has_access) {
         return NextResponse.redirect(new URL('/inscribete', request.url))
@@ -87,13 +87,13 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
 
-      const { data: userProfile } = await supabaseAdmin
+      const { data: userProfile2 } = await supabaseAdmin
         .from('user_profiles')
         .select('has_access')
-        .eq('id', user.id)
-        .single()
+        .eq('user_id', user.id)
+        .maybeSingle()
 
-      if (userProfile?.has_access) {
+      if (userProfile2?.has_access) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
     }
