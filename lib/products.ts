@@ -14,7 +14,7 @@ export const PRODUCTS: Product[] = [
     priceInCents: 999,
     mode: 'subscription',
     interval: 'month',
-    stripePriceId: 'price_1T7xP7GXPveWbaAfp8cD5Sx6',
+    stripePriceId: 'price_1T83ofAfevND1plyNxraYawB',
   },
   {
     id: 'plan-completo',
@@ -22,7 +22,7 @@ export const PRODUCTS: Product[] = [
     priceInCents: 250000,
     mode: 'subscription',
     interval: 'year',
-    stripePriceId: 'price_1T7xP7GXPveWbaAfoQvvYVYI',
+    stripePriceId: 'price_1T83p9AfevND1plyW4Aas4rE',
   },
 ]
 
