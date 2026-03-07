@@ -51,8 +51,9 @@ export default function InscribetePage() {
         return
       }
       window.location.assign(data.url)
-    } catch (err: any) {
-      toast.error(err?.message || 'No se pudo iniciar el pago')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'No se pudo iniciar el pago'
+      toast.error(message)
     } finally {
       setLoadingPlan(null)
     }
@@ -91,6 +92,7 @@ export default function InscribetePage() {
           </div>
 
           <div className="grid items-stretch gap-8 lg:grid-cols-2">
+            {/* Plan Mensual */}
             <Card className="relative flex flex-col border-2 border-blue-500/60 bg-gradient-to-b from-blue-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-blue-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
@@ -126,6 +128,7 @@ export default function InscribetePage() {
               </CardContent>
             </Card>
 
+            {/* Plan Completo Anual */}
             <Card className="relative flex flex-col border-2 border-amber-500/60 bg-gradient-to-b from-amber-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-amber-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-black">
@@ -167,7 +170,7 @@ export default function InscribetePage() {
       <footer className="border-t border-border py-10">
         <div className="container mx-auto px-6 text-center">
           <p className="text-sm font-light text-muted-foreground">
-    DigiCash Academy {new Date().getFullYear()}. Todos los derechos reservados.
+            DigiCash Academy {new Date().getFullYear()}. Todos los derechos reservados.
           </p>
         </div>
       </footer>
