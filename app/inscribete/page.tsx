@@ -168,7 +168,7 @@ function InscribetePage() {
             </Card>
 
             {/* Plan Completo */}
-            <Card className="relative flex flex-col border-2 border-white/20">
+            <Card className="relative flex flex-col border-2 border-foreground/20">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-orange-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
                   Plan Recomendado
@@ -176,13 +176,13 @@ function InscribetePage() {
               </div>
               <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-white/90">Plan Completo Anual</h2>
+                  <h2 className="text-xl font-light text-foreground">Plan Completo Anual</h2>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-6xl font-light">$2,500</span>
                     <span className="text-xl text-muted-foreground">/ año</span>
                   </div>
                   <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
-                  <p className="text-sm font-light text-green-400">Valor real superior a $7,000</p>
+                  <p className="text-sm font-light text-green-600 dark:text-green-400">Valor real superior a $7,000</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
@@ -197,7 +197,7 @@ function InscribetePage() {
                 <div className="mt-auto space-y-3">
                   <Button
                     variant="outline"
-                    className="w-full border-white/30 py-5 text-base text-white hover:bg-white hover:text-background"
+                    className="w-full py-5 text-base"
                     onClick={() => onSelectPlan('anual')}
                     disabled={loadingPlan === 'anual'}
                   >
