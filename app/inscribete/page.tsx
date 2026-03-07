@@ -18,9 +18,9 @@ const PRODUCT_IDS: Record<string, string> = {
 const MENSUAL_BENEFITS: string[] = [
   "Acceso a los 5 campus especializados",
   "Contenido actualizado diariamente a las 8 a.m.",
-  "Comunidad privada de mas de 100 estudiantes",
+  "Comunidad privada de más de 100 estudiantes",
   "Recursos descargables y plantillas",
-  "Acceso a llamadas en vivo y mentorias",
+  "Acceso a llamadas en vivo y mentorías",
   "Soporte prioritario",
   "Sin permanencia, cancela cuando quieras",
 ]
@@ -100,7 +100,7 @@ function InscribetePage() {
             ) : (
               <Link href="/login">
                 <Button variant="outline" size="sm" className="font-light">
-                  Iniciar sesi\u00f3n
+                  Iniciar sesión
                 </Button>
               </Link>
             )}
@@ -133,7 +133,7 @@ function InscribetePage() {
                   Recomendado
                 </Badge>
               </div>
-              <CardContent className="flex flex-col gap-6 p-8 pt-10">
+              <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
                 <div className="space-y-2 text-center">
                   <h2 className="text-xl font-light text-blue-400">Plan Mensual</h2>
                   <div className="flex items-baseline justify-center gap-1">
@@ -152,7 +152,7 @@ function InscribetePage() {
                   ))}
                 </ul>
 
-                <div className="space-y-3">
+                <div className="mt-auto space-y-3">
                   <Button
                     className="w-full bg-blue-600 py-5 text-base hover:bg-blue-700"
                     onClick={() => onSelectPlan('mensual')}
@@ -162,14 +162,14 @@ function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">7 d\u00edas de garant\u00eda de devoluci\u00f3n</p>
+                  <p className="text-center text-xs text-muted-foreground">7 días de garantía de devolución</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Plan Completo */}
             <Card className="flex flex-col border border-border">
-              <CardContent className="flex flex-col gap-6 p-8">
+              <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
                 <div className="space-y-2 text-center">
                   <h2 className="text-xl font-light text-muted-foreground">Plan Completo Anual</h2>
                   <div className="flex items-baseline justify-center gap-1">
@@ -188,7 +188,7 @@ function InscribetePage() {
                   ))}
                 </ul>
 
-                <div className="space-y-3">
+                <div className="mt-auto space-y-3">
                   <Button
                     variant="outline"
                     className="w-full border-foreground py-5 text-base hover:bg-foreground hover:text-background"
