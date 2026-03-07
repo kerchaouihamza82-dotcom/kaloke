@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { getProductById } from '@/lib/products'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://v0-digicashacademy.vercel.app'
@@ -18,8 +18,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Producto no encontrado: ${productId}` }, { status: 400 })
     }
 
-    // Crear sesión de Stripe Checkout SIN requerir login
-    // El email se captura en Stripe Checkout
+    const stripe = getStripe()
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: product.stripePriceId, quantity: 1 }],
