@@ -89,9 +89,9 @@ export default function InscribetePage() {
 
           <div className="grid items-stretch gap-8 lg:grid-cols-2">
             {/* Plan Mensual */}
-            <Card className="relative flex flex-col border-2 border-blue-500/40 pt-4">
+            <Card className="relative flex flex-col border-2 border-blue-500/60 bg-gradient-to-b from-blue-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
+                <Badge className="bg-blue-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
                   Recomendado
                 </Badge>
               </div>
@@ -99,21 +99,21 @@ export default function InscribetePage() {
                 <div className="space-y-2 text-center">
                   <h2 className="text-xl font-light text-blue-400">Plan Mensual</h2>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-6xl font-light">$9.99</span>
+                    <span className="text-6xl font-light text-blue-50">$9.99</span>
                     <span className="text-xl text-muted-foreground">/ mes</span>
                   </div>
-                  <p className="text-sm font-light text-muted-foreground">Cancela cuando quieras</p>
+                  <p className="text-sm font-light text-blue-400/70">Cancela cuando quieras</p>
                 </div>
                 <ul className="flex-1 space-y-3">
                   {MENSUAL_BENEFITS.map((b, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
                       <span className="text-sm font-light text-foreground/80">{b}</span>
                     </li>
                   ))}
                 </ul>
                 <Button
-                  className="mt-auto w-full bg-blue-600 py-6 text-base font-normal hover:bg-blue-700"
+                  className="mt-auto w-full border-blue-500 bg-blue-500 py-6 text-base font-normal text-white hover:bg-blue-400"
                   disabled={!!loadingPlan}
                   onClick={() => handlePlan('mensual')}
                 >
