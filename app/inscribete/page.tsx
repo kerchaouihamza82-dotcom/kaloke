@@ -100,7 +100,7 @@ function InscribetePage() {
             ) : (
               <Link href="/login">
                 <Button variant="outline" size="sm" className="font-light">
-                  Iniciar sesi\u00f3n
+                  Iniciar Sesión
                 </Button>
               </Link>
             )}
