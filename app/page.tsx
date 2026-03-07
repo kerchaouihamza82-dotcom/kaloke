@@ -410,95 +410,102 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="mb-16 space-y-4 text-center">
             <h2 className="text-4xl font-bold md:text-5xl">Elige tu acceso</h2>
-            <p className="text-lg font-medium text-muted-foreground">Empieza hoy a desarrollar habilidades digitales rentables</p>
+            <p className="text-lg font-light text-muted-foreground">Empieza hoy a desarrollar habilidades digitales rentables</p>
           </div>
 
-          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:items-stretch">
-            <Card className="relative flex overflow-hidden border-2 border-blue-500/50 bg-gray-950 shadow-2xl shadow-blue-500/20">
-              <div className="absolute right-4 top-4">
-                <Badge className="bg-blue-600 text-xs font-semibold">Más Popular</Badge>
+          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2">
+            {/* Plan Mensual */}
+            <Card className="relative flex flex-col border-2 border-blue-500/40">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
+                  Plan Mensual
+                </Badge>
               </div>
-              <CardContent className="flex w-full flex-col p-8">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold">Suscripción Mensual</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-blue-400">$9.99</span>
-                    <span className="text-muted-foreground">/mes</span>
+              <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
+                <div className="space-y-2 text-center">
+                  <h3 className="text-xl font-light text-blue-400">Plan Mensual</h3>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-6xl font-light">$9.99</span>
+                    <span className="text-xl text-muted-foreground">/ mes</span>
                   </div>
+                  <p className="text-sm font-light text-muted-foreground">Sin permanencia. Cancela cuando quieras.</p>
                 </div>
-                <ul className="mt-8 space-y-3">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Acceso a todos los campus</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Red privada de estudiantes</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Actualizaciones diarias</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Cancela cuando quieras</span>
-                  </li>
+                <ul className="flex-1 space-y-3">
+                  {[
+                    "Acceso completo a los 5 campus especializados",
+                    "Contenido nuevo cada semana con estrategias actuales",
+                    "Comunidad privada de emprendedores para aprender y conectar",
+                    "Plantillas, recursos y herramientas listas para usar",
+                    "Mentorías grupales y sesiones en vivo para resolver dudas",
+                    "Soporte dentro de la plataforma cuando lo necesites",
+                    "Garantía de devolución de 7 días",
+                  ].map((b, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                      <span className="text-sm font-light text-foreground/80">{b}</span>
+                    </li>
+                  ))}
                 </ul>
-                <div className="mt-auto pt-8">
+                <div className="mt-auto space-y-3">
                   <Button
-                    className="h-12 w-full bg-blue-600 font-medium transition-transform hover:scale-105"
+                    className="w-full bg-blue-600 py-5 text-base hover:bg-blue-700"
                     onClick={async () => {
                       try { await handleSubscription('mensual') }
                       catch (e: any) { toast.error(e.message) }
                     }}
                   >
-                    Acceder ahora
+                    Elegir este plan
                   </Button>
+                  <p className="text-center text-xs text-muted-foreground">Garantía de devolución de 7 días</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="flex overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
-              <CardContent className="flex w-full flex-col p-8">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold">Acceso Completo</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-blue-400">$2,500</span>
-                    <span className="text-muted-foreground">único</span>
+            {/* Plan Anual */}
+            <Card className="relative flex flex-col border-2 border-foreground/20">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <Badge className="bg-orange-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
+                  Plan Recomendado
+                </Badge>
+              </div>
+              <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
+                <div className="space-y-2 text-center">
+                  <h3 className="text-xl font-light text-foreground">Plan Completo Anual</h3>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-6xl font-light">$2,500</span>
+                    <span className="text-xl text-muted-foreground">/ año</span>
                   </div>
+                  <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
+                  <p className="text-sm font-light text-green-600 dark:text-green-400">Valor real superior a $7,000</p>
                 </div>
-                <ul className="mt-8 space-y-3">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Acceso de por vida</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Acceso a todos los campus</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Red privada de estudiantes</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Actualizaciones diarias</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Futuros campus incluidos</span>
-                  </li>
+                <ul className="flex-1 space-y-3">
+                  {[
+                    "Incluye todo lo del plan mensual durante 12 meses completos",
+                    "Mentoría privada 1 a 1 cada mes para trabajar tu negocio",
+                    "Auditoría estratégica completa para detectar oportunidades",
+                    "Plan de crecimiento personalizado paso a paso",
+                    "Revisión de campañas y estrategias con feedback directo",
+                    "Biblioteca premium de recursos, sistemas y funnels",
+                    "Grupo VIP exclusivo de networking estratégico",
+                    "Acceso prioritario a nuevos campus, programas y actualizaciones",
+                  ].map((b, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
+                      <span className="text-sm font-light text-foreground/80">{b}</span>
+                    </li>
+                  ))}
                 </ul>
-                <div className="mt-auto pt-8">
+                <div className="mt-auto space-y-3">
                   <Button
-                    className="h-12 w-full bg-red-600 font-medium transition-transform hover:scale-105"
+                    className="w-full bg-orange-600 py-5 text-base hover:bg-orange-700"
                     onClick={async () => {
                       try { await handleSubscription('anual') }
                       catch (e: any) { toast.error(e.message) }
                     }}
                   >
-                    Acceder ahora
+                    Elegir este plan
                   </Button>
+                  <p className="text-center text-xs text-muted-foreground">Renovación anual automática, cancela antes de que venza</p>
                 </div>
               </CardContent>
             </Card>
