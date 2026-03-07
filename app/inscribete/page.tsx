@@ -130,7 +130,7 @@ function InscribetePage() {
             <Card className="relative flex flex-col border-2 border-blue-500/40">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
-                  🔹 Plan Mensual
+                  Plan Mensual
                 </Badge>
               </div>
               <CardContent className="flex flex-col gap-6 p-8 pt-10">
@@ -171,7 +171,7 @@ function InscribetePage() {
             <Card className="relative flex flex-col border-2 border-white/20">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-orange-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
-                  🔥 Plan Recomendado
+                  Plan Recomendado
                 </Badge>
               </div>
               <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
@@ -182,7 +182,7 @@ function InscribetePage() {
                     <span className="text-xl text-muted-foreground">/ año</span>
                   </div>
                   <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
-                  <p className="text-sm font-light text-green-400">💰 Valor real superior a $7,000</p>
+                  <p className="text-sm font-light text-green-400">Valor real superior a $7,000</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
