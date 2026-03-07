@@ -167,7 +167,7 @@ export default function InscribetePage() {
       <footer className="border-t border-border py-10">
         <div className="container mx-auto px-6 text-center">
           <p className="text-sm font-light text-muted-foreground">
-            &copy; 2024 DigiCash Academy. Todos los derechos reservados.
+    DigiCash Academy {new Date().getFullYear()}. Todos los derechos reservados.
           </p>
         </div>
       </footer>
