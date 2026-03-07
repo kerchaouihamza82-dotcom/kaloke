@@ -421,12 +421,12 @@ export default function LandingPage() {
               </div>
               <CardContent className="flex flex-1 flex-col p-8">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold text-blue-400">Suscripción Mensual</h3>
+                  <h3 className="text-2xl font-semibold text-blue-500 dark:text-blue-400">Suscripción Mensual</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-blue-50">$9.99</span>
+                    <span className="text-4xl font-bold text-blue-600 dark:text-blue-300">$9.99</span>
                     <span className="text-muted-foreground">/mes</span>
                   </div>
-                  <p className="text-sm text-blue-400/70">Cancela cuando quieras</p>
+                  <p className="text-sm text-blue-500/70 dark:text-blue-400/70">Cancela cuando quieras</p>
                 </div>
                 <ul className="mt-8 flex-1 space-y-3">
                   <li className="flex items-start gap-3">
@@ -467,12 +467,12 @@ export default function LandingPage() {
               </div>
               <CardContent className="flex flex-1 flex-col p-8">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold text-amber-400">Plan Completo Anual</h3>
+                  <h3 className="text-2xl font-semibold text-amber-600 dark:text-amber-400">Plan Completo Anual</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-amber-50">$2,500</span>
+                    <span className="text-4xl font-bold text-amber-700 dark:text-amber-300">$2,500</span>
                     <span className="text-muted-foreground">/año</span>
                   </div>
-                  <p className="text-sm text-amber-400/70">Equivale a solo $208 al mes</p>
+                  <p className="text-sm text-amber-600/70 dark:text-amber-400/70">Equivale a solo $208 al mes</p>
                 </div>
                 <ul className="mt-8 flex-1 space-y-3">
                   <li className="flex items-start gap-3">

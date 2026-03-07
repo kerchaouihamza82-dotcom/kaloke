@@ -63,6 +63,9 @@ export default function InscribetePage() {
       <header className="border-b border-border bg-background/60 backdrop-blur-xl">
         <div className="container mx-auto flex h-20 items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 font-bold text-white shadow-lg shadow-blue-500/25">
+              D
+            </div>
             <span className="text-xl font-light tracking-wide">DigiCash Academy</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -97,12 +100,12 @@ export default function InscribetePage() {
               </div>
               <CardContent className="flex flex-1 flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-blue-400">Plan Mensual</h2>
+                  <h2 className="text-xl font-light text-blue-500 dark:text-blue-400">Plan Mensual</h2>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-6xl font-light text-blue-50">$9.99</span>
+                    <span className="text-6xl font-light text-blue-600 dark:text-blue-300">$9.99</span>
                     <span className="text-xl text-muted-foreground">/ mes</span>
                   </div>
-                  <p className="text-sm font-light text-blue-400/70">Cancela cuando quieras</p>
+                  <p className="text-sm font-light text-blue-500/70 dark:text-blue-400/70">Cancela cuando quieras</p>
                 </div>
                 <ul className="flex-1 space-y-3">
                   {MENSUAL_BENEFITS.map((b, i) => (
@@ -133,12 +136,12 @@ export default function InscribetePage() {
               </div>
               <CardContent className="flex flex-1 flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-amber-400">Plan Completo Anual</h2>
+                  <h2 className="text-xl font-light text-amber-600 dark:text-amber-400">Plan Completo Anual</h2>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-6xl font-light text-amber-50">$2,500</span>
+                    <span className="text-6xl font-light text-amber-700 dark:text-amber-300">$2,500</span>
                     <span className="text-xl text-muted-foreground">/ año</span>
                   </div>
-                  <p className="text-sm font-light text-amber-400/70">Equivale a solo $208 al mes</p>
+                  <p className="text-sm font-light text-amber-600/70 dark:text-amber-400/70">Equivale a solo $208 al mes</p>
                 </div>
                 <ul className="flex-1 space-y-3">
                   {ANUAL_BENEFITS.map((b, i) => (
