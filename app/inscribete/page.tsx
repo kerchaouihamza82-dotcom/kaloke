@@ -91,7 +91,6 @@ export default function InscribetePage() {
           </div>
 
           <div className="grid items-stretch gap-8 lg:grid-cols-2">
-            {/* Plan Mensual */}
             <Card className="relative flex flex-col border-2 border-blue-500/60 bg-gradient-to-b from-blue-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-blue-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
@@ -127,7 +126,6 @@ export default function InscribetePage() {
               </CardContent>
             </Card>
 
-            {/* Plan Completo Anual */}
             <Card className="relative flex flex-col border-2 border-amber-500/60 bg-gradient-to-b from-amber-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-amber-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-black">
