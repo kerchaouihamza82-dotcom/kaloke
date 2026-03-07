@@ -87,14 +87,15 @@ export default function InscribetePage() {
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2">
-            <Card className="relative flex flex-col border-2 border-blue-500/40">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+          <div className="grid items-stretch gap-8 lg:grid-cols-2">
+            {/* Plan Mensual */}
+            <Card className="relative flex flex-col border-2 border-blue-500/40 pt-4">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
                   Recomendado
                 </Badge>
               </div>
-              <CardContent className="flex flex-col gap-6 p-8 pt-10">
+              <CardContent className="flex flex-1 flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
                   <h2 className="text-xl font-light text-blue-400">Plan Mensual</h2>
                   <div className="flex items-baseline justify-center gap-1">
@@ -112,44 +113,49 @@ export default function InscribetePage() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full bg-blue-600 py-5 text-base hover:bg-blue-700"
+                  className="mt-auto w-full bg-blue-600 py-6 text-base font-normal hover:bg-blue-700"
                   disabled={!!loadingPlan}
                   onClick={() => handlePlan('mensual')}
                 >
                   {loadingPlan === 'mensual'
                     ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirigiendo...</>
-                    : 'Empezar mensual'}
+                    : 'Elegir este plan'}
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="flex flex-col border-2 border-border">
-              <CardContent className="flex flex-col gap-6 p-8">
+            {/* Plan Completo Anual */}
+            <Card className="relative flex flex-col border-2 border-amber-500/60 bg-gradient-to-b from-amber-950/20 to-background pt-4">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                <Badge className="bg-amber-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-black">
+                  Mejor valor
+                </Badge>
+              </div>
+              <CardContent className="flex flex-1 flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo Anual</h2>
+                  <h2 className="text-xl font-light text-amber-400">Plan Completo Anual</h2>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-6xl font-light">$2,500</span>
+                    <span className="text-6xl font-light text-amber-50">$2,500</span>
                     <span className="text-xl text-muted-foreground">/ año</span>
                   </div>
-                  <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
+                  <p className="text-sm font-light text-amber-400/70">Equivale a solo $208 al mes</p>
                 </div>
                 <ul className="flex-1 space-y-3">
                   {ANUAL_BENEFITS.map((b, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
                       <span className="text-sm font-light text-foreground/80">{b}</span>
                     </li>
                   ))}
                 </ul>
                 <Button
-                  variant="outline"
-                  className="w-full border-foreground py-5 text-base hover:bg-foreground hover:text-background"
+                  className="mt-auto w-full border-amber-500 bg-amber-500 py-6 text-base font-normal text-black hover:bg-amber-400"
                   disabled={!!loadingPlan}
                   onClick={() => handlePlan('anual')}
                 >
                   {loadingPlan === 'anual'
                     ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirigiendo...</>
-                    : 'Empezar anual'}
+                    : 'Elegir este plan'}
                 </Button>
               </CardContent>
             </Card>
