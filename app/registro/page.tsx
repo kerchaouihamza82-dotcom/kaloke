@@ -51,7 +51,7 @@ function RegistroForm() {
       // Build redirect URL — after email confirmation, land on /inscribete if plan pending
       const pendingPlan = localStorage.getItem('pendingPlan')
       const emailRedirectTo = pendingPlan
-        ? `${window.location.origin}/inscribete?plan=${pendingPlan}`
+        ? `${window.location.origin}/pricing?plan=${pendingPlan}`
         : `${window.location.origin}/dashboard`
 
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -111,7 +111,7 @@ function RegistroForm() {
           }
         } else if (pendingPlan === 'mensual' || pendingPlan === 'anual') {
           // Plan came from URL param, no priceId saved — redirect to /inscribete to pick plan
-          router.push('/inscribete')
+          router.push('/pricing')
           return
         } else {
           router.push('/dashboard')

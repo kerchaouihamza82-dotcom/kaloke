@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       mode: 'subscription',
       line_items: [{ price: product.stripePriceId, quantity: 1 }],
       success_url: `${APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${APP_URL}/inscribete`,
+      cancel_url: `${APP_URL}/pricing`,
       metadata: { productId: product.id },
       subscription_data: { metadata: { productId: product.id } },
     })

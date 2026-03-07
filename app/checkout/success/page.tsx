@@ -13,7 +13,7 @@ function SuccessContent() {
 
   useEffect(() => {
     if (!searchParams.get('session_id')) {
-      router.push('/inscribete')
+      router.push('/pricing')
       return
     }
     // Redirigir al dashboard tras 3 segundos

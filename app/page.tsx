@@ -67,7 +67,7 @@ export default function LandingPage() {
             <a href="#información" className="text-sm font-medium transition-colors hover:text-blue-400">Información</a>
             <AuthNavButton />
             <ThemeToggle />
-            <Link href="/inscribete">
+            <Link href="/pricing">
               <Button className="h-10 bg-red-600 px-6 font-medium transition-transform hover:scale-105">
                 {'Inscríbete Ahora'}
               </Button>
@@ -75,7 +75,7 @@ export default function LandingPage() {
           </nav>
           <div className="flex items-center gap-3 lg:hidden">
             <ThemeToggle />
-            <Link href="/inscribete">
+            <Link href="/pricing">
               <Button className="h-10 bg-red-600 px-4 transition-transform hover:scale-105">Inscríbete</Button>
             </Link>
           </div>
