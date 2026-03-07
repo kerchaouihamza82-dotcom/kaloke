@@ -168,10 +168,10 @@ function InscribetePage() {
             </Card>
 
             {/* Plan Completo */}
-            <Card className="flex flex-col border border-border">
+            <Card className="flex flex-col border-2 border-white/20">
               <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo Anual</h2>
+                  <h2 className="text-xl font-light text-white/90">Plan Completo Anual</h2>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-6xl font-light">$2,500</span>
                     <span className="text-xl text-muted-foreground">/ año</span>
@@ -182,7 +182,7 @@ function InscribetePage() {
                 <ul className="flex-1 space-y-3">
                   {ANUAL_BENEFITS.map((b, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-white/70" />
                       <span className="text-sm font-light text-foreground/80">{b}</span>
                     </li>
                   ))}
