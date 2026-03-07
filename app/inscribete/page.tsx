@@ -16,24 +16,24 @@ const PRODUCT_IDS: Record<string, string> = {
 }
 
 const MENSUAL_BENEFITS: string[] = [
-  "Acceso a los 5 campus especializados",
-  "Contenido actualizado diariamente a las 8 a.m.",
-  "Comunidad privada de mas de 100 estudiantes",
-  "Recursos descargables y plantillas",
-  "Acceso a llamadas en vivo y mentorias",
-  "Soporte prioritario",
-  "Sin permanencia, cancela cuando quieras",
+  "Acceso completo a los 5 campus especializados.",
+  "Contenido nuevo cada semana con estrategias actuales.",
+  "Comunidad privada de emprendedores para aprender y conectar.",
+  "Plantillas, recursos y herramientas listas para usar.",
+  "Mentorías grupales y sesiones en vivo para resolver dudas.",
+  "Soporte dentro de la plataforma cuando lo necesites.",
+  "Cancela cuando quieras, sin permanencia.",
 ]
 
 const ANUAL_BENEFITS: string[] = [
-  "Todo lo del plan mensual",
-  "Acceso durante 12 meses completos",
-  "Todas las actualizaciones del año incluidas",
-  "Sesiones de mentoría 1 a 1 mensuales",
-  "Acceso prioritario a nuevos campus",
-  "Certificados de finalización",
-  "Grupo VIP exclusivo",
-  "Ahorra más de $1,500 al año frente al mensual",
+  "Incluye todo el plan mensual durante 12 meses completos.",
+  "Mentoría privada 1 a 1 cada mes para trabajar tu negocio.",
+  "Auditoría estratégica completa de tu proyecto.",
+  "Plan de crecimiento personalizado paso a paso.",
+  "Revisión de campañas y estrategias con feedback directo.",
+  "Biblioteca premium de recursos y funnels profesionales.",
+  "Grupo VIP de networking con emprendedores avanzados.",
+  "Acceso prioritario a nuevos programas y actualizaciones.",
 ]
 
 const CHECKOUT_URL = '/api/checkout'
