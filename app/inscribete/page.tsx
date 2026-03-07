@@ -13,7 +13,7 @@ const PRODUCT_IDS: Record<string, string> = {
   anual: 'plan-completo',
 }
 
-const MENSUAL_BENEFITS: string[] = [
+const MENSUAL_BENEFITS = [
   "Acceso a los 5 campus especializados",
   "Contenido actualizado diariamente a las 8 a.m.",
   "Comunidad privada de mas de 100 estudiantes",
@@ -23,7 +23,7 @@ const MENSUAL_BENEFITS: string[] = [
   "Sin permanencia, cancela cuando quieras",
 ]
 
-const ANUAL_BENEFITS: string[] = [
+const ANUAL_BENEFITS = [
   "Todo lo del plan mensual",
   "Acceso durante 12 meses completos",
   "Todas las actualizaciones del año incluidas",
@@ -34,7 +34,7 @@ const ANUAL_BENEFITS: string[] = [
   "Ahorra más de $1,500 al año frente al mensual",
 ]
 
-function InscribetePage() {
+export default function InscribetePage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
 
   const handlePlan = async (plan: 'mensual' | 'anual') => {
@@ -52,7 +52,7 @@ function InscribetePage() {
       }
       window.location.assign(data.url)
     } catch (err: any) {
-      toast.error(err?.message || 'No se pudo iniciar el pago, intenta nuevamente')
+      toast.error(err?.message || 'No se pudo iniciar el pago')
     } finally {
       setLoadingPlan(null)
     }
@@ -67,14 +67,11 @@ function InscribetePage() {
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/login">
-              <Button variant="outline" size="sm" className="font-light">
-                Iniciar sesión
-              </Button>
+              <Button variant="outline" size="sm" className="font-light">Iniciar sesión</Button>
             </Link>
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2 font-light">
-                <ArrowLeft className="h-4 w-4" />
-                Volver
+                <ArrowLeft className="h-4 w-4" />Volver
               </Button>
             </Link>
           </div>
@@ -84,14 +81,13 @@ function InscribetePage() {
       <main className="container mx-auto px-6 py-24">
         <div className="mx-auto max-w-5xl">
           <div className="mb-16 space-y-4 text-center">
-            <h1 className="text-5xl font-light tracking-tight">Elige tu plan</h1>
+            <h1 className="text-5xl font-light tracking-tight text-balance">Elige tu plan</h1>
             <p className="text-lg font-light text-muted-foreground">
               Paga y accede de inmediato. Sin necesidad de crear cuenta primero.
             </p>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-2">
-            {/* Plan Mensual */}
             <Card className="relative flex flex-col border-2 border-blue-500/40">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
@@ -127,7 +123,6 @@ function InscribetePage() {
               </CardContent>
             </Card>
 
-            {/* Plan Anual */}
             <Card className="flex flex-col border-2 border-border">
               <CardContent className="flex flex-col gap-6 p-8">
                 <div className="space-y-2 text-center">
@@ -172,5 +167,3 @@ function InscribetePage() {
     </div>
   )
 }
-
-export default InscribetePage
