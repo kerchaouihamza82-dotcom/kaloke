@@ -29,14 +29,24 @@ function SuccessContent() {
             <CheckCircle2 className="h-16 w-16 text-green-500" />
           </div>
           <h1 className="mb-2 text-3xl font-light">¡Pago exitoso!</h1>
-          <p className="mb-8 text-muted-foreground">
-            Tu suscripción ha sido activada. Redirigiendo al dashboard...
+          <p className="mb-2 text-muted-foreground">
+            Tu suscripción ha sido activada.
           </p>
-          <Link href="/dashboard">
-            <Button className="w-full" size="lg">
-              Ir al Dashboard
-            </Button>
-          </Link>
+          <p className="mb-8 text-sm text-muted-foreground">
+            Si es tu primera vez, revisa tu email para crear tu contraseña.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link href="/dashboard">
+              <Button className="w-full" size="lg">
+                Ir al Dashboard
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="w-full" size="lg">
+                Iniciar sesión
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
