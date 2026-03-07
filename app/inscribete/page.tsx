@@ -188,7 +188,7 @@ function InscribetePage() {
                 <ul className="flex-1 space-y-3">
                   {ANUAL_BENEFITS.map((b, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-white/70" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-white" />
                       <span className="text-sm font-light text-foreground/80">{b}</span>
                     </li>
                   ))}
