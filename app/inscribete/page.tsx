@@ -196,8 +196,7 @@ function InscribetePage() {
 
                 <div className="mt-auto space-y-3">
                   <Button
-                    variant="outline"
-                    className="w-full py-5 text-base"
+                    className="w-full bg-orange-600 py-5 text-base hover:bg-orange-700"
                     onClick={() => onSelectPlan('anual')}
                     disabled={loadingPlan === 'anual'}
                   >
