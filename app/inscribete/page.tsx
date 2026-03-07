@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 
-export default function InscribetePage() {
+// Redirect to pricing page
+export default function Page() {
   redirect('/pricing')
 }
