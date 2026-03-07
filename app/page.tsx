@@ -414,90 +414,97 @@ export default function LandingPage() {
           </div>
 
           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:items-stretch">
-            <Card className="relative flex overflow-hidden border-2 border-blue-500/50 bg-gray-950 shadow-2xl shadow-blue-500/20">
+            {/* Plan Mensual */}
+            <Card className="relative flex flex-col overflow-hidden border-2 border-blue-500/60 bg-gradient-to-b from-blue-950/20 to-background shadow-2xl shadow-blue-500/10">
               <div className="absolute right-4 top-4">
-                <Badge className="bg-blue-600 text-xs font-semibold">Más Popular</Badge>
+                <Badge className="bg-blue-500 text-xs font-semibold text-white">Más Popular</Badge>
               </div>
-              <CardContent className="flex w-full flex-col p-8">
+              <CardContent className="flex flex-1 flex-col p-8">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold">Suscripción Mensual</h3>
+                  <h3 className="text-2xl font-semibold text-blue-400">Suscripción Mensual</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-blue-400">$9.99</span>
+                    <span className="text-4xl font-bold text-blue-50">$9.99</span>
                     <span className="text-muted-foreground">/mes</span>
                   </div>
+                  <p className="text-sm text-blue-400/70">Cancela cuando quieras</p>
                 </div>
-                <ul className="mt-8 space-y-3">
+                <ul className="mt-8 flex-1 space-y-3">
                   <li className="flex items-start gap-3">
                     <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Acceso a todos los campus</span>
+                    <span className="text-foreground/80">Acceso a todos los campus</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Red privada de estudiantes</span>
+                    <span className="text-foreground/80">Red privada de estudiantes</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Actualizaciones diarias</span>
+                    <span className="text-foreground/80">Actualizaciones diarias</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Cancela cuando quieras</span>
+                    <span className="text-foreground/80">Cancela cuando quieras</span>
                   </li>
                 </ul>
                 <div className="mt-auto pt-8">
                   <Button
-                    className="h-12 w-full bg-blue-600 font-medium transition-transform hover:scale-105"
+                    className="h-12 w-full bg-blue-500 font-medium text-white transition-transform hover:scale-105 hover:bg-blue-400"
                     onClick={async () => {
                       try { await handleSubscription('mensual') }
                       catch (e: any) { toast.error(e.message) }
                     }}
                   >
-                    Acceder ahora
+                    Elegir este plan
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="flex overflow-hidden border border-border bg-card transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/10">
-              <CardContent className="flex w-full flex-col p-8">
+            {/* Plan Anual */}
+            <Card className="relative flex flex-col overflow-hidden border-2 border-amber-500/60 bg-gradient-to-b from-amber-950/20 to-background shadow-2xl shadow-amber-500/10">
+              <div className="absolute right-4 top-4">
+                <Badge className="bg-amber-500 text-xs font-semibold text-black">Mejor Valor</Badge>
+              </div>
+              <CardContent className="flex flex-1 flex-col p-8">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold">Acceso Completo</h3>
+                  <h3 className="text-2xl font-semibold text-amber-400">Plan Completo Anual</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-blue-400">$2,500</span>
-                    <span className="text-muted-foreground">único</span>
+                    <span className="text-4xl font-bold text-amber-50">$2,500</span>
+                    <span className="text-muted-foreground">/año</span>
                   </div>
+                  <p className="text-sm text-amber-400/70">Equivale a solo $208 al mes</p>
                 </div>
-                <ul className="mt-8 space-y-3">
+                <ul className="mt-8 flex-1 space-y-3">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Acceso de por vida</span>
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+                    <span className="text-foreground/80">Acceso durante 12 meses</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Acceso a todos los campus</span>
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+                    <span className="text-foreground/80">Acceso a todos los campus</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Red privada de estudiantes</span>
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+                    <span className="text-foreground/80">Red privada de estudiantes</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Actualizaciones diarias</span>
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+                    <span className="text-foreground/80">Actualizaciones diarias</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-400" />
-                    <span className="text-gray-300">Futuros campus incluidos</span>
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+                    <span className="text-foreground/80">Futuros campus incluidos</span>
                   </li>
                 </ul>
                 <div className="mt-auto pt-8">
                   <Button
-                    className="h-12 w-full bg-red-600 font-medium transition-transform hover:scale-105"
+                    className="h-12 w-full bg-amber-500 font-medium text-black transition-transform hover:scale-105 hover:bg-amber-400"
                     onClick={async () => {
                       try { await handleSubscription('anual') }
                       catch (e: any) { toast.error(e.message) }
                     }}
                   >
-                    Acceder ahora
+                    Elegir este plan
                   </Button>
                 </div>
               </CardContent>
