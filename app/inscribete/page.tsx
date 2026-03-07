@@ -8,12 +8,12 @@ import { Check, ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
-const PRODUCT_IDS: Record<string, string> = {
+const PLANS = {
   mensual: 'plan-mensual',
   anual: 'plan-completo',
 }
 
-const MENSUAL_BENEFITS = [
+const BENEFITS_MENSUAL = [
   "Acceso a los 5 campus especializados",
   "Contenido actualizado diariamente a las 8 a.m.",
   "Comunidad privada de mas de 100 estudiantes",
@@ -23,7 +23,7 @@ const MENSUAL_BENEFITS = [
   "Sin permanencia, cancela cuando quieras",
 ]
 
-const ANUAL_BENEFITS = [
+const BENEFITS_ANUAL = [
   "Todo lo del plan mensual",
   "Acceso durante 12 meses completos",
   "Todas las actualizaciones del año incluidas",
@@ -34,28 +34,27 @@ const ANUAL_BENEFITS = [
   "Ahorra más de $1,500 al año frente al mensual",
 ]
 
-export default function InscribetePage() {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+export default function PricingPage() {
+  const [loading, setLoading] = useState<string | null>(null)
 
-  const handlePlan = async (plan: 'mensual' | 'anual') => {
-    setLoadingPlan(plan)
+  async function selectPlan(plan: 'mensual' | 'anual') {
+    setLoading(plan)
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: PRODUCT_IDS[plan] }),
+        body: JSON.stringify({ productId: PLANS[plan] }),
       })
       const data = await res.json()
       if (!res.ok || !data?.url) {
-        toast.error(data?.error || 'No se pudo iniciar el pago')
+        toast.error(data?.error || 'Error al iniciar el pago')
         return
       }
-      window.location.assign(data.url)
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'No se pudo iniciar el pago'
-      toast.error(message)
+      window.location.href = data.url
+    } catch {
+      toast.error('Error al conectar con el servidor')
     } finally {
-      setLoadingPlan(null)
+      setLoading(null)
     }
   }
 
@@ -92,8 +91,7 @@ export default function InscribetePage() {
           </div>
 
           <div className="grid items-stretch gap-8 lg:grid-cols-2">
-            {/* Plan Mensual */}
-            <Card className="relative flex flex-col border-2 border-blue-500/60 bg-gradient-to-b from-blue-950/20 to-background pt-4">
+            <Card className="relative flex flex-col overflow-hidden border-2 border-blue-500/60 bg-gradient-to-b from-blue-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-blue-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
                   Recomendado
@@ -109,7 +107,7 @@ export default function InscribetePage() {
                   <p className="text-sm font-light text-blue-500/70 dark:text-blue-400/70">Cancela cuando quieras</p>
                 </div>
                 <ul className="flex-1 space-y-3">
-                  {MENSUAL_BENEFITS.map((b, i) => (
+                  {BENEFITS_MENSUAL.map((b, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
                       <span className="text-sm font-light text-foreground/80">{b}</span>
@@ -118,18 +116,15 @@ export default function InscribetePage() {
                 </ul>
                 <Button
                   className="mt-auto w-full border-blue-500 bg-blue-500 py-6 text-base font-normal text-white hover:bg-blue-400"
-                  disabled={!!loadingPlan}
-                  onClick={() => handlePlan('mensual')}
+                  disabled={!!loading}
+                  onClick={() => selectPlan('mensual')}
                 >
-                  {loadingPlan === 'mensual'
-                    ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirigiendo...</>
-                    : 'Elegir este plan'}
+                  {loading === 'mensual' ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirigiendo...</> : 'Elegir este plan'}
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Plan Completo Anual */}
-            <Card className="relative flex flex-col border-2 border-amber-500/60 bg-gradient-to-b from-amber-950/20 to-background pt-4">
+            <Card className="relative flex flex-col overflow-hidden border-2 border-amber-500/60 bg-gradient-to-b from-amber-950/20 to-background pt-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <Badge className="bg-amber-500 px-5 py-1 text-xs font-medium uppercase tracking-widest text-black">
                   Mejor valor
@@ -145,7 +140,7 @@ export default function InscribetePage() {
                   <p className="text-sm font-light text-amber-600/70 dark:text-amber-400/70">Equivale a solo $208 al mes</p>
                 </div>
                 <ul className="flex-1 space-y-3">
-                  {ANUAL_BENEFITS.map((b, i) => (
+                  {BENEFITS_ANUAL.map((b, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
                       <span className="text-sm font-light text-foreground/80">{b}</span>
@@ -154,12 +149,10 @@ export default function InscribetePage() {
                 </ul>
                 <Button
                   className="mt-auto w-full border-amber-500 bg-amber-500 py-6 text-base font-normal text-black hover:bg-amber-400"
-                  disabled={!!loadingPlan}
-                  onClick={() => handlePlan('anual')}
+                  disabled={!!loading}
+                  onClick={() => selectPlan('anual')}
                 >
-                  {loadingPlan === 'anual'
-                    ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirigiendo...</>
-                    : 'Elegir este plan'}
+                  {loading === 'anual' ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Redirigiendo...</> : 'Elegir este plan'}
                 </Button>
               </CardContent>
             </Card>
