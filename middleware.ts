@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
         .maybeSingle()
 
       if (!userProfile?.has_access) {
-        return NextResponse.redirect(new URL('/pricing', request.url))
+        return NextResponse.redirect(new URL('/inscribete', request.url))
       }
     }
   }
