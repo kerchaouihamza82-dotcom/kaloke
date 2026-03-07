@@ -26,6 +26,26 @@ import { AuthNavButton } from "@/components/auth-nav-button"
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
+  const handleSubscription = async (plan: 'mensual' | 'anual') => {
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          productId: plan === 'mensual' ? 'plan-mensual' : 'plan-completo' 
+        }),
+      })
+      const data = await res.json()
+      if (data?.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data?.error || 'Error al iniciar pago')
+      }
+    } catch (err: any) {
+      toast.error('Error de conexión')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
