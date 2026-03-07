@@ -16,24 +16,24 @@ const PRODUCT_IDS: Record<string, string> = {
 }
 
 const MENSUAL_BENEFITS: string[] = [
-  "Acceso a los 5 campus especializados",
-  "Contenido actualizado diariamente a las 8 a.m.",
-  "Comunidad privada de mas de 100 estudiantes",
-  "Recursos descargables y plantillas",
-  "Acceso a llamadas en vivo y mentorias",
-  "Soporte prioritario",
-  "Sin permanencia, cancela cuando quieras",
+  "Acceso completo a los 5 campus especializados",
+  "Contenido nuevo cada semana con estrategias actuales",
+  "Comunidad privada de emprendedores para aprender y conectar",
+  "Plantillas, recursos y herramientas listas para usar",
+  "Mentorías grupales y sesiones en vivo para resolver dudas",
+  "Soporte dentro de la plataforma cuando lo necesites",
+  "Garantía de devolución de 7 días",
 ]
 
 const ANUAL_BENEFITS: string[] = [
-  "Todo lo del plan mensual",
-  "Acceso durante 12 meses completos",
-  "Todas las actualizaciones del año incluidas",
-  "Sesiones de mentoría 1 a 1 mensuales",
-  "Acceso prioritario a nuevos campus",
-  "Certificados de finalización",
-  "Grupo VIP exclusivo",
-  "Ahorra más de $1,500 al año frente al mensual",
+  "Incluye todo lo del plan mensual durante 12 meses completos",
+  "Mentoría privada 1 a 1 cada mes para trabajar tu negocio",
+  "Auditoría estratégica completa para detectar oportunidades",
+  "Plan de crecimiento personalizado paso a paso",
+  "Revisión de campañas y estrategias con feedback directo",
+  "Biblioteca premium de recursos, sistemas y funnels",
+  "Grupo VIP exclusivo de networking estratégico",
+  "Acceso prioritario a nuevos campus, programas y actualizaciones",
 ]
 
 const CHECKOUT_URL = '/api/checkout'
@@ -100,7 +100,7 @@ function InscribetePage() {
             ) : (
               <Link href="/login">
                 <Button variant="outline" size="sm" className="font-light">
-                  Iniciar sesi\u00f3n
+                  Iniciar Sesión
                 </Button>
               </Link>
             )}
@@ -130,7 +130,7 @@ function InscribetePage() {
             <Card className="relative flex flex-col border-2 border-blue-500/40">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-blue-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
-                  Recomendado
+                  Plan Mensual
                 </Badge>
               </div>
               <CardContent className="flex flex-col gap-6 p-8 pt-10">
@@ -140,7 +140,7 @@ function InscribetePage() {
                     <span className="text-6xl font-light">$9.99</span>
                     <span className="text-xl text-muted-foreground">/ mes</span>
                   </div>
-                  <p className="text-sm font-light text-muted-foreground">Cancela cuando quieras</p>
+                  <p className="text-sm font-light text-muted-foreground">Sin permanencia. Cancela cuando quieras.</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
@@ -162,21 +162,27 @@ function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">7 d\u00edas de garant\u00eda de devoluci\u00f3n</p>
+                  <p className="text-center text-xs text-muted-foreground">Garantía de devolución de 7 días</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Plan Completo */}
-            <Card className="flex flex-col border border-border">
-              <CardContent className="flex flex-col gap-6 p-8">
+            <Card className="relative flex flex-col border-2 border-foreground/20">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <Badge className="bg-orange-600 px-5 py-1 text-xs font-medium uppercase tracking-widest text-white">
+                  Plan Recomendado
+                </Badge>
+              </div>
+              <CardContent className="flex h-full flex-col gap-6 p-8 pt-10">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-xl font-light text-muted-foreground">Plan Completo Anual</h2>
+                  <h2 className="text-xl font-light text-foreground">Plan Completo Anual</h2>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-6xl font-light">$2,500</span>
                     <span className="text-xl text-muted-foreground">/ año</span>
                   </div>
                   <p className="text-sm font-light text-muted-foreground">Equivale a solo $208 al mes</p>
+                  <p className="text-sm font-light text-green-600 dark:text-green-400">Valor real superior a $7,000</p>
                 </div>
 
                 <ul className="flex-1 space-y-3">
@@ -188,10 +194,9 @@ function InscribetePage() {
                   ))}
                 </ul>
 
-                <div className="space-y-3">
+                <div className="mt-auto space-y-3">
                   <Button
-                    variant="outline"
-                    className="w-full border-foreground py-5 text-base hover:bg-foreground hover:text-background"
+                    className="w-full bg-orange-600 py-5 text-base hover:bg-orange-700"
                     onClick={() => onSelectPlan('anual')}
                     disabled={loadingPlan === 'anual'}
                   >
@@ -199,7 +204,7 @@ function InscribetePage() {
                       ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
                       : 'Elegir este plan'}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">Renovación anual, cancela antes de que venza</p>
+                  <p className="text-center text-xs text-muted-foreground">Renovación anual automática, cancela antes de que venza</p>
                 </div>
               </CardContent>
             </Card>
